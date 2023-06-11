@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @brief The heart and soul of the project (plus some type definitions)
+ * @brief The heart and soul of the project (plus some type definitions).
  */
 
 #include "pch.hpp"
