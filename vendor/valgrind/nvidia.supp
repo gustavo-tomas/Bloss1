@@ -1,0 +1,26 @@
+{
+   nvidia
+   Memcheck:ReallocZero
+   fun:realloc
+   obj:/usr/lib/libnvidia-glcore.so.530.41.03
+   obj:/usr/lib/libGLX_nvidia.so.530.41.03
+   obj:/usr/lib/libGLX_nvidia.so.530.41.03
+   obj:/usr/lib/libGLX_nvidia.so.530.41.03
+}
+
+{
+   nvidia
+   Memcheck:ReallocZero
+   fun:realloc
+   obj:/usr/lib/libnvidia-eglcore.so.530.41.03
+   obj:/usr/lib/libnvidia-eglcore.so.530.41.03
+   obj:/usr/lib/libnvidia-eglcore.so.530.41.03
+   obj:/usr/lib/libnvidia-eglcore.so.530.41.03
+   fun:NvGlEglApiInit
+   obj:/usr/lib/libEGL_nvidia.so.530.41.03
+   obj:/usr/lib/libEGL_nvidia.so.530.41.03
+   obj:/usr/lib/libEGL_nvidia.so.530.41.03
+   obj:/usr/lib/libEGL_nvidia.so.530.41.03
+   obj:/usr/lib/libEGL_nvidia.so.530.41.03
+   fun:loadEGLExternalPlatform
+}

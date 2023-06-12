@@ -22,9 +22,8 @@ project "bloss1"
         pic "On"
 
     filter "configurations:debug"
-        buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
-        linkoptions { "-fsanitize=address" }
-        defines { "_DEBUG" }
+        buildoptions { "-Wall", "-Wextra" }
+        defines { "_DEBUG", "_OPENGL" }
         symbols "On" -- '-g'
         runtime "Debug"
 
