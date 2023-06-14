@@ -6,64 +6,62 @@
  */
 
 #include "core/core.hpp"
+#include "ecs/components.hpp"
+
+#define MAX_ENTITY_ID 100005U
 
 namespace bls
 {
     // Forward declaration
-    struct component;
-    struct entity;
-    struct world;
-
-    // Component: contain the data
-    struct component
-    {
-        virtual ~component() { };
-    };
-
-    // Entity: container of components
-    struct entity
-    {
-        ~entity()
-        {
-            for (auto& [name, cmp] : components)
-                delete cmp;
-
-            components.clear();
-        }
-
-        std::map<str, component*> components = { };
-    };
+    class Component;
+    class ECS;
 
     // System: the logic bits
-    typedef void (*system) (const world& wrld, const f32 dt);
+    typedef void (*System) (ECS& ecs, const f32& dt);
 
-    // World: container of the systems and entities
-    struct world
+    // ECS: container of the systems and entities
+    class ECS
     {
-        ~world()
-        {
-            systems.clear();
-            entities.clear();
+        public:
+            ECS()
+                : id_counter(0) { }
 
-            std::cout << "world destroyed successfully\n";
-        }
+            ~ECS()
+            {
+                systems.clear();
+                transforms.clear();
+                models.clear();
 
-        std::vector<system> systems = { };
-        std::vector<std::unique_ptr<entity>> entities = { };
+                std::cout << "world destroyed successfully\n";
+            }
+
+            // Return a new id (create a new entity)
+            u32 get_id()
+            {
+                if (id_counter >= MAX_ENTITY_ID)
+                {
+                    std::cerr << "id_counter reached maximum id\n";
+                    exit(1);
+                }
+                return id_counter++;
+            }
+
+            // Register a system
+            void add_system(System system)
+            {
+                systems.push_back(system);
+            }
+
+            // Registered systems
+            std::vector<System> systems;
+
+            // Table of components
+            // @TODO: use templates or smth
+            std::map<u32, std::unique_ptr<Transform>> transforms;
+            std::map<u32, std::unique_ptr<Model>> models;
+
+        private:
+            // Entities IDs
+            u32 id_counter;
     };
-
-    world* create_world();
-    entity* create_entity(world& wrld);
-
-    template<typename T, typename... Args>
-    T* create_component(Args... args) { return new T(args...); }
-
-    void add_system(world& wrld, system sys);
-    void add_component_to_entity(entity& ent, const str& name, component& cmp);
-
-    // Query entities with the required components
-    std::vector<entity*> query_entities(const world& wrld, const std::vector<str>& query);
-
-    // Update all the registered systems
-    void update_world(const world& wrld, const f32 dt);
 };

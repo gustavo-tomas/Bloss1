@@ -1,36 +1,66 @@
-#include "game.hpp"
+#include "core/game.hpp"
 #include "ecs/systems.hpp"
+#include "ecs/entities.hpp"
 
 namespace bls
 {
-    game* create_game(const str& title, const u32& width, const u32& height)
+    Game* Game::instance = nullptr;
+
+    Game::Game(const str& title, const u32& width, const u32& height)
     {
-        game* gm = new game(title, width, height);
-        gm->wrld = create_world();
+        if (instance != nullptr)
+        {
+            std::cerr << "there can be only one instance of game\n";
+            exit(1);
+        }
 
-        world* my_world = gm->wrld;
+        instance = this;
 
-        add_system(*my_world, transform_system);
-        add_system(*my_world, render_system);
+        this->title = title;
+        this->width = width;
+        this->height = height;
 
-        entity* my_entity = create_entity(*my_world);
+        // Create ECS
+        ecs = new ECS();
 
-        transform* my_transform = create_component<transform>(10, 20);
-        model* my_model = create_component<model>(200);
+        // Add systems in order of execution
+        ecs->add_system(transform_system);
+        ecs->add_system(render_system);
 
-        add_component_to_entity(*my_entity, "transform", *my_transform);
-        add_component_to_entity(*my_entity, "model", *my_model);
+        // Add some entities
+        u32 e1 = player(*ecs, Transform(10, 20, 30));
+        u32 e2 = player(*ecs, Transform(100, 200, 300));
 
-        return gm;
+        std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
     }
 
-    void destroy_game(const game& gm)
+    Game::~Game()
     {
-        delete &gm;
+        delete ecs;
+
+        std::cout << "game destroyed successfully\n";
     }
 
-    void update_game(const game& gm)
+    Game& Game::get()
     {
-        update_world(*gm.wrld, 0.1f);
+        if (instance == nullptr)
+        {
+            std::cerr << "game instance is nullptr\n";
+            exit(1);
+        }
+
+        return *instance;
+    }
+
+    void Game::run()
+    {
+        // The game loop
+        for (int i = 0; i < 5; i++)
+        {
+            // Update all registered systems in registration order
+            auto& systems = ecs->systems;
+            for (auto& system : systems)
+                system(*ecs, dt);
+        }
     }
 };

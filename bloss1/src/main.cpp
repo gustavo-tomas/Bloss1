@@ -4,9 +4,9 @@ using namespace bls;
 
 int main()
 {
-    game* gm = create_game("Bloss1");
-    update_game(*gm);
-    destroy_game(*gm);
+    Game* game = new Game("Bloss1", 1024, 600);
+    game->run();
+    delete game;
 
     return 0;
 }

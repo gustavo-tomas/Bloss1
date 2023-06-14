@@ -9,29 +9,26 @@
 
 namespace bls
 {
-    struct game
+    class Game
     {
-        game(const str& title, const u32& width, const u32& height)
-        {
-            this->title = title;
-            this->width = width;
-            this->height = height;
-        }
+        public:
+            Game(const str& title, const u32& width, const u32& height);
+            ~Game();
 
-        ~game()
-        {
-            delete wrld;
-            std::cout << "game destroyed successfully\n";
-        }
+            static Game& get(); // im sorry i can change
 
-        world* wrld;
-        str title;
-        u32 width;
-        u32 height;
+            // The game loop
+            void run();
+
+        private:
+            static Game* instance;
+
+            ECS* ecs;
+
+            str title;
+            u32 width;
+            u32 height;
+
+            f32 dt = 0.1f;
     };
-
-    game* create_game(const str& title, const u32& width = 1024, const u32& height = 768);
-    void destroy_game(const game& gm);
-
-    void update_game(const game& gm);
 };
