@@ -1,4 +1,6 @@
 #include "core/game.hpp"
+#include "core/input.hpp"
+#include "core/key_codes.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
 
@@ -18,11 +20,7 @@ namespace bls
         instance = this;
 
         // Create a window
-        window = Window::create(title, width, height);
-
-        this->title = title;
-        this->width = width;
-        this->height = height;
+        window = std::unique_ptr<Window>(Window::create(title, width, height));
 
         // Create ECS
         ecs = new ECS();
@@ -49,20 +47,8 @@ namespace bls
     Game::~Game()
     {
         delete ecs;
-        delete window;
 
         std::cout << "game destroyed successfully\n";
-    }
-
-    Game& Game::get()
-    {
-        if (instance == nullptr)
-        {
-            std::cerr << "game instance is nullptr\n";
-            exit(1);
-        }
-
-        return *instance;
     }
 
     void Game::run()
@@ -83,9 +69,28 @@ namespace bls
             for (auto& system : systems)
                 system(*ecs, dt);
 
+            if (Input::is_key_pressed(KEY_ESCAPE))
+                running = false;
+
             // Update window
             window->update();
         }
+    }
+
+    Game& Game::get()
+    {
+        if (instance == nullptr)
+        {
+            std::cerr << "game instance is nullptr\n";
+            exit(1);
+        }
+
+        return *instance;
+    }
+
+    Window& Game::get_window()
+    {
+        return *window;
     }
 
     void Game::on_window_close(const WindowCloseEvent&)

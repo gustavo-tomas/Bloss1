@@ -17,10 +17,11 @@ namespace bls
             Game(const str& title, const u32& width, const u32& height);
             ~Game();
 
-            static Game& get(); // im sorry i can change
-
             // The game loop
             void run();
+
+            static Game& get(); // im sorry i can change
+            Window& get_window();
 
         private:
             void on_window_close(const WindowCloseEvent& event);
@@ -30,12 +31,8 @@ namespace bls
 
             static Game* instance;
 
-            Window* window;
+            std::unique_ptr<Window> window;
             ECS* ecs;
-
-            str title;
-            u32 width;
-            u32 height;
 
             bool running;
     };
