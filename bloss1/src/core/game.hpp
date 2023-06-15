@@ -35,5 +35,6 @@ namespace bls
             ECS* ecs;
 
             bool running;
+            bool minimized;
     };
 };

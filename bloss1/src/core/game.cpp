@@ -42,6 +42,7 @@ namespace bls
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
 
         running = true;
+        minimized = false;
     }
 
     Game::~Game()
@@ -59,6 +60,10 @@ namespace bls
         // The game loop
         while (running)
         {
+            // Don't render if the application is minimized
+            if (minimized)
+                continue;
+
             // Calculate dt
             current_time = window->get_time();
             dt = current_time - last_time;
