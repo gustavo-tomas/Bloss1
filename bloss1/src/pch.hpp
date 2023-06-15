@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PCH_HPP
+#define PCH_HPP
 
 /**
  * @brief The famous pre-compiled headers.
@@ -12,3 +13,5 @@
 #include <memory>     // Unique ptr
 #include <string>     // Strings!
 #include <vector>     // Vec vec vec
+
+#endif // PCH_HPP

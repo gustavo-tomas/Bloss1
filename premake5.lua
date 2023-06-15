@@ -14,6 +14,8 @@ project "bloss1"
     targetdir ("bin/%{cfg.buildcfg}/%{prj.name}")
     objdir ("bin/build/%{prj.name}")
 
+    pchheader "%{prj.name}/src/pch.hpp"
+
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
 
     includedirs { "%{prj.name}/src" }
