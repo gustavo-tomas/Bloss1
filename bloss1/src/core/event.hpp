@@ -49,7 +49,7 @@ namespace bls
 
     struct WindowResizeEvent : public Event
     {
-        WindowResizeEvent(const i32& width, const i32& height) : width(width), height(height) { }
+        WindowResizeEvent(i32 width, i32 height) : width(width), height(height) { }
 
         i32 width;
         i32 height;
@@ -57,14 +57,14 @@ namespace bls
 
     struct KeyPressEvent : public Event
     {
-        KeyPressEvent(const i32& key) : key(key) { }
+        KeyPressEvent(i32 key) : key(key) { }
 
         i32 key;
     };
 
     struct MouseScrollEvent : public Event
     {
-        MouseScrollEvent(const f64& xoffset, const f64& yoffset) : xoffset(xoffset), yoffset(yoffset) { }
+        MouseScrollEvent(f64 xoffset, f64 yoffset) : xoffset(xoffset), yoffset(yoffset) { }
 
         f64 xoffset;
         f64 yoffset;
