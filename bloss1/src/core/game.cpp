@@ -8,6 +8,7 @@ namespace bls
 
     Game::Game(const str& title, const u32& width, const u32& height)
     {
+        // Create game instance
         if (instance != nullptr)
         {
             std::cerr << "there can be only one instance of game\n";
@@ -15,6 +16,9 @@ namespace bls
         }
 
         instance = this;
+
+        // Create a window
+        window = Window::create(title, width, height);
 
         this->title = title;
         this->width = width;
@@ -32,11 +36,14 @@ namespace bls
         u32 e2 = player(*ecs, Transform(100, 200, 300));
 
         std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
+
+        running = true;
     }
 
     Game::~Game()
     {
         delete ecs;
+        delete window;
 
         std::cout << "game destroyed successfully\n";
     }
@@ -54,13 +61,26 @@ namespace bls
 
     void Game::run()
     {
+        // Time variation
+        f64 last_time = window->get_time(), current_time = 0, dt = 0;
+
         // The game loop
-        for (int i = 0; i < 5; i++)
+        while (running)
         {
-            // Update all registered systems in registration order
+            // Calculate dt
+            current_time = window->get_time();
+            dt = current_time - last_time;
+            last_time = current_time;
+
+            std::cout << "DT: " << dt << "\n";
+
+            // Update all systems in registration order
             auto& systems = ecs->systems;
             for (auto& system : systems)
                 system(*ecs, dt);
+
+            // Update window
+            window->update();
         }
     }
 };

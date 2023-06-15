@@ -5,6 +5,7 @@
  */
 
 #include "core/core.hpp"
+#include "core/window.hpp"
 #include "ecs/ecs.hpp"
 
 namespace bls
@@ -23,12 +24,15 @@ namespace bls
         private:
             static Game* instance;
 
+            Window* window;
             ECS* ecs;
 
             str title;
             u32 width;
             u32 height;
 
-            f32 dt = 0.1f;
+            f32 dt;
+
+            bool running;
     };
 };
