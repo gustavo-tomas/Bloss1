@@ -14,7 +14,10 @@ namespace bls
     class GlfwWindow : public Window
     {
         public:
+            // using EventCallback = std::function<void(Event&)>;
+
             GlfwWindow(const str& title, const u32& width, const u32& height);
+            ~GlfwWindow();
 
             void update() override;
 
@@ -27,8 +30,13 @@ namespace bls
         private:
             GLFWwindow* native_window;
 
-            str title;
-            u32 width;
-            u32 height;
+            struct WindowData
+            {
+                str title;
+                u32 width, height;
+                // EventCallback event_callback;
+            };
+
+            WindowData window_data;
     };
 };

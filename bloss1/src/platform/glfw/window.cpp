@@ -10,6 +10,10 @@ namespace bls
 
     GlfwWindow::GlfwWindow(const str& title, const u32& width, const u32& height)
     {
+        window_data.title = title;
+        window_data.width = width;
+        window_data.height = height;
+
         // Initialize GLFW
         glewExperimental = true;
         if (!glfwInit())
@@ -83,7 +87,7 @@ namespace bls
         glfwSetFramebufferSizeCallback(
             native_window, [](GLFWwindow * window, i32 width, i32 height)
             {
-                WindowResizeEvent event = { width, height };
+                WindowResizeEvent event = { (u32) width, (u32) height };
                 Window* this_window = (Window*) glfwGetWindowUserPointer(window);
                 this_window->fire_event(event);
             });
@@ -95,7 +99,7 @@ namespace bls
                 // Key press
                 if (action == GLFW_PRESS || action == GLFW_REPEAT)
                 {
-                    KeyPressEvent event = { key };
+                    KeyPressEvent event = { (u32) key };
                     Window* this_window = (Window*) glfwGetWindowUserPointer(window);
                     this_window->fire_event(event);
                 }
@@ -111,6 +115,12 @@ namespace bls
             });
     }
 
+    GlfwWindow::~GlfwWindow()
+    {
+        glfwTerminate();
+        std::cout << "glfw window destroyed successfully\n";
+    }
+
     void GlfwWindow::update()
     {
         // Poll events
@@ -122,12 +132,12 @@ namespace bls
 
     u32 GlfwWindow::get_width() const
     {
-        return width;
+        return window_data.width;
     }
 
     u32 GlfwWindow::get_height() const
     {
-        return height;
+        return window_data.height;
     }
 
     f64 GlfwWindow::get_time() const

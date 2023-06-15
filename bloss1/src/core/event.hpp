@@ -49,17 +49,17 @@ namespace bls
 
     struct WindowResizeEvent : public Event
     {
-        WindowResizeEvent(i32 width, i32 height) : width(width), height(height) { }
+        WindowResizeEvent(u32 width, u32 height) : width(width), height(height) { }
 
-        i32 width;
-        i32 height;
+        u32 width;
+        u32 height;
     };
 
     struct KeyPressEvent : public Event
     {
-        KeyPressEvent(i32 key) : key(key) { }
+        KeyPressEvent(u32 key) : key(key) { }
 
-        i32 key;
+        u32 key;
     };
 
     struct MouseScrollEvent : public Event
