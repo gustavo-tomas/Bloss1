@@ -24,3 +24,6 @@ typedef double f64;
 
 // Strings
 typedef std::string str;
+
+// Shorthand to bind event callbacks
+#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)

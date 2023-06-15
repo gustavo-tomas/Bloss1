@@ -1,4 +1,5 @@
 #include "platform/glfw/window.hpp"
+#include "core/event.hpp"
 
 namespace bls
 {
@@ -69,7 +70,45 @@ namespace bls
         // Set callbacks
         glfwSetWindowUserPointer(native_window, this);
 
-        // @TODO: callbacks
+        // Window close callback
+        glfwSetWindowCloseCallback(
+            native_window, [](GLFWwindow * window)
+            {
+                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
+                WindowCloseEvent event = { };
+                this_window->fire_event(event);
+            });
+
+        // Resize callback
+        glfwSetFramebufferSizeCallback(
+            native_window, [](GLFWwindow * window, i32 width, i32 height)
+            {
+                WindowResizeEvent event = { width, height };
+                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
+                this_window->fire_event(event);
+            });
+
+        // Key callback
+        glfwSetKeyCallback(
+            native_window, [](GLFWwindow * window, i32 key, i32, i32 action, i32)
+            {
+                // Key press
+                if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                {
+                    KeyPressEvent event = { key };
+                    Window* this_window = (Window*) glfwGetWindowUserPointer(window);
+                    this_window->fire_event(event);
+                }
+            });
+
+        // Scroll callback
+        glfwSetScrollCallback(
+            native_window, [](GLFWwindow * window, f64 xoffset, f64 yoffset)
+            {
+                MouseScrollEvent event = { xoffset, yoffset };
+                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
+                this_window->fire_event(event);
+            });
     }
 
     void GlfwWindow::update()

@@ -6,6 +6,7 @@
 
 #include "core/core.hpp"
 #include "core/window.hpp"
+#include "core/event.hpp"
 #include "ecs/ecs.hpp"
 
 namespace bls
@@ -22,6 +23,11 @@ namespace bls
             void run();
 
         private:
+            void on_window_close(const WindowCloseEvent& event);
+            void on_window_resize(const WindowResizeEvent& event);
+            void on_key_press(const KeyPressEvent& event);
+            void on_mouse_scroll(const MouseScrollEvent& event);
+
             static Game* instance;
 
             Window* window;
@@ -30,8 +36,6 @@ namespace bls
             str title;
             u32 width;
             u32 height;
-
-            f32 dt;
 
             bool running;
     };

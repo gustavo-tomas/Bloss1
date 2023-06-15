@@ -37,6 +37,12 @@ namespace bls
 
         std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
 
+        // Register callbacks
+        EventSystem::register_callback<WindowCloseEvent>(BIND_EVENT_FN(Game::on_window_close));
+        EventSystem::register_callback<WindowResizeEvent>(BIND_EVENT_FN(Game::on_window_resize));
+        EventSystem::register_callback<KeyPressEvent>(BIND_EVENT_FN(Game::on_key_press));
+        EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
+
         running = true;
     }
 
@@ -72,8 +78,6 @@ namespace bls
             dt = current_time - last_time;
             last_time = current_time;
 
-            std::cout << "DT: " << dt << "\n";
-
             // Update all systems in registration order
             auto& systems = ecs->systems;
             for (auto& system : systems)
@@ -82,5 +86,25 @@ namespace bls
             // Update window
             window->update();
         }
+    }
+
+    void Game::on_window_close(const WindowCloseEvent&)
+    {
+        running = false;
+    }
+
+    void Game::on_key_press(const KeyPressEvent& event)
+    {
+        std::cout << "Key pressed: " << event.key << "\n";
+    }
+
+    void Game::on_mouse_scroll(const MouseScrollEvent& event)
+    {
+        std::cout << "Scroll X: " << event.xoffset << " Scroll Y: " << event.yoffset << "\n";
+    }
+
+    void Game::on_window_resize(const WindowResizeEvent& event)
+    {
+        std::cout << "Width: " << event.width << " Height: " << event.height << "\n";
     }
 };

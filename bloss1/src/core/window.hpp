@@ -5,6 +5,7 @@
  */
 
 #include "core/core.hpp"
+#include "core/event.hpp"
 
 namespace bls
 {
@@ -22,5 +23,13 @@ namespace bls
 
             // Must be implemented by the platform
             static Window* create(const str& title, const u32& width, const u32& height);
+
+            // protected:
+            // @TODO: encapsulate this
+            template<typename EventType>
+            void fire_event(const EventType& event)
+            {
+                EventSystem::fire_event(event);
+            }
     };
 };
