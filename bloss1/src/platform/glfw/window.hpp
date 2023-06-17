@@ -14,12 +14,12 @@ namespace bls
     class GlfwWindow : public Window
     {
         public:
-            // using EventCallback = std::function<void(Event&)>;
-
             GlfwWindow(const str& title, const u32& width, const u32& height);
             ~GlfwWindow();
 
             void update() override;
+
+            void set_event_callback(const EventCallback& callback) override;
 
             u32 get_width() const override;
             u32 get_height() const override;
@@ -34,7 +34,7 @@ namespace bls
             {
                 str title;
                 u32 width, height;
-                // EventCallback event_callback;
+                EventCallback event_callback;
             };
 
             WindowData window_data;

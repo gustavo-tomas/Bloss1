@@ -20,6 +20,8 @@ namespace bls
             // The game loop
             void run();
 
+            void on_event(Event& event);
+
             static Game& get(); // im sorry i can change
             Window& get_window();
 

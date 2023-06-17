@@ -19,7 +19,7 @@ namespace bls
             }
 
         private:
-            friend class Window;
+            friend class Game; // Don't judge me
 
             template<typename EventType>
             static void fire_event(const EventType& event)

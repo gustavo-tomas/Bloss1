@@ -21,6 +21,7 @@ namespace bls
 
         // Create a window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
+        window->set_event_callback(BIND_EVENT_FN(Game::on_event));
 
         // Create ECS
         ecs = new ECS();
@@ -74,12 +75,28 @@ namespace bls
             for (auto& system : systems)
                 system(*ecs, dt);
 
+            // Input polling test
             if (Input::is_key_pressed(KEY_ESCAPE))
                 running = false;
 
             // Update window
             window->update();
         }
+    }
+
+    void Game::on_event(Event& event)
+    {
+        if (typeid(event) == typeid(WindowCloseEvent))
+            EventSystem::fire_event(static_cast<const WindowCloseEvent&>(event));
+
+        else if (typeid(event) == typeid(WindowResizeEvent))
+            EventSystem::fire_event(static_cast<const WindowResizeEvent&>(event));
+
+        else if (typeid(event) == typeid(KeyPressEvent))
+            EventSystem::fire_event(static_cast<const KeyPressEvent&>(event));
+
+        else if (typeid(event) == typeid(MouseScrollEvent))
+            EventSystem::fire_event(static_cast<const MouseScrollEvent&>(event));
     }
 
     Game& Game::get()

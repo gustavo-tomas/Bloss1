@@ -72,24 +72,24 @@ namespace bls
         glfwSwapInterval(0);
 
         // Set callbacks
-        glfwSetWindowUserPointer(native_window, this);
+        glfwSetWindowUserPointer(native_window, &window_data);
 
         // Window close callback
         glfwSetWindowCloseCallback(
             native_window, [](GLFWwindow * window)
             {
-                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
+                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
                 WindowCloseEvent event = { };
-                this_window->fire_event(event);
+                window_data.event_callback(event);
             });
 
         // Resize callback
         glfwSetFramebufferSizeCallback(
             native_window, [](GLFWwindow * window, i32 width, i32 height)
             {
+                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
                 WindowResizeEvent event = { (u32) width, (u32) height };
-                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
-                this_window->fire_event(event);
+                window_data.event_callback(event);
             });
 
         // Key callback
@@ -99,9 +99,9 @@ namespace bls
                 // Key press
                 if (action == GLFW_PRESS || action == GLFW_REPEAT)
                 {
+                    auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
                     KeyPressEvent event = { (u32) key };
-                    Window* this_window = (Window*) glfwGetWindowUserPointer(window);
-                    this_window->fire_event(event);
+                    window_data.event_callback(event);
                 }
             });
 
@@ -109,9 +109,9 @@ namespace bls
         glfwSetScrollCallback(
             native_window, [](GLFWwindow * window, f64 xoffset, f64 yoffset)
             {
+                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
                 MouseScrollEvent event = { xoffset, yoffset };
-                Window* this_window = (Window*) glfwGetWindowUserPointer(window);
-                this_window->fire_event(event);
+                window_data.event_callback(event);
             });
     }
 
@@ -128,6 +128,11 @@ namespace bls
 
         // Swap buffers
         glfwSwapBuffers(native_window);
+    }
+
+    void GlfwWindow::set_event_callback(const EventCallback& callback)
+    {
+        window_data.event_callback = callback;
     }
 
     u32 GlfwWindow::get_width() const

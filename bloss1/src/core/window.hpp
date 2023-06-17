@@ -12,6 +12,8 @@ namespace bls
     class Window
     {
         public:
+            using EventCallback = std::function<void(Event&)>;
+
             virtual ~Window() { }
 
             virtual void update() = 0;
@@ -21,15 +23,9 @@ namespace bls
             virtual void* get_native_window() const = 0;
             virtual f64 get_time() const = 0;
 
+            virtual void set_event_callback(const EventCallback& callback) = 0;
+
             // Must be implemented by the platform
             static Window* create(const str& title, const u32& width, const u32& height);
-
-            // protected:
-            // @TODO: encapsulate this
-            template<typename EventType>
-            void fire_event(const EventType& event)
-            {
-                EventSystem::fire_event(event);
-            }
     };
 };
