@@ -1,4 +1,5 @@
 #include "platform/glfw/window.hpp"
+#include "platform/glfw/extensions.hpp"
 #include "core/event.hpp"
 
 namespace bls
@@ -51,16 +52,14 @@ namespace bls
         glfwGetWindowSize(native_window, (i32*) &width, (i32*) &height);
 
         // Set debug callbacks
-        // if (GLEW_ARB_debug_output)
-        // {
-        //     glDebugMessageCallbackARB(&DebugOutputCallback, NULL);
-        //     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-        // }
+        if (GLEW_ARB_debug_output)
+        {
+            glDebugMessageCallbackARB(&debug_callback, NULL);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+        }
 
-        // else
-        // {
-        //     std::cout << "ARB Debug extension not supported\n";
-        // }
+        else
+            std::cout << "ARB Debug extension not supported\n";
 
         // Ensure we can capture the escape key being pressed below
         glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GL_TRUE);
