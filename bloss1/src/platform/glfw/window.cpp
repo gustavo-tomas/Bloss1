@@ -88,6 +88,9 @@ namespace bls
             native_window, [](GLFWwindow * window, i32 width, i32 height)
             {
                 auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+                window_data.width = width;
+                window_data.height = height;
+
                 WindowResizeEvent event = { (u32) width, (u32) height };
                 window_data.event_callback(event);
             });
