@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @brief The renderer factory creates a renderer with the chosen backend. For now,
+ * only OpenGL is supported.
+ */
+
 #include "renderer/renderer.hpp"
 #include "renderer/opengl/renderer.hpp"
 
