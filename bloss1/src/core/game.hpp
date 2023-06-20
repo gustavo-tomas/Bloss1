@@ -7,6 +7,7 @@
 #include "core/core.hpp"
 #include "core/window.hpp"
 #include "core/event.hpp"
+#include "renderer/renderer.hpp"
 #include "ecs/ecs.hpp"
 
 namespace bls
@@ -24,6 +25,7 @@ namespace bls
 
             static Game& get(); // im sorry i can change
             Window& get_window();
+            Renderer& get_renderer();
 
         private:
             void on_window_close(const WindowCloseEvent& event);
@@ -34,6 +36,7 @@ namespace bls
             static Game* instance;
 
             std::unique_ptr<Window> window;
+            std::unique_ptr<Renderer> renderer;
             ECS* ecs;
 
             bool running;

@@ -5,6 +5,7 @@
  */
 
 #include "math/math.hpp"
+#include "renderer/buffers.hpp"
 
 namespace bls
 {
@@ -12,10 +13,13 @@ namespace bls
     class Renderer
     {
         public:
+            virtual ~Renderer() { }
+
             virtual void initialize() = 0;
 
-            virtual void create_vertex_buffer() = 0;
-            virtual void create_index_buffer() = 0;
+            virtual VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) = 0;
+            virtual IndexBuffer* create_index_buffer(u32* indices, u32 count) = 0;
+            virtual VertexArray* create_vertex_array() = 0;
             virtual void create_shader() = 0;
 
             virtual void set_uniform() = 0;

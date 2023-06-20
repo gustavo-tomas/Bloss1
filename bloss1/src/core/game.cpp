@@ -1,6 +1,8 @@
 #include "core/game.hpp"
 #include "core/input.hpp"
 #include "core/key_codes.hpp"
+#include "math/math.hpp"
+#include "renderer/factory.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
 
@@ -22,6 +24,13 @@ namespace bls
         // Create a window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
         window->set_event_callback(BIND_EVENT_FN(Game::on_event));
+
+        // Create a renderer
+        renderer = std::unique_ptr<Renderer>(RendererFactory::create_renderer(BackendType::OpenGL));
+        renderer->initialize();
+
+        auto arr = renderer->create_vertex_array();
+        delete arr;
 
         // Create ECS
         ecs = new ECS();
@@ -108,6 +117,11 @@ namespace bls
         }
 
         return *instance;
+    }
+
+    Renderer& Game::get_renderer()
+    {
+        return *renderer;
     }
 
     Window& Game::get_window()
