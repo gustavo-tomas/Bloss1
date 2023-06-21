@@ -1,5 +1,6 @@
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/buffers.hpp"
+#include "renderer/opengl/shader.hpp"
 #include "platform/glfw/window.hpp"
 
 namespace bls
@@ -54,9 +55,9 @@ namespace bls
         return new OpenGLVertexArray();
     }
 
-    void OpenGLRenderer::create_shader()
+    Shader* OpenGLRenderer::create_shader(const str& vertex_path, const str& fragment_path, const str& geometry_path)
     {
-
+        return new OpenGLShader(vertex_path, fragment_path, geometry_path);
     }
 
     void OpenGLRenderer::set_uniform()

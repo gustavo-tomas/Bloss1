@@ -6,6 +6,7 @@
 
 #include "math/math.hpp"
 #include "renderer/buffers.hpp"
+#include "renderer/shader.hpp"
 
 namespace bls
 {
@@ -20,7 +21,7 @@ namespace bls
             virtual VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) = 0;
             virtual IndexBuffer* create_index_buffer(u32* indices, u32 count) = 0;
             virtual VertexArray* create_vertex_array() = 0;
-            virtual void create_shader() = 0;
+            virtual Shader* create_shader(const str& vertex_path, const str& fragment_path, const str& geometry_path = "") = 0;
 
             virtual void set_uniform() = 0;
             virtual void set_texture() = 0;

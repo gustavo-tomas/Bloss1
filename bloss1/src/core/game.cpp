@@ -29,6 +29,9 @@ namespace bls
         renderer = std::unique_ptr<Renderer>(RendererFactory::create_renderer(BackendType::OpenGL));
         renderer->initialize();
 
+        auto shader = renderer->create_shader("vertex", "frag", "geometry");
+        delete shader;
+
         auto arr = renderer->create_vertex_array();
         delete arr;
 
