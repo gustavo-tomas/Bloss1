@@ -70,6 +70,7 @@ namespace bls
         // The game loop
         while (running)
         {
+            // Update ----------------------------------------------------------
             // Don't render if the application is minimized
             if (minimized)
                 continue;
@@ -87,6 +88,11 @@ namespace bls
             // Input polling test
             if (Input::is_key_pressed(KEY_ESCAPE))
                 running = false;
+
+            // Render ----------------------------------------------------------
+            renderer->clear();
+            renderer->clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
+            renderer->draw();
 
             // Update window
             window->update();
