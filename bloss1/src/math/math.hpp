@@ -11,6 +11,7 @@
 #include "math/to_str.hpp"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace bls
 {
@@ -20,4 +21,10 @@ namespace bls
 
     typedef glm::mat4 mat4;
     typedef glm::mat3 mat3;
+
+    template<typename T>
+    auto value_ptr(T x)
+    {
+        return glm::value_ptr(x);
+    }
 };
