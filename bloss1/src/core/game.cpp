@@ -3,6 +3,7 @@
 #include "core/key_codes.hpp"
 #include "math/math.hpp"
 #include "renderer/factory.hpp"
+#include "managers/shader_manager.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
 
@@ -28,9 +29,6 @@ namespace bls
         // Create a renderer
         renderer = std::unique_ptr<Renderer>(RendererFactory::create_renderer(BackendType::OpenGL));
         renderer->initialize();
-
-        auto shader = renderer->create_shader("vertex", "frag", "geometry");
-        delete shader;
 
         auto arr = renderer->create_vertex_array();
         delete arr;
@@ -67,6 +65,32 @@ namespace bls
 
     void Game::run()
     {
+        f32 quadVertices[] =
+        {
+            -0.5f, -0.5f, // 0
+            0.5f, -0.5f,  // 1
+            0.5f, 0.5f,   // 2
+            -0.5f, 0.5f,  // 3
+        };
+
+        u32 indices[] =
+        {
+            0, 1, 2,  // first Triangle
+            2, 3, 0   // second Triangle
+        };
+
+        auto vao = renderer->create_vertex_array();
+        vao->bind();
+
+        auto vbo = renderer->create_vertex_buffer(quadVertices, sizeof(quadVertices));
+        vbo->bind();
+        vao->add_vertex_buffer(0, 2, ShaderDataType::Float, false, 2 * sizeof(f32), (void*) 0);
+
+        auto ebo = renderer->create_index_buffer(indices, 6);
+        ebo->bind();
+
+        auto shader = ShaderManager::get().load("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
+
         // Time variation
         f64 last_time = window->get_time(), current_time = 0, dt = 0;
 
@@ -76,7 +100,10 @@ namespace bls
             // Update ----------------------------------------------------------
             // Don't render if the application is minimized
             if (minimized)
+            {
+                window->update();
                 continue;
+            }
 
             // Calculate dt
             current_time = window->get_time();
@@ -95,11 +122,20 @@ namespace bls
             // Render ----------------------------------------------------------
             renderer->clear();
             renderer->clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
-            renderer->draw();
+
+            shader->bind();
+            shader->set_uniform3("color", { 0.8f, 0.6f, 0.4f });
+            vao->bind();
+
+            renderer->draw_indexed(sizeof(indices));
 
             // Update window
             window->update();
         }
+
+        delete vao;
+        delete vbo;
+        delete ebo;
     }
 
     void Game::on_event(Event& event)
@@ -156,5 +192,10 @@ namespace bls
     void Game::on_window_resize(const WindowResizeEvent& event)
     {
         std::cout << "Width: " << event.width << " Height: " << event.height << "\n";
+        if (event.width <= 100 || event.height <= 100)
+            minimized = true;
+
+        else
+            minimized = false;
     }
 };

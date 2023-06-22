@@ -21,7 +21,6 @@ namespace bls
             virtual VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) = 0;
             virtual IndexBuffer* create_index_buffer(u32* indices, u32 count) = 0;
             virtual VertexArray* create_vertex_array() = 0;
-            virtual Shader* create_shader(const str& vertex_path, const str& fragment_path, const str& geometry_path = "") = 0;
 
             virtual void set_uniform() = 0;
             virtual void set_texture() = 0;
@@ -30,6 +29,6 @@ namespace bls
 
             virtual void clear_color(const vec4& color) = 0;
             virtual void clear() = 0;
-            virtual void draw() = 0;
+            virtual void draw_indexed(u32 count) = 0;
     };
 };

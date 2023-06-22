@@ -45,6 +45,8 @@ namespace bls
             void bind() override;
             void unbind() override;
 
+            void add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer) override;
+
         private:
             u32 VAO;
     };

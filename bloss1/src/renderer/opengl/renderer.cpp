@@ -1,6 +1,5 @@
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/buffers.hpp"
-#include "renderer/opengl/shader.hpp"
 #include "platform/glfw/window.hpp"
 
 namespace bls
@@ -55,11 +54,6 @@ namespace bls
         return new OpenGLVertexArray();
     }
 
-    Shader* OpenGLRenderer::create_shader(const str& vertex_path, const str& fragment_path, const str& geometry_path)
-    {
-        return new OpenGLShader(vertex_path, fragment_path, geometry_path);
-    }
-
     void OpenGLRenderer::set_uniform()
     {
 
@@ -90,8 +84,8 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::draw()
+    void OpenGLRenderer::draw_indexed(u32 count)
     {
-        // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
     }
 };

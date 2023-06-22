@@ -30,6 +30,7 @@ namespace bls
             virtual void set_uniform4(const str& name, const vec4& vector) = 0;
             virtual void set_uniform4(const str& name, const mat4& matrix) = 0;
 
-            virtual mat4 getUniformMatrix4(const str& name) = 0;
+            virtual vec3 get_uniform3(const str& name) = 0;
+            virtual mat4 get_uniform4(const str& name) = 0;
     };
 };

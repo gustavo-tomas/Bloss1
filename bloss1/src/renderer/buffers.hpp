@@ -8,6 +8,11 @@
 
 namespace bls
 {
+    enum ShaderDataType
+    {
+        Float, Int, Bool
+    };
+
     class VertexBuffer
     {
         public:
@@ -34,5 +39,7 @@ namespace bls
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
+
+            virtual void add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer) = 0;
     };
 };

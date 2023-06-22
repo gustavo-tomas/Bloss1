@@ -18,7 +18,6 @@ namespace bls
             VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) override;
             IndexBuffer* create_index_buffer(u32* indices, u32 count) override;
             VertexArray* create_vertex_array() override;
-            Shader* create_shader(const str& vertex_path, const str& fragment_path, const str& geometry_path = "") override;
 
             void set_uniform() override;
             void set_texture() override;
@@ -27,6 +26,6 @@ namespace bls
 
             void clear_color(const vec4& color) override;
             void clear() override;
-            void draw() override;
+            void draw_indexed(u32 count) override;
     };
 };

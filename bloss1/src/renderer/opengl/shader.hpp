@@ -30,9 +30,12 @@ namespace bls
             void set_uniform4(const str& name, const vec4& vector) override;
             void set_uniform4(const str& name, const mat4& matrix) override;
 
-            mat4 getUniformMatrix4(const str& name) override;
+            vec3 get_uniform3(const str& name) override;
+            mat4 get_uniform4(const str& name) override;
 
         private:
+            void compile_shader(const str& path, const str& code, u32 ID);
+
             u32 id;
     };
 };
