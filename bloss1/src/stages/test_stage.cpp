@@ -1,5 +1,4 @@
 #include "stages/test_stage.hpp"
-#include "core/game.hpp"
 #include "core/input.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
@@ -49,14 +48,14 @@ namespace bls
 
         std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
 
-        vao = renderer.create_vertex_array();
+        vao = VertexArray::create();
         vao->bind();
 
-        vbo = renderer.create_vertex_buffer(quadVertices, sizeof(quadVertices));
+        vbo = VertexBuffer::create(quadVertices, sizeof(quadVertices));
         vbo->bind();
         vao->add_vertex_buffer(0, 2, ShaderDataType::Float, false, 2 * sizeof(f32), (void*) 0);
 
-        ebo = renderer.create_index_buffer(indices, 6);
+        ebo = IndexBuffer::create(indices, 6);
         ebo->bind();
 
         shader = ShaderManager::get().load("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");

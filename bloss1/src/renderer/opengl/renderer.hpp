@@ -15,10 +15,6 @@ namespace bls
 
             void initialize() override;
 
-            VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) override;
-            IndexBuffer* create_index_buffer(u32* indices, u32 count) override;
-            VertexArray* create_vertex_array() override;
-
             void set_uniform() override;
             void set_texture() override;
             void set_render_target() override;

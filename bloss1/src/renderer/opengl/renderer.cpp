@@ -39,21 +39,6 @@ namespace bls
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    VertexBuffer* OpenGLRenderer::create_vertex_buffer(f32* vertices, u32 size)
-    {
-        return new OpenGLVertexBuffer(vertices, size);
-    }
-
-    IndexBuffer* OpenGLRenderer::create_index_buffer(u32* indices, u32 count)
-    {
-        return new OpenGLIndexBuffer(indices, count);
-    }
-
-    VertexArray* OpenGLRenderer::create_vertex_array()
-    {
-        return new OpenGLVertexArray();
-    }
-
     void OpenGLRenderer::set_uniform()
     {
 

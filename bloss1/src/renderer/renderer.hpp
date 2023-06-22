@@ -18,10 +18,6 @@ namespace bls
 
             virtual void initialize() = 0;
 
-            virtual VertexBuffer* create_vertex_buffer(f32* vertices, u32 size) = 0;
-            virtual IndexBuffer* create_index_buffer(u32* indices, u32 count) = 0;
-            virtual VertexArray* create_vertex_array() = 0;
-
             virtual void set_uniform() = 0;
             virtual void set_texture() = 0;
             virtual void set_render_target() = 0;
