@@ -32,5 +32,10 @@ namespace bls
 
             virtual vec3 get_uniform3(const str& name) = 0;
             virtual mat4 get_uniform4(const str& name) = 0;
+
+            static std::shared_ptr<Shader> create(const str& name,
+                                                  const str& vertex_path,
+                                                  const str& fragment_path,
+                                                  const str& geometry_path = "");
     };
 };

@@ -5,7 +5,7 @@ namespace bls
 {
     std::shared_ptr<Shader> ShaderManager::load(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path)
     {
-        if (shaders.count(name))
+        if (exists(name))
             return shaders[name];
 
         // @TODO: for now, just opengl
@@ -15,7 +15,7 @@ namespace bls
 
     std::shared_ptr<Shader> ShaderManager::get_shader(const str& name)
     {
-        if (shaders.count(name))
+        if (exists(name))
             return shaders[name];
 
         else
@@ -23,6 +23,11 @@ namespace bls
             std::cerr << "shader '" << name << "' doesn't exist\n";
             exit(1);
         }
+    }
+
+    bool ShaderManager::exists(const str& name)
+    {
+        return shaders.count(name) > 0;
     }
 
     ShaderManager& ShaderManager::get()

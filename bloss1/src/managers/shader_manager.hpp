@@ -13,6 +13,7 @@ namespace bls
         public:
             std::shared_ptr<Shader> load(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path = "");
             std::shared_ptr<Shader> get_shader(const str& name);
+            bool exists(const str& name);
 
             static ShaderManager& get();
 

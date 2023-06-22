@@ -5,8 +5,6 @@
  */
 
 #include "math/math.hpp"
-#include "renderer/buffers.hpp"
-#include "renderer/shader.hpp"
 
 namespace bls
 {

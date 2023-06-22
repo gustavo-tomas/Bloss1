@@ -3,6 +3,7 @@
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/shader.hpp"
 #include "renderer/opengl/buffers.hpp"
+#include "managers/shader_manager.hpp"
 
 namespace bls
 {
@@ -13,6 +14,19 @@ namespace bls
         #else
         std::cerr << "no valid renderer defined\n";
         exit(1);
+        #endif
+    }
+
+    std::shared_ptr<Shader> Shader::create(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path)
+    {
+        #ifdef _OPENGL
+        if (ShaderManager::get().exists(name))
+            return ShaderManager::get().get_shader(name);
+
+        else
+            return ShaderManager::get().load(name, vertex_path, fragment_path, geometry_path);
+        #else
+        return nullptr;
         #endif
     }
 

@@ -2,7 +2,6 @@
 #include "core/input.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
-#include "managers/shader_manager.hpp"
 
 // Testing
 f32 quadVertices[] =
@@ -58,7 +57,7 @@ namespace bls
         ebo = IndexBuffer::create(indices, 6);
         ebo->bind();
 
-        shader = ShaderManager::get().load("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
+        shader = Shader::create("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
 
         running = true;
     }
