@@ -29,7 +29,7 @@ project "bloss1"
         buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
         linkoptions { "-fsanitize=address" }
 
-        defines { "_DEBUG", "_OPENGL" }
+        defines { "_DEBUG", "_GLFW", "_OPENGL" }
         symbols "On" -- '-g'
         runtime "Debug"
 

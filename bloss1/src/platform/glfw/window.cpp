@@ -4,11 +4,6 @@
 
 namespace bls
 {
-    Window* Window::create(const str& title, const u32& width, const u32& height)
-    {
-        return new GlfwWindow(title, width, height);
-    }
-
     GlfwWindow::GlfwWindow(const str& title, const u32& width, const u32& height)
     {
         window_data.title = title;

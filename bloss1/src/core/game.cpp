@@ -1,5 +1,4 @@
 #include "core/game.hpp"
-#include "renderer/factory.hpp"
 #include "stages/test_stage.hpp"
 
 namespace bls
@@ -22,7 +21,7 @@ namespace bls
         window->set_event_callback(BIND_EVENT_FN(Game::on_event));
 
         // Create a renderer
-        renderer = std::unique_ptr<Renderer>(RendererFactory::create_renderer(BackendType::OpenGL));
+        renderer = std::unique_ptr<Renderer>(Renderer::create());
         renderer->initialize();
 
         // Register callbacks
