@@ -20,13 +20,15 @@ u32 indices[] =
 
 namespace bls
 {
-    TestStage::TestStage(Renderer& renderer) : renderer(renderer)
+    TestStage::TestStage(Renderer& renderer, Window& window) : renderer(renderer), window(window)
     {
 
     }
 
     TestStage::~TestStage()
     {
+        delete controller;
+
         delete vao;
         delete vbo;
         delete ebo;
@@ -34,6 +36,9 @@ namespace bls
 
     void TestStage::start()
     {
+        // Create a camera
+        controller = new CameraController();
+
         // Create ECS
         ecs = std::unique_ptr<ECS>(new ECS());
 
@@ -67,6 +72,9 @@ namespace bls
         if (!running)
             return;
 
+        // Update camera controller
+        controller->update(dt);
+
         // Update all systems in registration order
         auto& systems = ecs->systems;
         for (auto& system : systems)
@@ -78,11 +86,24 @@ namespace bls
 
     void TestStage::render()
     {
+        // Window properties
+        auto width = window.get_width();
+        auto height = window.get_height();
+
+        // Camera properties
+        auto projection = controller->get_camera().get_projection_matrix(width, height);
+        auto view = controller->get_camera().get_view_matrix();
+
+        // Clear the screen
         renderer.clear();
         renderer.clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
 
+        // Bind and update data to shader
         shader->bind();
         shader->set_uniform3("color", { 0.8f, 0.6f, 0.4f });
+        shader->set_uniform4("model", mat4(1.0f));
+        shader->set_uniform4("projection", projection);
+        shader->set_uniform4("view", view);
         vao->bind();
 
         renderer.draw_indexed(sizeof(indices));

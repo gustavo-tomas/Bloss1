@@ -5,17 +5,19 @@
  */
 
 #include "stages/stage.hpp"
+#include "core/window.hpp"
 #include "ecs/ecs.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/buffers.hpp"
 #include "renderer/shader.hpp"
+#include "camera/controller.hpp"
 
 namespace bls
 {
     class TestStage : public Stage
     {
         public:
-            TestStage(Renderer& renderer);
+            TestStage(Renderer& renderer, Window& window);
             ~TestStage();
 
             void start() override;
@@ -28,6 +30,9 @@ namespace bls
             std::unique_ptr<ECS> ecs;
 
             Renderer& renderer; // @TODO: temporary
+            Window& window;
+
+            CameraController* controller;
             std::shared_ptr<Shader> shader;
 
             VertexArray* vao;

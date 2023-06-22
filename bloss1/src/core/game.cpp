@@ -31,7 +31,7 @@ namespace bls
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
 
         // Register initial stage
-        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get())); // oof
+        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get())); // oof
         stages->start();
 
         running = true;
@@ -96,6 +96,12 @@ namespace bls
 
         else if (typeid(event) == typeid(MouseScrollEvent))
             EventSystem::fire_event(static_cast<const MouseScrollEvent&>(event));
+
+        else if (typeid(event) == typeid(MouseMoveEvent))
+            EventSystem::fire_event(static_cast<const MouseMoveEvent&>(event));
+
+        else
+            std::cerr << "invalid event type\n";
     }
 
     Game& Game::get()
@@ -131,7 +137,7 @@ namespace bls
 
     void Game::on_mouse_scroll(const MouseScrollEvent& event)
     {
-        std::cout << "Scroll X: " << event.xoffset << " Scroll Y: " << event.yoffset << "\n";
+        std::cout << "Scroll X: " << event.x_offset << " Scroll Y: " << event.y_offset << "\n";
     }
 
     void Game::on_window_resize(const WindowResizeEvent& event)
