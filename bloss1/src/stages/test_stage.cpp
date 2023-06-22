@@ -62,7 +62,7 @@ namespace bls
         running = true;
     }
 
-    void TestStage::update(const f32& dt)
+    void TestStage::update(f32 dt)
     {
         if (!running)
             return;

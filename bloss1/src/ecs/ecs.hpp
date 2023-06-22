@@ -17,7 +17,7 @@ namespace bls
     class ECS;
 
     // System: the logic bits
-    typedef void (*System) (ECS& ecs, const f32& dt);
+    typedef void (*System) (ECS& ecs, f32 dt);
 
     // ECS: container of the systems and entities
     class ECS

@@ -14,7 +14,7 @@ namespace bls
             virtual ~Stage() { }
 
             virtual void start() = 0;
-            virtual void update(const f32& dt) = 0;
+            virtual void update(f32 dt) = 0;
             virtual void render() = 0;
 
             virtual bool is_running() = 0;
