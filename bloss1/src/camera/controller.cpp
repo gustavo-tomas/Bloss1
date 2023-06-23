@@ -83,7 +83,7 @@ namespace bls
     void CameraController::on_mouse_scroll(const MouseScrollEvent& event)
     {
         f32 zoom = camera.get_zoom() - event.y_offset;
-        clamp(zoom, 1.0f, 45.0f);
+        zoom = clamp(zoom, 1.0f, 45.0f);
 
         camera.set_zoom(zoom);
     }
