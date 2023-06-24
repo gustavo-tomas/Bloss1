@@ -8,8 +8,8 @@
 #include "core/window.hpp"
 #include "ecs/ecs.hpp"
 #include "renderer/renderer.hpp"
-#include "renderer/buffers.hpp"
 #include "renderer/shader.hpp"
+#include "renderer/primitives/cube.hpp"
 #include "camera/controller.hpp"
 
 namespace bls
@@ -35,9 +35,7 @@ namespace bls
             CameraController* controller;
             std::shared_ptr<Shader> shader;
 
-            VertexArray* vao;
-            VertexBuffer* vbo;
-            IndexBuffer* ebo;
+            Cube* cube;
 
             bool running;
     };

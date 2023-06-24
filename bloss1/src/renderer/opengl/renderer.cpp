@@ -73,4 +73,9 @@ namespace bls
     {
         glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
     }
+
+    void OpenGLRenderer::draw_arrays(u32 count)
+    {
+        glDrawArrays(GL_TRIANGLES, 0, count);
+    }
 };

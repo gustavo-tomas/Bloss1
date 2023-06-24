@@ -3,21 +3,6 @@
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
 
-// Testing
-f32 quadVertices[] =
-{
-    -0.5f, -0.5f, // 0
-    0.5f, -0.5f,  // 1
-    0.5f, 0.5f,   // 2
-    -0.5f, 0.5f,  // 3
-};
-
-u32 indices[] =
-{
-    0, 1, 2,  // first Triangle
-    2, 3, 0   // second Triangle
-};
-
 namespace bls
 {
     TestStage::TestStage(Renderer& renderer, Window& window) : renderer(renderer), window(window)
@@ -28,10 +13,7 @@ namespace bls
     TestStage::~TestStage()
     {
         delete controller;
-
-        delete vao;
-        delete vbo;
-        delete ebo;
+        delete cube;
     }
 
     void TestStage::start()
@@ -52,15 +34,7 @@ namespace bls
 
         std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
 
-        vao = VertexArray::create();
-        vao->bind();
-
-        vbo = VertexBuffer::create(quadVertices, sizeof(quadVertices));
-        vbo->bind();
-        vao->add_vertex_buffer(0, 2, ShaderDataType::Float, false, 2 * sizeof(f32), (void*) 0);
-
-        ebo = IndexBuffer::create(indices, 6);
-        ebo->bind();
+        cube = new Cube(renderer);
 
         shader = Shader::create("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
 
@@ -98,15 +72,18 @@ namespace bls
         renderer.clear();
         renderer.clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
 
+        // Translation @TODO: next step: use the component system here
+        vec3 position = { 1.0f, 5.0f, -3.0f };
+        auto translation = translate(mat4(1.0f), position);
+
         // Bind and update data to shader
         shader->bind();
         shader->set_uniform3("color", { 0.8f, 0.6f, 0.4f });
-        shader->set_uniform4("model", mat4(1.0f));
+        shader->set_uniform4("model", translation);
         shader->set_uniform4("projection", projection);
         shader->set_uniform4("view", view);
-        vao->bind();
 
-        renderer.draw_indexed(sizeof(indices));
+        cube->Render(); // do batching pls tyty
     }
 
     bool TestStage::is_running()

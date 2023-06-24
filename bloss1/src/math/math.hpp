@@ -63,4 +63,10 @@ namespace bls
     {
         return glm::perspective(fov, aspect, near, far);
     }
+
+    template<typename T>
+    auto translate(T mat, T vec)
+    {
+        return glm::translate(mat, vec);
+    }
 };
