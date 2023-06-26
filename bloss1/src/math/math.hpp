@@ -12,6 +12,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace bls
 {
@@ -65,8 +66,26 @@ namespace bls
     }
 
     template<typename T>
+    auto scale(T mat, T vec)
+    {
+        return glm::scale(mat, vec);
+    }
+
+    template<typename T>
     auto translate(T mat, T vec)
     {
         return glm::translate(mat, vec);
+    }
+
+    template<typename T>
+    auto to_mat4(T quat)
+    {
+        return glm::toMat4(quat);
+    }
+
+    template<typename T>
+    auto angle_axis(f32 angle, T axis)
+    {
+        return glm::angleAxis(angle, axis);
     }
 };

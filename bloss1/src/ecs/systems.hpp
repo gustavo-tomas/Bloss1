@@ -13,7 +13,7 @@ namespace bls
         auto& models = ecs.models;
         for (auto& [id, model] : models)
         {
-            model->mesh += 200 * dt;
+            // @TODO: for now, do nothing
         }
     }
 
@@ -22,7 +22,7 @@ namespace bls
         auto& transforms = ecs.transforms;
         for (auto& [id, transform] : transforms)
         {
-            transform->scale += 400 * dt;
+            // @TODO: for now, do nothing
         }
     }
 };

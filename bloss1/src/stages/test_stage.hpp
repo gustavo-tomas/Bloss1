@@ -28,13 +28,11 @@ namespace bls
         private:
             std::unique_ptr<ECS> ecs;
 
-            Renderer& renderer; // @TODO: temporary
+            Renderer& renderer;
             Window& window;
 
             CameraController* controller;
             std::shared_ptr<Shader> shader;
-
-            Cube* cube;
 
             bool running;
     };

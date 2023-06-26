@@ -3,6 +3,8 @@
 #include <GL/glew.h> // Include glew before glfw
 #include <GLFW/glfw3.h>
 
+#define MAX_SHADER_ID 100000007
+
 namespace bls
 {
     OpenGLShader::OpenGLShader(const str& vertex_path, const str& fragment_path, const str& geometry_path)
@@ -10,7 +12,7 @@ namespace bls
         // Create the shaders
         GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
-        GLuint geometry_shader_id;
+        GLuint geometry_shader_id = MAX_SHADER_ID;
 
         if (geometry_path != "")
             geometry_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
@@ -58,7 +60,7 @@ namespace bls
         compile_shader(vertex_path, vertex_shader_code, vertex_shader_id);
         compile_shader(fragment_path, fragment_shader_code, fragment_shader_id);
 
-        if (geometry_path != "")
+        if (geometry_path != "" && geometry_shader_id != MAX_SHADER_ID)
             compile_shader(geometry_path, geometry_shader_code, geometry_shader_id);
 
         // Link the program

@@ -34,6 +34,7 @@ namespace bls
         stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get())); // oof
         stages->start();
 
+        running = true;
         minimized = false;
     }
 

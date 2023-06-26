@@ -13,7 +13,6 @@ namespace bls
     TestStage::~TestStage()
     {
         delete controller;
-        delete cube;
     }
 
     void TestStage::start()
@@ -28,13 +27,9 @@ namespace bls
         ecs->add_system(transform_system);
         ecs->add_system(render_system);
 
-        // Add some entities
-        u32 e1 = player(*ecs, Transform(10, 20, 30));
-        u32 e2 = player(*ecs, Transform(100, 200, 300));
-
-        std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
-
-        cube = new Cube(renderer);
+        // Add some entities to the world
+        player(*ecs, Transform(vec3( 5.0f)));
+        player(*ecs, Transform(vec3(-5.0f)));
 
         shader = Shader::create("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
 
@@ -47,6 +42,7 @@ namespace bls
         controller->update(dt);
 
         // Update all systems in registration order
+        // @TODO: for now do nothing
         auto& systems = ecs->systems;
         for (auto& system : systems)
             system(*ecs, dt);
@@ -63,18 +59,35 @@ namespace bls
         renderer.clear();
         renderer.clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
 
-        // Translation @TODO: next step: use the component system here
-        vec3 position = { 1.0f, 5.0f, -3.0f };
-        auto translation = translate(mat4(1.0f), position);
+        // Render all entities
+        for (const auto& [id, transform] : ecs->transforms)
+        {
+            auto scale_mat = scale(mat4(1.0f), transform->scale);
+            auto translation_mat = translate(mat4(1.0f), transform->position);
 
-        // Bind and update data to shader
-        shader->bind();
-        shader->set_uniform3("color", { 0.8f, 0.6f, 0.4f });
-        shader->set_uniform4("model", translation);
-        shader->set_uniform4("projection", projection);
-        shader->set_uniform4("view", view);
+            // Rotate
+            auto pitch_quat = angle_axis(radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            auto yaw_quat = angle_axis(radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
+            auto roll_quat = angle_axis(radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+            auto rotation_quat = normalize(yaw_quat * pitch_quat * roll_quat);
+            auto rotation_mat = to_mat4(rotation_quat);
 
-        cube->Render();
+            // Remember: scale -> rotate -> translate
+            auto model_matrix = translation_mat * rotation_mat * scale_mat;
+
+            // Bind and update data to shader
+            shader->bind();
+            shader->set_uniform3("color", { 0.8f, 0.2f, 0.1f });
+            shader->set_uniform4("model", model_matrix);
+            shader->set_uniform4("projection", projection);
+            shader->set_uniform4("view", view);
+
+            // Render the model
+            auto model = ecs->models[id].get();
+            model->vao->bind();
+            renderer.draw_indexed(model->indices.size());
+            model->vao->unbind();
+        }
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
