@@ -43,9 +43,6 @@ namespace bls
 
     void TestStage::update(f32 dt)
     {
-        if (!running)
-            return;
-
         // Update camera controller
         controller->update(dt);
 
@@ -54,12 +51,6 @@ namespace bls
         for (auto& system : systems)
             system(*ecs, dt);
 
-        if (Input::is_key_pressed(KEY_ESCAPE))
-            running = false;
-    }
-
-    void TestStage::render()
-    {
         // Window properties
         auto width = window.get_width();
         auto height = window.get_height();
@@ -83,7 +74,11 @@ namespace bls
         shader->set_uniform4("projection", projection);
         shader->set_uniform4("view", view);
 
-        cube->Render(); // do batching pls tyty
+        cube->Render();
+
+        // Exit the stage
+        if (Input::is_key_pressed(KEY_ESCAPE))
+            running = false;
     }
 
     bool TestStage::is_running()

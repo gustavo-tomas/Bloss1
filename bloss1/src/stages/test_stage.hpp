@@ -22,7 +22,6 @@ namespace bls
 
             void start() override;
             void update(f32 dt) override;
-            void render() override;
 
             bool is_running() override;
 

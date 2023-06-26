@@ -60,7 +60,7 @@ namespace bls
         glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GL_TRUE);
 
         // Hide the mouse and enable unlimited movement
-        // glfwSetInputMode(native_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(native_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Disable VSync
         glfwSwapInterval(0);

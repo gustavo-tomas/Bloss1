@@ -34,7 +34,6 @@ namespace bls
         stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get())); // oof
         stages->start();
 
-        running = true;
         minimized = false;
     }
 
@@ -51,7 +50,6 @@ namespace bls
         // The game loop
         while (running)
         {
-            // Update ----------------------------------------------------------
             // Don't render if the application is minimized
             if (minimized)
             {
@@ -67,11 +65,8 @@ namespace bls
             dt = current_time - last_time;
             last_time = current_time;
 
+            // Update running stage
             stages->update(dt);
-
-            // Render ----------------------------------------------------------
-            // @TODO: batching ?
-            stages->render();
 
             // Update window
             window->update();
