@@ -21,7 +21,7 @@ namespace bls
             virtual void bind() = 0;
             virtual void unbind() = 0;
 
-            static VertexBuffer* create(const std::vector<f32>& vertices, u32 size);
+            static VertexBuffer* create(void* vertices, u32 size);
     };
 
     class IndexBuffer

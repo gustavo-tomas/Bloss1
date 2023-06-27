@@ -46,7 +46,7 @@ namespace bls
         #endif
     }
 
-    VertexBuffer* VertexBuffer::create(const std::vector<f32>& vertices, u32 size)
+    VertexBuffer* VertexBuffer::create(void* vertices, u32 size)
     {
         #ifdef _OPENGL
         return new OpenGLVertexBuffer(vertices, size);

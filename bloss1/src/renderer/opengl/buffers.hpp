@@ -11,7 +11,7 @@ namespace bls
     class OpenGLVertexBuffer : public VertexBuffer
     {
         public:
-            OpenGLVertexBuffer(const std::vector<f32>& vertices, u32 size);
+            OpenGLVertexBuffer(void* vertices, u32 size);
             ~OpenGLVertexBuffer();
 
             void bind() override;

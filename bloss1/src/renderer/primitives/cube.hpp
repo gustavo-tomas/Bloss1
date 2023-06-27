@@ -17,7 +17,7 @@ namespace bls
                 vao = VertexArray::create();
                 vao->bind();
 
-                vbo = VertexBuffer::create(vertices, vertices.size() * sizeof(f32));
+                vbo = VertexBuffer::create(static_cast<void*>(vertices.data()), vertices.size() * sizeof(f32));
                 ebo = IndexBuffer::create(indices, indices.size());
 
                 vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 0, (void*) 0);

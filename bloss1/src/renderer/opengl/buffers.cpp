@@ -19,11 +19,11 @@ namespace bls
     }
 
     // Vertex Buffer ---------------------------------------------------------------------------------------------------
-    OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<f32>& vertices, u32 size)
+    OpenGLVertexBuffer::OpenGLVertexBuffer(void* vertices, u32 size)
     {
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, size, &vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
     }
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer()

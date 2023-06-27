@@ -31,8 +31,20 @@ namespace bls
     class Mesh : public Component
     {
         public:
+            struct Vertex
+            {
+                vec3 position;
+                vec3 normal;
+                vec2 tex_coords;
+                vec3 tangent;
+                vec3 bitangent;
+
+                // int boneIDs[MAX_BONE_PER_VERTEX];
+                // float weights[MAX_BONE_PER_VERTEX];
+            };
+
             Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<f32>& vertices, const std::vector<u32>& indices)
+                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices)
                 : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices)
             { }
 
@@ -47,7 +59,7 @@ namespace bls
             VertexBuffer* vbo;
             IndexBuffer* ebo;
 
-            std::vector<f32> vertices;
+            std::vector<Vertex> vertices;
             std::vector<u32> indices;
     };
 };
