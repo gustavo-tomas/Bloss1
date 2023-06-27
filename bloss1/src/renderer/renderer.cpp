@@ -1,5 +1,4 @@
 #include "renderer/renderer.hpp"
-#include "renderer/shader.hpp"
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/shader.hpp"
 #include "renderer/opengl/buffers.hpp"
@@ -19,15 +18,15 @@ namespace bls
         #endif
     }
 
-    // @TODO: doesnt need to be this way (same for the texture manager)
     std::shared_ptr<Shader> Shader::create(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path)
     {
-        #ifdef _OPENGL
         if (ShaderManager::get().exists(name))
             return ShaderManager::get().get_shader(name);
 
-        else
-            return ShaderManager::get().load(name, vertex_path, fragment_path, geometry_path);
+        #ifdef _OPENGL
+        auto shader = std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path);
+        ShaderManager::get().load(name, shader);
+        return shader;
         #else
         return nullptr;
         #endif
@@ -35,12 +34,13 @@ namespace bls
 
     std::shared_ptr<Texture> Texture::create(const str& name, const str& path, TextureType texture_type)
     {
-        #ifdef _OPENGL
         if (TextureManager::get().exists(name))
             return TextureManager::get().get_texture(name);
 
-        else
-            return TextureManager::get().load(name, path, texture_type);
+        #ifdef _OPENGL
+        auto texture = std::make_shared<OpenGLTexture>(path, texture_type);
+        TextureManager::get().load(name, texture);
+        return texture;
         #else
         return nullptr;
         #endif

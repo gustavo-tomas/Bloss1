@@ -1,16 +1,11 @@
 #include "managers/shader_manager.hpp"
-#include "renderer/opengl/shader.hpp"
+#include "renderer/shader.hpp"
 
 namespace bls
 {
-    std::shared_ptr<Shader> ShaderManager::load(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path)
+    void ShaderManager::load(const str& name, std::shared_ptr<Shader> shader)
     {
-        if (exists(name))
-            return shaders[name];
-
-        // @TODO: for now, just opengl
-        shaders[name] = std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path);
-        return shaders[name];
+        shaders[name] = shader;
     }
 
     std::shared_ptr<Shader> ShaderManager::get_shader(const str& name)
