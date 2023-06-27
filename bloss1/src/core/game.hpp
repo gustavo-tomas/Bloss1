@@ -7,7 +7,8 @@
 #include "core/core.hpp"
 #include "core/window.hpp"
 #include "core/event.hpp"
-#include "ecs/ecs.hpp"
+#include "stages/stage.hpp"
+#include "renderer/renderer.hpp"
 
 namespace bls
 {
@@ -20,10 +21,12 @@ namespace bls
             // The game loop
             void run();
 
+            void push_stage(Stage* stage);
             void on_event(Event& event);
 
             static Game& get(); // im sorry i can change
             Window& get_window();
+            Renderer& get_renderer();
 
         private:
             void on_window_close(const WindowCloseEvent& event);
@@ -34,7 +37,8 @@ namespace bls
             static Game* instance;
 
             std::unique_ptr<Window> window;
-            ECS* ecs;
+            std::unique_ptr<Renderer> renderer;
+            std::unique_ptr<Stage> stages; // For now just one stage
 
             bool running;
             bool minimized;

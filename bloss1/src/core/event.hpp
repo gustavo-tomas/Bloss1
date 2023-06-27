@@ -62,11 +62,19 @@ namespace bls
         u32 key;
     };
 
+    struct MouseMoveEvent : public Event
+    {
+        MouseMoveEvent(f64 x_position, f64 y_position) : x_position(x_position), y_position(y_position) { }
+
+        f64 x_position;
+        f64 y_position;
+    };
+
     struct MouseScrollEvent : public Event
     {
-        MouseScrollEvent(f64 xoffset, f64 yoffset) : xoffset(xoffset), yoffset(yoffset) { }
+        MouseScrollEvent(f64 x_offset, f64 y_offset) : x_offset(x_offset), y_offset(y_offset) { }
 
-        f64 xoffset;
-        f64 yoffset;
+        f64 x_offset;
+        f64 y_offset;
     };
 };

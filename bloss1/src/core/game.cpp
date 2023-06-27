@@ -1,8 +1,5 @@
 #include "core/game.hpp"
-#include "core/input.hpp"
-#include "core/key_codes.hpp"
-#include "ecs/systems.hpp"
-#include "ecs/entities.hpp"
+#include "stages/test_stage.hpp"
 
 namespace bls
 {
@@ -23,18 +20,9 @@ namespace bls
         window = std::unique_ptr<Window>(Window::create(title, width, height));
         window->set_event_callback(BIND_EVENT_FN(Game::on_event));
 
-        // Create ECS
-        ecs = new ECS();
-
-        // Add systems in order of execution
-        ecs->add_system(transform_system);
-        ecs->add_system(render_system);
-
-        // Add some entities
-        u32 e1 = player(*ecs, Transform(10, 20, 30));
-        u32 e2 = player(*ecs, Transform(100, 200, 300));
-
-        std::cout << "e1: " << e1 << " e2: " << e2 << "\n";
+        // Create a renderer
+        renderer = std::unique_ptr<Renderer>(Renderer::create());
+        renderer->initialize();
 
         // Register callbacks
         EventSystem::register_callback<WindowCloseEvent>(BIND_EVENT_FN(Game::on_window_close));
@@ -42,14 +30,16 @@ namespace bls
         EventSystem::register_callback<KeyPressEvent>(BIND_EVENT_FN(Game::on_key_press));
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
 
+        // Register initial stage
+        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get())); // oof
+        stages->start();
+
         running = true;
         minimized = false;
     }
 
     Game::~Game()
     {
-        delete ecs;
-
         std::cout << "game destroyed successfully\n";
     }
 
@@ -63,25 +53,30 @@ namespace bls
         {
             // Don't render if the application is minimized
             if (minimized)
+            {
+                window->update();
                 continue;
+            }
+
+            if (!stages->is_running())
+                running = false;
 
             // Calculate dt
             current_time = window->get_time();
             dt = current_time - last_time;
             last_time = current_time;
 
-            // Update all systems in registration order
-            auto& systems = ecs->systems;
-            for (auto& system : systems)
-                system(*ecs, dt);
-
-            // Input polling test
-            if (Input::is_key_pressed(KEY_ESCAPE))
-                running = false;
+            // Update running stage
+            stages->update(dt);
 
             // Update window
             window->update();
         }
+    }
+
+    void Game::push_stage(Stage* stage)
+    {
+        stages = std::unique_ptr<Stage>(stage);
     }
 
     void Game::on_event(Event& event)
@@ -97,6 +92,12 @@ namespace bls
 
         else if (typeid(event) == typeid(MouseScrollEvent))
             EventSystem::fire_event(static_cast<const MouseScrollEvent&>(event));
+
+        else if (typeid(event) == typeid(MouseMoveEvent))
+            EventSystem::fire_event(static_cast<const MouseMoveEvent&>(event));
+
+        else
+            std::cerr << "invalid event type\n";
     }
 
     Game& Game::get()
@@ -108,6 +109,11 @@ namespace bls
         }
 
         return *instance;
+    }
+
+    Renderer& Game::get_renderer()
+    {
+        return *renderer;
     }
 
     Window& Game::get_window()
@@ -127,11 +133,16 @@ namespace bls
 
     void Game::on_mouse_scroll(const MouseScrollEvent& event)
     {
-        std::cout << "Scroll X: " << event.xoffset << " Scroll Y: " << event.yoffset << "\n";
+        std::cout << "Scroll X: " << event.x_offset << " Scroll Y: " << event.y_offset << "\n";
     }
 
     void Game::on_window_resize(const WindowResizeEvent& event)
     {
         std::cout << "Width: " << event.width << " Height: " << event.height << "\n";
+        if (event.width <= 100 || event.height <= 100)
+            minimized = true;
+
+        else
+            minimized = false;
     }
 };

@@ -5,6 +5,8 @@
  */
 
 #include "ecs/ecs.hpp"
+#include "math/math.hpp"
+#include "renderer/buffers.hpp"
 
 namespace bls
 {
@@ -18,20 +20,34 @@ namespace bls
     class Transform : public Component
     {
         public:
-            Transform(const i32& position = 0, const i32& rotation = 0, const i32& scale = 0)
+            Transform(const vec3& position = vec3(0.0f), const vec3& rotation = vec3(0.0f), const vec3& scale = vec3(1.0f))
                 : position(position), rotation(rotation), scale(scale) { }
 
-            i32 position;
-            i32 rotation;
-            i32 scale;
+            vec3 position;
+            vec3 rotation;
+            vec3 scale;
     };
 
-    class Model : public Component
+    class Mesh : public Component
     {
         public:
-            Model(const i32& mesh = 0)
-                : mesh(mesh) { }
+            Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
+                 const std::vector<f32>& vertices, const std::vector<u32>& indices)
+                : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices)
+            { }
 
-            i32 mesh;
+            ~Mesh()
+            {
+                delete vao;
+                delete vbo;
+                delete ebo;
+            }
+
+            VertexArray* vao;
+            VertexBuffer* vbo;
+            IndexBuffer* ebo;
+
+            std::vector<f32> vertices;
+            std::vector<u32> indices;
     };
 };

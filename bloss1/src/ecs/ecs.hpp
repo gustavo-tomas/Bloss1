@@ -17,7 +17,7 @@ namespace bls
     class ECS;
 
     // System: the logic bits
-    typedef void (*System) (ECS& ecs, const f32& dt);
+    typedef void (*System) (ECS& ecs, f32 dt);
 
     // ECS: container of the systems and entities
     class ECS
@@ -58,7 +58,7 @@ namespace bls
             // Table of components
             // @TODO: use templates or smth
             std::map<u32, std::unique_ptr<Transform>> transforms;
-            std::map<u32, std::unique_ptr<Model>> models;
+            std::map<u32, std::unique_ptr<Mesh>> models;
 
         private:
             // Entities IDs

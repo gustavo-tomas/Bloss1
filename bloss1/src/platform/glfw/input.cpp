@@ -5,8 +5,6 @@
 
 namespace bls
 {
-    Input* Input::instance = new GlfwInput();
-
     bool GlfwInput::is_key_pressed_native(i32 keycode)
     {
         auto native_window = static_cast<GLFWwindow*>(Game::get().get_window().get_native_window());

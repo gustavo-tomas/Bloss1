@@ -21,17 +21,23 @@ project "bloss1"
     includedirs { "%{prj.name}/src" }
 
     linkoptions { "-lglfw", "-lGL", "-lGLEW" }
+
+    -- Change project APIs here
+    defines { "_GLFW", "_OPENGL" }
     
     filter "system:linux"
         pic "On"
 
     filter "configurations:debug"
-        buildoptions { "-Wall", "-Wextra" }
-        defines { "_DEBUG", "_OPENGL" }
+        buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
+        linkoptions { "-fsanitize=address" }
+
+        defines { "_DEBUG" }
         symbols "On" -- '-g'
         runtime "Debug"
 
     filter "configurations:release"
         buildoptions { "-O3" } -- Zoooom
         defines { "_RELEASE" }
+        symbols "Off"
         runtime "Release"

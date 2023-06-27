@@ -4,11 +4,6 @@
 
 namespace bls
 {
-    Window* Window::create(const str& title, const u32& width, const u32& height)
-    {
-        return new GlfwWindow(title, width, height);
-    }
-
     GlfwWindow::GlfwWindow(const str& title, const u32& width, const u32& height)
     {
         window_data.title = title;
@@ -65,7 +60,7 @@ namespace bls
         glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GL_TRUE);
 
         // Hide the mouse and enable unlimited movement
-        // glfwSetInputMode(native_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(native_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Disable VSync
         glfwSwapInterval(0);
@@ -107,12 +102,21 @@ namespace bls
                 }
             });
 
-        // Scroll callback
-        glfwSetScrollCallback(
-            native_window, [](GLFWwindow * window, f64 xoffset, f64 yoffset)
+        // Mouse callback
+        glfwSetCursorPosCallback(
+            native_window, [](GLFWwindow * window, f64 x_position, f64 y_position)
             {
                 auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                MouseScrollEvent event = { xoffset, yoffset };
+                MouseMoveEvent event = { x_position, y_position };
+                window_data.event_callback(event);
+            });
+
+        // Scroll callback
+        glfwSetScrollCallback(
+            native_window, [](GLFWwindow * window, f64 x_offset, f64 y_offset)
+            {
+                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+                MouseScrollEvent event = { x_offset, y_offset };
                 window_data.event_callback(event);
             });
     }

@@ -6,6 +6,7 @@
  */
 
 #include "core/core.hpp"
+#include "core/key_codes.hpp"
 
 namespace bls
 {
