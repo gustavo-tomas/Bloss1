@@ -31,7 +31,8 @@ namespace bls
         player(*ecs, Transform(vec3( 5.0f)));
         player(*ecs, Transform(vec3(-5.0f)));
 
-        shader = Shader::create("test", "bloss1/assets/shaders/test.vs", "bloss1/assets/shaders/test.fs");
+        tex_shader = Shader::create("tex", "bloss1/assets/shaders/test/texture.vs", "bloss1/assets/shaders/test/texture.fs");
+        texture = Texture::create("simple_texture", "bloss1/assets/textures/bark.png", TextureType::Diffuse);
 
         running = true;
     }
@@ -76,11 +77,15 @@ namespace bls
             auto model_matrix = translation_mat * rotation_mat * scale_mat;
 
             // Bind and update data to shader
-            shader->bind();
-            shader->set_uniform3("color", { 0.8f, 0.2f, 0.1f });
-            shader->set_uniform4("model", model_matrix);
-            shader->set_uniform4("projection", projection);
-            shader->set_uniform4("view", view);
+            tex_shader->bind();
+            tex_shader->set_uniform1("simple_texture", 0U); // Texture slot 0 (doesn't need to be called every frame)
+            tex_shader->set_uniform3("color", { 0.8f, 0.2f, 0.1f });
+            tex_shader->set_uniform4("model", model_matrix);
+            tex_shader->set_uniform4("projection", projection);
+            tex_shader->set_uniform4("view", view);
+
+            // Set textures
+            texture->bind(0);
 
             // Render the model
             auto model = ecs->models[id].get();
