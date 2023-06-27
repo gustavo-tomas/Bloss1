@@ -46,7 +46,7 @@ namespace bls
         #endif
     }
 
-    VertexBuffer* VertexBuffer::create(f32* vertices, u32 size)
+    VertexBuffer* VertexBuffer::create(const std::vector<f32>& vertices, u32 size)
     {
         #ifdef _OPENGL
         return new OpenGLVertexBuffer(vertices, size);
@@ -55,7 +55,7 @@ namespace bls
         #endif
     }
 
-    IndexBuffer* IndexBuffer::create(u32* indices, u32 count)
+    IndexBuffer* IndexBuffer::create(const std::vector<u32>& indices, u32 count)
     {
         #ifdef _OPENGL
         return new OpenGLIndexBuffer(indices, count);

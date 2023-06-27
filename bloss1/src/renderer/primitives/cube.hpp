@@ -17,8 +17,8 @@ namespace bls
                 vao = VertexArray::create();
                 vao->bind();
 
-                vbo = VertexBuffer::create(vertices, sizeof(vertices));
-                ebo = IndexBuffer::create(indices, sizeof(indices) / sizeof(u32));
+                vbo = VertexBuffer::create(vertices, vertices.size() * sizeof(f32));
+                ebo = IndexBuffer::create(indices, indices.size());
 
                 vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 0, (void*) 0);
             };
@@ -45,7 +45,7 @@ namespace bls
             VertexBuffer* vbo;
             IndexBuffer* ebo;
 
-            f32 vertices[24] =
+            std::vector<f32> vertices =
             {
                 // Front face
                 -1.0f, -1.0f, 1.0f, // (0)
@@ -60,7 +60,7 @@ namespace bls
                 -1.0f,  1.0f, -1.0f  // (7)
             };
 
-            u32 indices[36] =
+            std::vector<u32> indices =
             {
                 // Front face
                 0, 1, 2,

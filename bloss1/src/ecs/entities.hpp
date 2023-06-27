@@ -9,7 +9,7 @@
 #include "renderer/buffers.hpp"
 
 // @TODO: testing
-f32 cube_vertices[48] =
+std::vector<f32> cube_vertices =
 {
     // Front face       // Texture coords   // Vertice
     -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,         // (0)
@@ -24,7 +24,7 @@ f32 cube_vertices[48] =
     -1.0f,  1.0f, -1.0f, 1.0f, 1.0f,        // (7)
 };
 
-u32 cube_indices[36] =
+std::vector<u32> cube_indices =
 {
     // Front face
     0, 1, 2,
@@ -61,8 +61,8 @@ namespace bls
         auto vao = VertexArray::create();
         vao->bind();
 
-        auto vbo = VertexBuffer::create(cube_vertices, sizeof(cube_vertices));
-        auto ebo = IndexBuffer::create(cube_indices, sizeof(cube_indices) / sizeof(u32));
+        auto vbo = VertexBuffer::create(cube_vertices, cube_vertices.size() * sizeof(f32));
+        auto ebo = IndexBuffer::create(cube_indices, cube_indices.size());
 
         // Position
         vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 5 * sizeof(f32), (void*) 0);
@@ -70,10 +70,7 @@ namespace bls
         // Texture
         vao->add_vertex_buffer(1, 2, ShaderDataType::Float, false, 5 * sizeof(f32), (void*) (3 * sizeof(f32)));
 
-        std::vector<f32> vertices(cube_vertices, cube_vertices + 48);
-        std::vector<u32> indices(cube_indices, cube_indices + 36);
-
-        ecs.models[id] = std::make_unique<Mesh>(vao, vbo, ebo, vertices, indices);
+        ecs.models[id] = std::make_unique<Mesh>(vao, vbo, ebo, cube_vertices, cube_indices);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
 
         return id;

@@ -11,7 +11,7 @@ namespace bls
     class OpenGLVertexBuffer : public VertexBuffer
     {
         public:
-            OpenGLVertexBuffer(f32* vertices, u32 size);
+            OpenGLVertexBuffer(const std::vector<f32>& vertices, u32 size);
             ~OpenGLVertexBuffer();
 
             void bind() override;
@@ -24,7 +24,7 @@ namespace bls
     class OpenGLIndexBuffer : public IndexBuffer
     {
         public:
-            OpenGLIndexBuffer(u32* indices, u32 count);
+            OpenGLIndexBuffer(const std::vector<u32>& indices, u32 count);
             ~OpenGLIndexBuffer();
 
             void bind() override;
