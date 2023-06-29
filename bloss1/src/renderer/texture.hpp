@@ -23,6 +23,7 @@ namespace bls
             virtual u32 get_id() = 0;
             virtual u32 get_width() = 0;
             virtual u32 get_height() = 0;
+            virtual TextureType get_type() = 0;
 
             static std::shared_ptr<Texture> create(const str& name, const str& path, TextureType texture_type);
     };

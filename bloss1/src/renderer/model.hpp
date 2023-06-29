@@ -6,6 +6,7 @@
  */
 
 #include "renderer/buffers.hpp"
+#include "renderer/texture.hpp"
 #include "math/math.hpp"
 
 #include <assimp/scene.h>
@@ -30,8 +31,8 @@ namespace bls
             };
 
             Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices)
-                : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices)
+                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const std::vector<Texture*>& textures)
+                : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices), textures(textures)
             { }
 
             ~Mesh()
@@ -47,6 +48,7 @@ namespace bls
 
             std::vector<Vertex> vertices;
             std::vector<u32> indices;
+            std::vector<Texture*> textures;
     };
 
     class Model
@@ -65,6 +67,7 @@ namespace bls
             // Helper methods
             void process_node(aiNode* node, const aiScene* scene);
             Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
+            std::vector<Texture*> load_material_textures(aiMaterial* mat, aiTextureType type);
 
             Assimp::Importer* importer; // @TODO: find a better solution
     };

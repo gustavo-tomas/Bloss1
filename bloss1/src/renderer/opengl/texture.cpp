@@ -110,6 +110,7 @@ namespace bls
         }
 
         this->path = path;
+        this->type = texture_type;
     }
 
     OpenGLTexture::~OpenGLTexture()
@@ -138,5 +139,10 @@ namespace bls
     u32 OpenGLTexture::get_height()
     {
         return height;
+    }
+
+    TextureType OpenGLTexture::get_type()
+    {
+        return type;
     }
 };

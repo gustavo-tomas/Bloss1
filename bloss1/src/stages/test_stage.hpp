@@ -34,7 +34,6 @@ namespace bls
 
             CameraController* controller;
             std::shared_ptr<Shader> tex_shader;
-            std::shared_ptr<Texture> texture;
 
             bool running;
     };

@@ -65,7 +65,7 @@ namespace bls
     {
         std::vector<Mesh::Vertex> vertices;
         std::vector<u32> indices;
-        std::vector<Texture> textures;
+        std::vector<Texture*> textures;
 
         // Process vertex positions, normals and texture coordinates
         for (u32 i = 0; i < mesh->mNumVertices; i++)
@@ -127,20 +127,20 @@ namespace bls
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
         // Diffuse
-        // std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        // textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+        auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE);
+        textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
 
-        // // Specular
-        // std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
-        // textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+        // Specular
+        auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR);
+        textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 
-        // // Normal
-        // std::vector<Texture> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
-        // textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+        // Normal
+        auto normal_maps = load_material_textures(material, aiTextureType_NORMALS);
+        textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
 
-        // // Metalness
-        // std::vector<Texture> metalnessMaps = LoadMaterialTextures(material, aiTextureType_METALNESS, "texture_metalness");
-        // textures.insert(textures.end(), metalnessMaps.begin(), metalnessMaps.end());
+        // Metalness
+        auto metalness_maps = load_material_textures(material, aiTextureType_METALNESS);
+        textures.insert(textures.end(), metalness_maps.begin(), metalness_maps.end());
 
         // Roughness (already loaded in metal ARM textures)
         // vector<Texture> roughnessMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness");
@@ -152,8 +152,6 @@ namespace bls
 
         // Bone weight
         // ExtractBoneWeightForVertices(vertices, mesh);
-
-        // return new Mesh(vertices, indices, textures);
 
         auto vao = VertexArray::create();
         vao->bind();
@@ -176,6 +174,37 @@ namespace bls
         // Bitangent
         vao->add_vertex_buffer(4, 3, ShaderDataType::Float, false, sizeof(Mesh::Vertex), (void*) offsetof(Mesh::Vertex, Mesh::Vertex::bitangent));
 
-        return new Mesh(vao, vbo, ebo, vertices, indices);
+        return new Mesh(vao, vbo, ebo, vertices, indices, textures);
+    }
+
+    std::vector<Texture*> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
+    {
+        str directory = path.substr(0, path.find_last_of('/'));
+
+        std::vector<Texture*> textures;
+        for (u32 i = 0; i < mat->GetTextureCount(type); i++)
+        {
+            aiString str;
+            mat->GetTexture(type, i, &str);
+
+            TextureType texture_type;
+            switch (type)
+            {
+                case aiTextureType_DIFFUSE:   texture_type = TextureType::Diffuse;   break;
+                case aiTextureType_SPECULAR:  texture_type = TextureType::Specular;  break;
+                case aiTextureType_NORMALS:   texture_type = TextureType::Normal;    break;
+                case aiTextureType_METALNESS: texture_type = TextureType::Metalness; break;
+
+                default:
+                    std::cerr << "invalid texture type: '" << type << "'\n";
+                    break;
+            }
+
+            // @TODO: might wanna check if texture was already loaded for another mesh
+            auto texture = Texture::create(str.C_Str(), directory + "/" + str.C_Str(), texture_type);
+            textures.push_back(texture.get());
+        }
+
+        return textures;
     }
 };

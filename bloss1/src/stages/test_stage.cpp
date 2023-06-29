@@ -32,7 +32,6 @@ namespace bls
         player(*ecs, Transform(vec3(-5.0f)));
 
         tex_shader = Shader::create("tex", "bloss1/assets/shaders/test/texture.vs", "bloss1/assets/shaders/test/texture.fs");
-        texture = Texture::create("simple_texture", "bloss1/assets/textures/bark.png", TextureType::Diffuse);
 
         running = true;
     }
@@ -78,21 +77,45 @@ namespace bls
 
             // Bind and update data to shader
             tex_shader->bind();
-            tex_shader->set_uniform1("simple_texture", 0U); // Texture slot 0 (doesn't need to be called every frame)
-            tex_shader->set_uniform3("color", { 0.8f, 0.2f, 0.1f });
+            tex_shader->set_uniform1("diffuse", 0U); // Texture slot 0 (doesn't need to be called every frame)
+            tex_shader->set_uniform3("color", { 1.0f, 1.0f, 1.0f });
             tex_shader->set_uniform4("model", model_matrix);
             tex_shader->set_uniform4("projection", projection);
             tex_shader->set_uniform4("view", view);
-
-            // Set textures
-            texture->bind(0);
 
             // Render the model
             auto model_component = ecs->models[id].get();
             for (auto& mesh : model_component->model->meshes)
             {
+                // Bind textures
+                i32 offset = 0; // @TODO: calculate precise offset
+                for (u32 i = 0; i < mesh->textures.size(); i++)
+                {
+                    auto texture = mesh->textures[i];
+
+                    str type_name;
+                    auto type = texture->get_type();
+
+                    switch (type)
+                    {
+                        case TextureType::Diffuse:          type_name = "diffuse";   break;
+                        case TextureType::Specular:         type_name = "specular";  break;
+                        case TextureType::Normal:           type_name = "normal";    break;
+                        case TextureType::Metalness:        type_name = "metalness"; break;
+                        case TextureType::Roughness:        type_name = "roughness"; break;
+                        case TextureType::AmbientOcclusion: type_name = "ao";        break;
+
+                        default: std::cerr << "invalid texture type: '" << type << "'\n";
+                    }
+
+                    tex_shader->set_uniform1("material." + type_name, i + offset);
+                    texture->bind(i + offset); // Offset the active samplers in the frag shader
+                }
+
                 mesh->vao->bind();
                 renderer.draw_indexed(mesh->indices.size());
+
+                // Reset
                 mesh->vao->unbind();
             }
         }
