@@ -7,6 +7,7 @@
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
 #include "renderer/buffers.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {
@@ -28,26 +29,13 @@ namespace bls
             vec3 scale;
     };
 
-    class Mesh : public Component
+    // @TODO: find a better solution (get rid of model entirely?)
+    class ModelComponent : public Component
     {
         public:
-            Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<f32>& vertices, const std::vector<u32>& indices)
-                : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices)
-            { }
+            ModelComponent(Model* model)
+                : model(model) { }
 
-            ~Mesh()
-            {
-                delete vao;
-                delete vbo;
-                delete ebo;
-            }
-
-            VertexArray* vao;
-            VertexBuffer* vbo;
-            IndexBuffer* ebo;
-
-            std::vector<f32> vertices;
-            std::vector<u32> indices;
+            Model* model;
     };
 };

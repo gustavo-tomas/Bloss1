@@ -9,6 +9,7 @@
 #include "ecs/ecs.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/shader.hpp"
+#include "renderer/texture.hpp"
 #include "renderer/primitives/cube.hpp"
 #include "camera/controller.hpp"
 
@@ -32,7 +33,7 @@ namespace bls
             Window& window;
 
             CameraController* controller;
-            std::shared_ptr<Shader> shader;
+            std::shared_ptr<Shader> tex_shader;
 
             bool running;
     };

@@ -11,7 +11,7 @@ namespace bls
     class ShaderManager
     {
         public:
-            std::shared_ptr<Shader> load(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path = "");
+            void load(const str& name, std::shared_ptr<Shader> shader);
             std::shared_ptr<Shader> get_shader(const str& name);
             bool exists(const str& name);
 

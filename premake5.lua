@@ -18,9 +18,9 @@ project "bloss1"
 
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
 
-    includedirs { "%{prj.name}/src" }
+    includedirs { "%{prj.name}/src", "vendor/" }
 
-    linkoptions { "-lglfw", "-lGL", "-lGLEW" }
+    linkoptions { "-lglfw", "-lGL", "-lGLEW", "-lassimp" }
 
     -- Change project APIs here
     defines { "_GLFW", "_OPENGL" }

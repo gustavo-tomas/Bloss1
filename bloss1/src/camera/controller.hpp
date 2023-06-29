@@ -25,7 +25,7 @@ namespace bls
             Camera& get_camera();
 
         private:
-            Camera camera;
+            Camera* camera;
             f32 mouse_x, mouse_y;
             f32 speed, sensitivity;
     };

@@ -21,7 +21,7 @@ namespace bls
             virtual void bind() = 0;
             virtual void unbind() = 0;
 
-            static VertexBuffer* create(f32* vertices, u32 size);
+            static VertexBuffer* create(void* vertices, u32 size);
     };
 
     class IndexBuffer
@@ -33,7 +33,7 @@ namespace bls
             virtual void unbind() = 0;
             virtual u32 get_count() = 0;
 
-            static IndexBuffer* create(u32* indices, u32 count);
+            static IndexBuffer* create(const std::vector<u32>& indices, u32 count);
     };
 
     class VertexArray
