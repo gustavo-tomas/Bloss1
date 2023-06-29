@@ -88,10 +88,13 @@ namespace bls
             texture->bind(0);
 
             // Render the model
-            auto model = ecs->models[id].get();
-            model->vao->bind();
-            renderer.draw_indexed(model->indices.size());
-            model->vao->unbind();
+            auto model_component = ecs->models[id].get();
+            for (auto& mesh : model_component->model->meshes)
+            {
+                mesh->vao->bind();
+                renderer.draw_indexed(mesh->indices.size());
+                mesh->vao->unbind();
+            }
         }
 
         // Exit the stage

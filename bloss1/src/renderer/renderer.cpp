@@ -1,10 +1,12 @@
 #include "renderer/renderer.hpp"
+#include "renderer/model.hpp"
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/shader.hpp"
 #include "renderer/opengl/buffers.hpp"
 #include "renderer/opengl/texture.hpp"
 #include "managers/shader_manager.hpp"
 #include "managers/texture_manager.hpp"
+#include "managers/model_manager.hpp"
 
 namespace bls
 {
@@ -30,6 +32,17 @@ namespace bls
         #else
         return nullptr;
         #endif
+    }
+
+    // @TODO: there must be a better way
+    std::shared_ptr<Model> Model::create(const str& name, const str& path, bool flip_uvs)
+    {
+        if (ModelManager::get().exists(name))
+            return ModelManager::get().get_model(name);
+
+        auto model = std::make_shared<Model>(path, flip_uvs);
+        ModelManager::get().load(name, model);
+        return model;
     }
 
     std::shared_ptr<Texture> Texture::create(const str& name, const str& path, TextureType texture_type)

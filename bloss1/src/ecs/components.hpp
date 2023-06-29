@@ -7,6 +7,7 @@
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
 #include "renderer/buffers.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {
@@ -28,38 +29,13 @@ namespace bls
             vec3 scale;
     };
 
-    class Mesh : public Component
+    // @TODO: find a better solution (get rid of model entirely?)
+    class ModelComponent : public Component
     {
         public:
-            struct Vertex
-            {
-                vec3 position;
-                vec3 normal;
-                vec2 tex_coords;
-                vec3 tangent;
-                vec3 bitangent;
+            ModelComponent(Model* model)
+                : model(model) { }
 
-                // int boneIDs[MAX_BONE_PER_VERTEX];
-                // float weights[MAX_BONE_PER_VERTEX];
-            };
-
-            Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices)
-                : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices)
-            { }
-
-            ~Mesh()
-            {
-                delete vao;
-                delete vbo;
-                delete ebo;
-            }
-
-            VertexArray* vao;
-            VertexBuffer* vbo;
-            IndexBuffer* ebo;
-
-            std::vector<Vertex> vertices;
-            std::vector<u32> indices;
+            Model* model;
     };
 };
