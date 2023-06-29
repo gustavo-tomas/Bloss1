@@ -29,15 +29,32 @@ namespace bls
             vec3 scale;
     };
 
-    class Light : public Component
+    class DirectionalLight : public Component
     {
         public:
-            Light(const vec3& ambient = vec3(0.0f), const vec3& diffuse = vec3(1.0f), const vec3& specular = vec3(1.0f))
+            DirectionalLight(const vec3& ambient = vec3(0.0f), const vec3& diffuse = vec3(1.0f), const vec3& specular = vec3(1.0f))
                 : ambient(ambient), diffuse(diffuse), specular(specular) { }
 
             vec3 ambient;
             vec3 diffuse;
             vec3 specular;
+    };
+
+    class PointLight : public Component
+    {
+        public:
+            PointLight(const vec3& ambient = vec3(0.0f), const vec3& diffuse = vec3(1.0f), const vec3& specular = vec3(1.0f),
+                       f32 constant = 1.0f, f32 linear = 0.0001f, f32 quadratic = 0.000001f)
+                : ambient(ambient), diffuse(diffuse), specular(specular),
+                  constant(constant), linear(linear), quadratic(quadratic) { }
+
+            vec3 ambient;
+            vec3 diffuse;
+            vec3 specular;
+
+            f32 constant;
+            f32 linear;
+            f32 quadratic;
     };
 
     // @TODO: find a better solution (get rid of model entirely?)

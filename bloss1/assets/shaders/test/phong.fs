@@ -74,8 +74,7 @@ void main() {
     vec3 pointLightColor = calcPointLight(pointLight, normalizedNormal, normalizedViewDir);
 
 	// Final color
-    // vec3 finalColor = dirLightColor + pointLightColor;
-    vec3 finalColor = dirLightColor;
+    vec3 finalColor = dirLightColor + pointLightColor;
     FragColor = vec4(finalColor, 1.0);
 }
 

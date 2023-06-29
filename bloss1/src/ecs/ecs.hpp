@@ -31,7 +31,7 @@ namespace bls
                 systems.clear();
                 transforms.clear();
                 models.clear();
-                lights.clear();
+                dir_lights.clear();
 
                 std::cout << "world destroyed successfully\n";
             }
@@ -59,8 +59,9 @@ namespace bls
             // Table of components
             // @TODO: use templates or smth
             std::map<u32, std::unique_ptr<Transform>> transforms;
-            std::map<u32, std::unique_ptr<Light>> lights;
             std::map<u32, std::unique_ptr<ModelComponent>> models;
+            std::map<u32, std::unique_ptr<DirectionalLight>> dir_lights;
+            std::map<u32, std::unique_ptr<PointLight>> point_lights;
 
         private:
             // Entities IDs

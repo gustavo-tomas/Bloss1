@@ -34,18 +34,30 @@ namespace bls
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
         // Add lights
-        dir_light = directional_light(*ecs,
-                                      Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                      Light(vec3(0.2f), vec3(5.0f), vec3(1.0f)));
+        dir_light_id = directional_light(*ecs,
+                                         Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
+                                         DirectionalLight(vec3(0.2f), vec3(5.0f), vec3(1.0f)));
+
+        point_light_id = point_light(*ecs,
+                                     Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
+                                     PointLight(vec3(0.2f), vec3(5.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
 
         // Create shaders
         phong_shader = Shader::create("test", "bloss1/assets/shaders/test/phong.vs", "bloss1/assets/shaders/test/phong.fs");
         phong_shader->bind();
 
-        phong_shader->set_uniform3("dirLight.direction", ecs->transforms[dir_light]->rotation);
-        phong_shader->set_uniform3("dirLight.ambient", ecs->lights[dir_light]->ambient);
-        phong_shader->set_uniform3("dirLight.diffuse", ecs->lights[dir_light]->diffuse);
-        phong_shader->set_uniform3("dirLight.specular", ecs->lights[dir_light]->specular);
+        phong_shader->set_uniform3("dirLight.direction", ecs->transforms[dir_light_id]->rotation);
+        phong_shader->set_uniform3("dirLight.ambient", ecs->dir_lights[dir_light_id]->ambient);
+        phong_shader->set_uniform3("dirLight.diffuse", ecs->dir_lights[dir_light_id]->diffuse);
+        phong_shader->set_uniform3("dirLight.specular", ecs->dir_lights[dir_light_id]->specular);
+
+        phong_shader->set_uniform3("pointLight.position", ecs->transforms[point_light_id]->position);
+        phong_shader->set_uniform3("pointLight.ambient", ecs->point_lights[point_light_id]->ambient);
+        phong_shader->set_uniform3("pointLight.diffuse", ecs->point_lights[point_light_id]->diffuse);
+        phong_shader->set_uniform3("pointLight.specular", ecs->point_lights[point_light_id]->specular);
+        phong_shader->set_uniform1("pointLight.constant", ecs->point_lights[point_light_id]->constant);
+        phong_shader->set_uniform1("pointLight.linear", ecs->point_lights[point_light_id]->linear);
+        phong_shader->set_uniform1("pointLight.quadratic", ecs->point_lights[point_light_id]->quadratic);
 
         running = true;
     }
