@@ -33,7 +33,10 @@ namespace bls
             Window& window;
 
             CameraController* controller;
-            std::shared_ptr<Shader> tex_shader;
+            std::shared_ptr<Shader> phong_shader;
+
+            u32 dir_light_id;
+            u32 point_light_id;
 
             bool running;
     };

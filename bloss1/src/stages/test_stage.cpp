@@ -28,10 +28,36 @@ namespace bls
         ecs->add_system(render_system);
 
         // Add some entities to the world
-        player(*ecs, Transform(vec3( 5.0f)));
-        player(*ecs, Transform(vec3(-5.0f)));
+        for (u32 i = 0; i < 5; i++)
+            player(*ecs, Transform(vec3(i * 10.0f, 5.0f, 5.0f), vec3(0.0f), vec3(5.0f)));
 
-        tex_shader = Shader::create("tex", "bloss1/assets/shaders/test/texture.vs", "bloss1/assets/shaders/test/texture.fs");
+        floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
+
+        // Add lights
+        dir_light_id = directional_light(*ecs,
+                                         Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
+                                         DirectionalLight(vec3(0.2f), vec3(5.0f), vec3(1.0f)));
+
+        point_light_id = point_light(*ecs,
+                                     Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
+                                     PointLight(vec3(0.2f), vec3(5.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
+
+        // Create shaders
+        phong_shader = Shader::create("test", "bloss1/assets/shaders/test/phong.vs", "bloss1/assets/shaders/test/phong.fs");
+        phong_shader->bind();
+
+        phong_shader->set_uniform3("dirLight.direction", ecs->transforms[dir_light_id]->rotation);
+        phong_shader->set_uniform3("dirLight.ambient", ecs->dir_lights[dir_light_id]->ambient);
+        phong_shader->set_uniform3("dirLight.diffuse", ecs->dir_lights[dir_light_id]->diffuse);
+        phong_shader->set_uniform3("dirLight.specular", ecs->dir_lights[dir_light_id]->specular);
+
+        phong_shader->set_uniform3("pointLight.position", ecs->transforms[point_light_id]->position);
+        phong_shader->set_uniform3("pointLight.ambient", ecs->point_lights[point_light_id]->ambient);
+        phong_shader->set_uniform3("pointLight.diffuse", ecs->point_lights[point_light_id]->diffuse);
+        phong_shader->set_uniform3("pointLight.specular", ecs->point_lights[point_light_id]->specular);
+        phong_shader->set_uniform1("pointLight.constant", ecs->point_lights[point_light_id]->constant);
+        phong_shader->set_uniform1("pointLight.linear", ecs->point_lights[point_light_id]->linear);
+        phong_shader->set_uniform1("pointLight.quadratic", ecs->point_lights[point_light_id]->quadratic);
 
         running = true;
     }
@@ -54,14 +80,16 @@ namespace bls
         // Camera properties
         auto projection = controller->get_camera().get_projection_matrix(width, height);
         auto view = controller->get_camera().get_view_matrix();
+        auto position = controller->get_camera().get_position();
 
         // Clear the screen
         renderer.clear();
         renderer.clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
 
         // Render all entities
-        for (const auto& [id, transform] : ecs->transforms)
+        for (const auto& [id, model] : ecs->models)
         {
+            auto transform = ecs->transforms[id].get();
             auto scale_mat = scale(mat4(1.0f), transform->scale);
             auto translation_mat = translate(mat4(1.0f), transform->position);
 
@@ -76,16 +104,14 @@ namespace bls
             auto model_matrix = translation_mat * rotation_mat * scale_mat;
 
             // Bind and update data to shader
-            tex_shader->bind();
-            tex_shader->set_uniform1("diffuse", 0U); // Texture slot 0 (doesn't need to be called every frame)
-            tex_shader->set_uniform3("color", { 1.0f, 1.0f, 1.0f });
-            tex_shader->set_uniform4("model", model_matrix);
-            tex_shader->set_uniform4("projection", projection);
-            tex_shader->set_uniform4("view", view);
+            phong_shader->bind();
+            phong_shader->set_uniform4("model", model_matrix);
+            phong_shader->set_uniform4("projection", projection);
+            phong_shader->set_uniform4("view", view);
+            phong_shader->set_uniform3("viewPos", position);
 
             // Render the model
-            auto model_component = ecs->models[id].get();
-            for (auto& mesh : model_component->model->meshes)
+            for (auto& mesh : model->model->meshes)
             {
                 // Bind textures
                 i32 offset = 0; // @TODO: calculate precise offset
@@ -108,7 +134,7 @@ namespace bls
                         default: std::cerr << "invalid texture type: '" << type << "'\n";
                     }
 
-                    tex_shader->set_uniform1("material." + type_name, i + offset);
+                    phong_shader->set_uniform1("material." + type_name, i + offset);
                     texture->bind(i + offset); // Offset the active samplers in the frag shader
                 }
 
