@@ -89,6 +89,16 @@ namespace bls
         return zoom;
     }
 
+    f32 Camera::get_near()
+    {
+        return near;
+    }
+
+    f32 Camera::get_far()
+    {
+        return far;
+    }
+
     void Camera::update_view_matrix()
     {
         front = vec3(cos(radians(yaw)) * cos(radians(pitch)),
