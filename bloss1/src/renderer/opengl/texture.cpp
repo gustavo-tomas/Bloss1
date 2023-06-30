@@ -6,28 +6,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include <assimp/material.h>
 #include <filesystem> // @TODO: temporary (use a filesystem pls tyty)
 
 namespace bls
 {
-    static aiTextureType convert_to_assimp_texture(TextureType type)
-    {
-        switch (type)
-        {
-            case TextureType::Diffuse:          return aiTextureType_DIFFUSE;
-            case TextureType::Normal:           return aiTextureType_NORMALS;
-            case TextureType::Specular:         return aiTextureType_SPECULAR;
-            case TextureType::Metalness:        return aiTextureType_METALNESS;
-            case TextureType::Roughness:        return aiTextureType_DIFFUSE_ROUGHNESS;
-            case TextureType::AmbientOcclusion: return aiTextureType_AMBIENT_OCCLUSION;
-
-            default: std::cerr << "unknown texture type\n"; exit(1);
-        }
-
-        return aiTextureType_UNKNOWN;
-    }
-
     OpenGLTexture::OpenGLTexture(const str& path, TextureType texture_type)
     {
         stbi_set_flip_vertically_on_load(true);
@@ -40,6 +22,7 @@ namespace bls
             f32* data = stbi_loadf(path.c_str(), &width, &height, &num_components, 0);
             if (data)
             {
+                // @TODO: dsa here too
                 glGenTextures(1, &texture_id);
                 glBindTexture(GL_TEXTURE_2D, texture_id);
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
@@ -67,28 +50,35 @@ namespace bls
             if (data)
             {
                 // Resolve format
-                GLenum format;
-                if      (num_components == 1) { format = GL_RED; }
-                else if (num_components == 3) { format = GL_RGB; }
-                else if (num_components == 4) { format = GL_RGBA; }
-                else format = GL_RGB;
+                GLenum internal_format = 0, data_format = 0;
+                if (num_components == 4)
+                {
+                    internal_format = GL_RGBA8;
+                    data_format = GL_RGBA;
+                }
 
-                // Resolve internal format (sRGB or linear space)
-                GLint internalFormat;
-                if      (format == GL_RGB  && convert_to_assimp_texture(texture_type) == aiTextureType_DIFFUSE) { internalFormat = GL_SRGB; }
-                else if (format == GL_RGBA && convert_to_assimp_texture(texture_type) == aiTextureType_DIFFUSE) { internalFormat = GL_SRGB_ALPHA; }
-                else internalFormat = format;
+                else if (num_components == 3)
+                {
+                    internal_format = GL_RGB8;
+                    data_format = GL_RGB;
+                }
+
+                else
+                {
+                    std::cerr << "unsupported number of channels: '" << num_components << "'\n";
+                    exit(1);
+                }
 
                 // Create texture
-                glGenTextures(1, &texture_id);
-                glBindTexture(GL_TEXTURE_2D, texture_id);
-                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
+                glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
+                glTextureStorage2D(texture_id, 1, internal_format, width, height);
+                glTextureSubImage2D(texture_id, 0, 0, 0, width, height, data_format, GL_UNSIGNED_BYTE, data);
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glGenerateTextureMipmap(texture_id);
+                glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
                 stbi_image_free(data);
             }
@@ -122,8 +112,7 @@ namespace bls
 
     void OpenGLTexture::bind(u32 slot)
     {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, texture_id);
+        glBindTextureUnit(slot, texture_id);
     }
 
     u32 OpenGLTexture::get_id()

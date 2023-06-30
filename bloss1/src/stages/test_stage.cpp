@@ -36,11 +36,11 @@ namespace bls
         // Add lights
         dir_light_id = directional_light(*ecs,
                                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                         DirectionalLight(vec3(0.2f), vec3(5.0f), vec3(1.0f)));
+                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
 
         point_light_id = point_light(*ecs,
                                      Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                     PointLight(vec3(0.2f), vec3(5.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
+                                     PointLight(vec3(0.2f), vec3(1.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
 
         // Create shaders
         phong_shader = Shader::create("test", "bloss1/assets/shaders/test/phong.vs", "bloss1/assets/shaders/test/phong.fs");
