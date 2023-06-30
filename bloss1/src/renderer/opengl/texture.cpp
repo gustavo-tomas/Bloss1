@@ -10,6 +10,48 @@
 
 namespace bls
 {
+    // static GLenum convert_to_opengl_image_format(ImageFormat format)
+    // {
+    //     switch (format)
+    //     {
+    //         case ImageFormat::RGB8:  return GL_RGB;
+    //         case ImageFormat::RGBA8: return GL_RGBA;
+    //         default: std::cerr << "invalid image format: '" << format << "'\n"; exit(1);
+    //     }
+
+    //     return 0;
+    // }
+
+    static GLenum convert_to_opengl_internal_format(ImageFormat format)
+    {
+        switch (format)
+        {
+            case ImageFormat::RGB8:  return GL_RGB8;
+            case ImageFormat::RGBA8: return GL_RGBA8;
+            default: std::cerr << "invalid image format: '" << format << "'\n"; exit(1);
+        }
+
+        return 0;
+    }
+
+    OpenGLTexture::OpenGLTexture(u32 width, u32 height, ImageFormat format)
+    {
+        auto internal_format = convert_to_opengl_internal_format(format);
+
+        // Create texture
+        glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
+        glTextureStorage2D(texture_id, 1, internal_format, width, height);
+
+        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // @TODO: this should also be configurable
+        glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        this->type = TextureType::None; // Type doesn't really matter for this kind of texture
+        this->width = width;
+        this->height = height;
+    }
+
     OpenGLTexture::OpenGLTexture(const str& path, TextureType texture_type)
     {
         stbi_set_flip_vertically_on_load(true);

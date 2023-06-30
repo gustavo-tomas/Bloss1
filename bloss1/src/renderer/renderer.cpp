@@ -45,6 +45,16 @@ namespace bls
         return model;
     }
 
+    std::shared_ptr<Texture> Texture::create(u32 width, u32 height, ImageFormat format)
+    {
+        #ifdef _OPENGL
+        auto texture = std::make_shared<OpenGLTexture>(width, height, format);
+        return texture;
+        #else
+        return nullptr;
+        #endif
+    }
+
     std::shared_ptr<Texture> Texture::create(const str& name, const str& path, TextureType texture_type)
     {
         if (TextureManager::get().exists(name))

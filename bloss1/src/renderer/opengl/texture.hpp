@@ -11,6 +11,7 @@ namespace bls
     class OpenGLTexture : public Texture
     {
         public:
+            OpenGLTexture(u32 width, u32 height, ImageFormat format);
             OpenGLTexture(const str& path, TextureType texture_type);
             ~OpenGLTexture();
 
