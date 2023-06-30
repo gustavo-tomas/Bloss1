@@ -5,12 +5,18 @@
  */
 
 #include "core/core.hpp"
+#include "renderer/texture.hpp"
 
 namespace bls
 {
     enum ShaderDataType
     {
         Float, Int, Bool
+    };
+
+    enum AttachmentType
+    {
+        Depth
     };
 
     class VertexBuffer
@@ -43,8 +49,24 @@ namespace bls
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
+            virtual void attach_texture(Texture* texture) = 0;
+            virtual void draw() = 0;
+            virtual bool check() = 0;
 
             static FrameBuffer* create();
+    };
+
+    class RenderBuffer
+    {
+        public:
+            virtual ~RenderBuffer() { };
+
+            virtual void bind() = 0;
+            virtual void unbind() = 0;
+            virtual u32 get_width() = 0;
+            virtual u32 get_height() = 0;
+
+            static RenderBuffer* create(u32 width, u32 height, AttachmentType type);
     };
 
     class VertexArray

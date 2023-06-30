@@ -59,6 +59,33 @@ namespace bls
         phong_shader->set_uniform1("pointLight.linear", ecs->point_lights[point_light_id]->linear);
         phong_shader->set_uniform1("pointLight.quadratic", ecs->point_lights[point_light_id]->quadratic);
 
+        // Create framebuffer textures
+        auto frame_buffer = FrameBuffer::create();
+
+        // Position
+        auto position_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        frame_buffer->attach_texture(position_texture.get());
+
+        // Normal
+        auto normal_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        frame_buffer->attach_texture(normal_texture.get());
+
+        // Albedo
+        auto albedo_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8);
+        frame_buffer->attach_texture(albedo_texture.get());
+
+        frame_buffer->draw();
+
+        // Create and attach depth buffer
+        auto render_buffer = RenderBuffer::create(window.get_width(), window.get_height(), AttachmentType::Depth);
+        render_buffer->bind();
+
+        // Check if framebuffer is complete
+        if (!frame_buffer->check())
+            exit(1);
+
+        frame_buffer->unbind();
+
         running = true;
     }
 

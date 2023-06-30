@@ -96,6 +96,15 @@ namespace bls
         #endif
     }
 
+    RenderBuffer* RenderBuffer::create(u32 width, u32 height, AttachmentType type)
+    {
+        #ifdef _OPENGL
+        return new OpenGLRenderBuffer(width, height, type);
+        #else
+        return nullptr;
+        #endif
+    }
+
     VertexArray* VertexArray::create()
     {
         #ifdef _OPENGL

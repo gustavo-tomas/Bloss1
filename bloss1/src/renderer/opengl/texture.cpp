@@ -28,6 +28,7 @@ namespace bls
         {
             case ImageFormat::RGB8:  return GL_RGB8;
             case ImageFormat::RGBA8: return GL_RGBA8;
+            case ImageFormat::RGBA32F: return GL_RGB32F;
             default: std::cerr << "invalid image format: '" << format << "'\n"; exit(1);
         }
 
