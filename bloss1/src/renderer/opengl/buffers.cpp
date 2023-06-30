@@ -69,6 +69,28 @@ namespace bls
         return count;
     }
 
+    // Frame Buffer ----------------------------------------------------------------------------------------------------
+    OpenGLFrameBuffer::OpenGLFrameBuffer()
+    {
+        glGenFramebuffers(1, &FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    }
+
+    OpenGLFrameBuffer::~OpenGLFrameBuffer()
+    {
+        glDeleteFramebuffers(1, &FBO);
+    }
+
+    void OpenGLFrameBuffer::bind()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    }
+
+    void OpenGLFrameBuffer::unbind()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     // Vertex Array ----------------------------------------------------------------------------------------------------
     OpenGLVertexArray::OpenGLVertexArray()
     {

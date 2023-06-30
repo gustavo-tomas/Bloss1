@@ -36,6 +36,17 @@ namespace bls
             static IndexBuffer* create(const std::vector<u32>& indices, u32 count);
     };
 
+    class FrameBuffer
+    {
+        public:
+            virtual ~FrameBuffer() { };
+
+            virtual void bind() = 0;
+            virtual void unbind() = 0;
+
+            static FrameBuffer* create();
+    };
+
     class VertexArray
     {
         public:

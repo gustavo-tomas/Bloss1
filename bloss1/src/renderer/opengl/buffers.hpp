@@ -36,6 +36,19 @@ namespace bls
             u32 count;
     };
 
+    class OpenGLFrameBuffer : public FrameBuffer
+    {
+        public:
+            OpenGLFrameBuffer();
+            ~OpenGLFrameBuffer();
+
+            void bind() override;
+            void unbind() override;
+
+        private:
+            u32 FBO;
+    };
+
     class OpenGLVertexArray : public VertexArray
     {
         public:

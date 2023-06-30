@@ -87,6 +87,15 @@ namespace bls
         #endif
     }
 
+    FrameBuffer* FrameBuffer::create()
+    {
+        #ifdef _OPENGL
+        return new OpenGLFrameBuffer();
+        #else
+        return nullptr;
+        #endif
+    }
+
     VertexArray* VertexArray::create()
     {
         #ifdef _OPENGL
