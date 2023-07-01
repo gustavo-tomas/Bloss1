@@ -52,6 +52,7 @@ namespace bls
             virtual void attach_texture(Texture* texture) = 0;
             virtual void draw() = 0;
             virtual bool check() = 0;
+            virtual std::vector<Texture*>& get_attachments() = 0;
 
             static FrameBuffer* create();
     };

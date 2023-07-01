@@ -93,8 +93,8 @@ namespace bls
 
     void OpenGLFrameBuffer::attach_texture(Texture* texture)
     {
-        attachments.push_back(texture);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachments.size(), GL_TEXTURE_2D, texture->get_id(), 0);
+        attachments.push_back(texture);
     }
 
     void OpenGLFrameBuffer::draw()
@@ -116,6 +116,11 @@ namespace bls
         }
 
         return true;
+    }
+
+    std::vector<Texture*>& OpenGLFrameBuffer::get_attachments()
+    {
+        return attachments;
     }
 
     // Render Buffer ---------------------------------------------------------------------------------------------------

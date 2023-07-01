@@ -47,6 +47,7 @@ namespace bls
             void attach_texture(Texture* texture) override;
             void draw() override;
             bool check() override;
+            std::vector<Texture*>& get_attachments() override;
 
         private:
             u32 FBO;

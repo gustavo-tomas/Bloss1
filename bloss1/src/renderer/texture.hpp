@@ -17,6 +17,7 @@ namespace bls
     {
         RGB8,
         RGBA8,
+        RGB32F,
         RGBA32F
     };
 
