@@ -43,7 +43,7 @@ namespace bls
     class PointLight : public Component
     {
         public:
-            PointLight(const vec3& ambient = vec3(0.0f), const vec3& diffuse = vec3(1.0f), const vec3& specular = vec3(1.0f),
+            PointLight(const vec3& diffuse = vec3(1.0f), const vec3& ambient = vec3(0.0f), const vec3& specular = vec3(1.0f),
                        f32 constant = 1.0f, f32 linear = 0.0001f, f32 quadratic = 0.000001f)
                 : ambient(ambient), diffuse(diffuse), specular(specular),
                   constant(constant), linear(linear), quadratic(quadratic) { }

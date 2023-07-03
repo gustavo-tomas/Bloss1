@@ -44,7 +44,6 @@ namespace bls
             std::shared_ptr<Texture> position_texture, normal_texture, albedo_texture, arm_texture, tbn_texture, depth_texture;
 
             u32 dir_light_id;
-            u32 point_light_id;
 
             bool running;
     };

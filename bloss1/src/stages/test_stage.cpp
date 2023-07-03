@@ -33,14 +33,17 @@ namespace bls
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
-        // Add lights
+        // Add directional lights
         dir_light_id = directional_light(*ecs,
                                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
+                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f))
+                                        );
 
-        point_light_id = point_light(*ecs,
-                                     Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                     PointLight(vec3(0.2f), vec3(1.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
+        // Add point lights
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(20000.0f)));
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(20000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(20000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(20000.0f)));
 
         // Create shaders
 
@@ -48,7 +51,7 @@ namespace bls
         g_buffer_shader = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
 
         // PBR shader
-        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr.vs", "bloss1/assets/shaders/pbr.fs");
+        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
 
         // Create framebuffer textures
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
@@ -190,6 +193,23 @@ namespace bls
         renderer.clear();
 
         pbr_shader->bind();
+
+        // Set camera position
+        pbr_shader->set_uniform3("viewPos", position);
+
+        // Set lights uniforms
+        u32 light_counter = 0;
+        auto& point_lights = ecs->point_lights;
+        auto& light_transforms = ecs->transforms;
+        for (auto& [id, light] : point_lights)
+        {
+            auto transform = light_transforms[id].get();
+
+            pbr_shader->set_uniform3("pointLightPositions[" + to_str(light_counter) + "]", transform->position);
+            pbr_shader->set_uniform3("pointLightColors[" + to_str(light_counter) + "]", light->diffuse);
+
+            light_counter++;
+        }
 
         // @TODO: this is hardcoded
         std::vector<str> textures = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
