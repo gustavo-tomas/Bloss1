@@ -202,7 +202,6 @@ namespace bls
 
         // Render light quad
         quad->Render();
-        pbr_shader->unbind();
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))

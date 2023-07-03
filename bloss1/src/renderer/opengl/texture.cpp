@@ -58,7 +58,7 @@ namespace bls
     {
         stbi_set_flip_vertically_on_load(true);
 
-        // @TODO: use a filesystem
+        // @TODO: use a filesystem (and make the other params configurable)
         const str extension = std::filesystem::path(path).extension();
 
         if (extension == ".hdr")
@@ -66,15 +66,14 @@ namespace bls
             f32* data = stbi_loadf(path.c_str(), &width, &height, &num_components, 0);
             if (data)
             {
-                // @TODO: dsa here too
-                glGenTextures(1, &texture_id);
-                glBindTexture(GL_TEXTURE_2D, texture_id);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+                glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
+                glTextureStorage2D(texture_id, 1, GL_RGB32F, width, height);
+                glTextureSubImage2D(texture_id, 0, 0, 0, width, height, GL_RGB, GL_FLOAT, data);
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
                 stbi_image_free(data);
             }
