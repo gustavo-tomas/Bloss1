@@ -49,15 +49,6 @@ namespace bls
 
         // PBR shader
         pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr.vs", "bloss1/assets/shaders/pbr.fs");
-        pbr_shader->bind();
-
-        pbr_shader->set_uniform1("position",  0U);
-        pbr_shader->set_uniform1("normal",    1U);
-        pbr_shader->set_uniform1("albedo",    2U);
-        pbr_shader->set_uniform1("arm",       3U);
-        pbr_shader->set_uniform1("tbnNormal", 4U);
-        pbr_shader->set_uniform1("depth",     5U);
-        pbr_shader->unbind();
 
         // Create framebuffer textures
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
@@ -161,7 +152,6 @@ namespace bls
             for (auto& mesh : model->model->meshes)
             {
                 // Bind textures
-                i32 offset = 0; // @TODO: calculate precise offset
                 for (u32 i = 0; i < mesh->textures.size(); i++)
                 {
                     auto texture = mesh->textures[i];
@@ -181,8 +171,8 @@ namespace bls
                         default: std::cerr << "invalid texture type: '" << type << "'\n";
                     }
 
-                    g_buffer_shader->set_uniform1("material." + type_name, i + offset);
-                    texture->bind(i + offset); // Offset the active samplers in the frag shader
+                    g_buffer_shader->set_uniform1("material." + type_name, i);
+                    texture->bind(i); // Offset the active samplers in the frag shader
                 }
 
                 mesh->vao->bind();
@@ -201,9 +191,14 @@ namespace bls
 
         pbr_shader->bind();
 
+        // @TODO: this is hardcoded
+        std::vector<str> textures = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
         auto attachments = g_buffer->get_attachments();
         for (u32 i = 0; i < attachments.size(); i++)
+        {
+            pbr_shader->set_uniform1("textures." + textures[i], i);
             attachments[i]->bind(i);
+        }
 
         // Render light quad
         quad->Render();

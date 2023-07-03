@@ -4,6 +4,7 @@
  * @brief Simple quad for rendering.
  */
 
+#include "renderer/renderer.hpp"
 #include "renderer/buffers.hpp"
 
 namespace bls

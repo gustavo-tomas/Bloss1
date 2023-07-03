@@ -6,22 +6,26 @@ in VS_OUT {
     vec2 TexCoords;
 } fs_in;
 
-uniform sampler2D position;
-uniform sampler2D normal;
-uniform sampler2D albedo;
-uniform sampler2D arm;
-uniform sampler2D tbnNormal;
-uniform sampler2D depth;
+struct Textures {
+    sampler2D position;
+    sampler2D normal;
+    sampler2D albedo;
+    sampler2D arm;
+    sampler2D tbnNormal;
+    sampler2D depth;
+};
+
+uniform Textures textures;
 
 void main() {
 
     // retrieve data from gbuffer
-    vec3 FragPos = texture(position, fs_in.TexCoords).rgb;
-    vec3 Normal = texture(normal, fs_in.TexCoords).rgb;
-    vec4 Albedo = texture(albedo, fs_in.TexCoords);
-    vec3 ARM = texture(arm, fs_in.TexCoords).rgb;
-    vec3 TBNNormal = texture(tbnNormal, fs_in.TexCoords).rgb;
-    float Depth = texture(depth, fs_in.TexCoords).r;
+    vec3 FragPos = texture(textures.position, fs_in.TexCoords).rgb;
+    vec3 Normal = texture(textures.normal, fs_in.TexCoords).rgb;
+    vec4 Albedo = texture(textures.albedo, fs_in.TexCoords);
+    vec3 ARM = texture(textures.arm, fs_in.TexCoords).rgb;
+    vec3 TBNNormal = texture(textures.tbnNormal, fs_in.TexCoords).rgb;
+    float Depth = texture(textures.depth, fs_in.TexCoords).r;
 
     float AO = ARM.r;
     float Roughness = ARM.g;
