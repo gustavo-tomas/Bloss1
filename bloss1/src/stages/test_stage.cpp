@@ -36,28 +36,60 @@ namespace bls
         // Add lights
         dir_light_id = directional_light(*ecs,
                                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                         DirectionalLight(vec3(0.2f), vec3(5.0f), vec3(1.0f)));
+                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
 
         point_light_id = point_light(*ecs,
                                      Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                     PointLight(vec3(0.2f), vec3(5.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
+                                     PointLight(vec3(0.2f), vec3(1.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
 
         // Create shaders
-        phong_shader = Shader::create("test", "bloss1/assets/shaders/test/phong.vs", "bloss1/assets/shaders/test/phong.fs");
-        phong_shader->bind();
 
-        phong_shader->set_uniform3("dirLight.direction", ecs->transforms[dir_light_id]->rotation);
-        phong_shader->set_uniform3("dirLight.ambient", ecs->dir_lights[dir_light_id]->ambient);
-        phong_shader->set_uniform3("dirLight.diffuse", ecs->dir_lights[dir_light_id]->diffuse);
-        phong_shader->set_uniform3("dirLight.specular", ecs->dir_lights[dir_light_id]->specular);
+        // Geometry buffer shader
+        g_buffer_shader = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
 
-        phong_shader->set_uniform3("pointLight.position", ecs->transforms[point_light_id]->position);
-        phong_shader->set_uniform3("pointLight.ambient", ecs->point_lights[point_light_id]->ambient);
-        phong_shader->set_uniform3("pointLight.diffuse", ecs->point_lights[point_light_id]->diffuse);
-        phong_shader->set_uniform3("pointLight.specular", ecs->point_lights[point_light_id]->specular);
-        phong_shader->set_uniform1("pointLight.constant", ecs->point_lights[point_light_id]->constant);
-        phong_shader->set_uniform1("pointLight.linear", ecs->point_lights[point_light_id]->linear);
-        phong_shader->set_uniform1("pointLight.quadratic", ecs->point_lights[point_light_id]->quadratic);
+        // PBR shader
+        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr.vs", "bloss1/assets/shaders/pbr.fs");
+
+        // Create framebuffer textures
+        g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
+
+        // Position
+        position_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        g_buffer->attach_texture(position_texture.get());
+
+        // Normal
+        normal_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        g_buffer->attach_texture(normal_texture.get());
+
+        // Albedo
+        albedo_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8);
+        g_buffer->attach_texture(albedo_texture.get());
+
+        // ARM
+        arm_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8);
+        g_buffer->attach_texture(arm_texture.get());
+
+        // TBN normal
+        tbn_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        g_buffer->attach_texture(tbn_texture.get());
+
+        // Depth
+        depth_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGB32F);
+        g_buffer->attach_texture(depth_texture.get());
+
+        g_buffer->draw();
+
+        // Create and attach depth buffer
+        render_buffer = std::unique_ptr<RenderBuffer>(RenderBuffer::create(window.get_width(), window.get_height(), AttachmentType::Depth));
+        render_buffer->bind();
+
+        // Check if framebuffer is complete
+        if (!g_buffer->check())
+            exit(1);
+
+        g_buffer->unbind();
+
+        quad = std::make_unique<Quad>(renderer);
 
         running = true;
     }
@@ -82,9 +114,19 @@ namespace bls
         auto view = controller->get_camera().get_view_matrix();
         auto position = controller->get_camera().get_position();
 
-        // Clear the screen
+        // Reset the viewport
+        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
         renderer.clear();
-        renderer.clear_color({ 0.4f, 0.6f, 0.8f, 1.0f });
+        renderer.set_viewport(0, 0, width, height);
+
+        // Geometry pass: render scene data into gbuffer
+        // -------------------------------------------------------------------------------------------------------------
+        g_buffer->bind();
+        renderer.clear();
+
+        g_buffer_shader->bind();
+        g_buffer_shader->set_uniform4("projection", projection);
+        g_buffer_shader->set_uniform4("view", view);
 
         // Render all entities
         for (const auto& [id, model] : ecs->models)
@@ -104,17 +146,12 @@ namespace bls
             auto model_matrix = translation_mat * rotation_mat * scale_mat;
 
             // Bind and update data to shader
-            phong_shader->bind();
-            phong_shader->set_uniform4("model", model_matrix);
-            phong_shader->set_uniform4("projection", projection);
-            phong_shader->set_uniform4("view", view);
-            phong_shader->set_uniform3("viewPos", position);
+            g_buffer_shader->set_uniform4("model", model_matrix);
 
             // Render the model
             for (auto& mesh : model->model->meshes)
             {
                 // Bind textures
-                i32 offset = 0; // @TODO: calculate precise offset
                 for (u32 i = 0; i < mesh->textures.size(); i++)
                 {
                     auto texture = mesh->textures[i];
@@ -134,8 +171,8 @@ namespace bls
                         default: std::cerr << "invalid texture type: '" << type << "'\n";
                     }
 
-                    phong_shader->set_uniform1("material." + type_name, i + offset);
-                    texture->bind(i + offset); // Offset the active samplers in the frag shader
+                    g_buffer_shader->set_uniform1("material." + type_name, i);
+                    texture->bind(i); // Offset the active samplers in the frag shader
                 }
 
                 mesh->vao->bind();
@@ -145,6 +182,26 @@ namespace bls
                 mesh->vao->unbind();
             }
         }
+        g_buffer->unbind();
+        g_buffer_shader->unbind();
+
+        // Lighting pass: calculate lighting using the gbuffer content
+        // -------------------------------------------------------------------------------------------------------------
+        renderer.clear();
+
+        pbr_shader->bind();
+
+        // @TODO: this is hardcoded
+        std::vector<str> textures = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
+        auto attachments = g_buffer->get_attachments();
+        for (u32 i = 0; i < attachments.size(); i++)
+        {
+            pbr_shader->set_uniform1("textures." + textures[i], i);
+            attachments[i]->bind(i);
+        }
+
+        // Render light quad
+        quad->Render();
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))

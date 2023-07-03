@@ -10,7 +10,15 @@ namespace bls
 {
     enum TextureType
     {
-        Diffuse, Normal, Specular, Metalness, Roughness, AmbientOcclusion
+        None, Diffuse, Normal, Specular, Metalness, Roughness, AmbientOcclusion
+    };
+
+    enum ImageFormat
+    {
+        RGB8,
+        RGBA8,
+        RGB32F,
+        RGBA32F
     };
 
     class Texture
@@ -25,6 +33,7 @@ namespace bls
             virtual u32 get_height() = 0;
             virtual TextureType get_type() = 0;
 
+            static std::shared_ptr<Texture> create(u32 width, u32 height, ImageFormat format);
             static std::shared_ptr<Texture> create(const str& name, const str& path, TextureType texture_type);
     };
 };

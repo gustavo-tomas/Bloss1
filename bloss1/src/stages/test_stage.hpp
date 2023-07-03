@@ -10,7 +10,7 @@
 #include "renderer/renderer.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/texture.hpp"
-#include "renderer/primitives/cube.hpp"
+#include "renderer/primitives/quad.hpp"
 #include "camera/controller.hpp"
 
 namespace bls
@@ -32,8 +32,16 @@ namespace bls
             Renderer& renderer;
             Window& window;
 
+            std::unique_ptr<Quad> quad;
+
             CameraController* controller;
-            std::shared_ptr<Shader> phong_shader;
+            std::shared_ptr<Shader> pbr_shader;
+            std::shared_ptr<Shader> g_buffer_shader;
+            std::unique_ptr<FrameBuffer> g_buffer;
+            std::unique_ptr<RenderBuffer> render_buffer;
+
+            // @TODO: temporary
+            std::shared_ptr<Texture> position_texture, normal_texture, albedo_texture, arm_texture, tbn_texture, depth_texture;
 
             u32 dir_light_id;
             u32 point_light_id;

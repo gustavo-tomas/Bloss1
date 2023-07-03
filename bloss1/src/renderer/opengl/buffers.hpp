@@ -36,6 +36,41 @@ namespace bls
             u32 count;
     };
 
+    class OpenGLFrameBuffer : public FrameBuffer
+    {
+        public:
+            OpenGLFrameBuffer();
+            ~OpenGLFrameBuffer();
+
+            void bind() override;
+            void unbind() override;
+            void attach_texture(Texture* texture) override;
+            void draw() override;
+            bool check() override;
+            std::vector<Texture*>& get_attachments() override;
+
+        private:
+            u32 FBO;
+            std::vector<Texture*> attachments;
+    };
+
+    class OpenGLRenderBuffer : public RenderBuffer
+    {
+        public:
+            OpenGLRenderBuffer(u32 width, u32 height, AttachmentType type);
+            ~OpenGLRenderBuffer();
+
+            void bind() override;
+            void unbind() override;
+            u32 get_width() override;
+            u32 get_height() override;
+
+        private:
+            u32 RBO;
+            u32 width;
+            u32 height;
+    };
+
     class OpenGLVertexArray : public VertexArray
     {
         public:

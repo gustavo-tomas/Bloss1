@@ -1,9 +1,10 @@
 #pragma once
 
 /**
- * @brief Simple test cube.
+ * @brief Simple test cube (also for rendering).
  */
 
+#include "renderer/renderer.hpp"
 #include "renderer/buffers.hpp"
 
 namespace bls
@@ -35,7 +36,7 @@ namespace bls
             void Render()
             {
                 vao->bind();
-                renderer.draw_indexed(sizeof(indices) / sizeof(u32));
+                renderer.draw_indexed(indices.size());
                 vao->unbind();
             };
 

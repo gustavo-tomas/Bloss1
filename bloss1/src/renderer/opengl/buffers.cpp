@@ -69,6 +69,97 @@ namespace bls
         return count;
     }
 
+    // Frame Buffer ----------------------------------------------------------------------------------------------------
+    OpenGLFrameBuffer::OpenGLFrameBuffer()
+    {
+        glGenFramebuffers(1, &FBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    }
+
+    OpenGLFrameBuffer::~OpenGLFrameBuffer()
+    {
+        glDeleteFramebuffers(1, &FBO);
+    }
+
+    void OpenGLFrameBuffer::bind()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    }
+
+    void OpenGLFrameBuffer::unbind()
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void OpenGLFrameBuffer::attach_texture(Texture* texture)
+    {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachments.size(), GL_TEXTURE_2D, texture->get_id(), 0);
+        attachments.push_back(texture);
+    }
+
+    void OpenGLFrameBuffer::draw()
+    {
+        u32 color_attachments[attachments.size()];
+        for (u32 i = 0; i < attachments.size(); i++)
+            color_attachments[i] = { GL_COLOR_ATTACHMENT0 + i };
+
+        glDrawBuffers(attachments.size(), color_attachments);
+    }
+
+    bool OpenGLFrameBuffer::check()
+    {
+        // Check if framebuffer is complete
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            std::cerr << "error generating framebuffer: '" << FBO << "'\n";
+            return false;
+        }
+
+        return true;
+    }
+
+    std::vector<Texture*>& OpenGLFrameBuffer::get_attachments()
+    {
+        return attachments;
+    }
+
+    // Render Buffer ---------------------------------------------------------------------------------------------------
+    OpenGLRenderBuffer::OpenGLRenderBuffer(u32 width, u32 height, AttachmentType)
+    {
+        glGenRenderbuffers(1, &RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+        this->width = width;
+        this->height = height;
+    }
+
+    OpenGLRenderBuffer::~OpenGLRenderBuffer()
+    {
+        glDeleteRenderbuffers(1, &RBO);
+    }
+
+    void OpenGLRenderBuffer::bind()
+    {
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+    }
+
+    void OpenGLRenderBuffer::unbind()
+    {
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+
+    u32 OpenGLRenderBuffer::get_width()
+    {
+        return width;
+    }
+
+    u32 OpenGLRenderBuffer::get_height()
+    {
+        return height;
+    }
+
     // Vertex Array ----------------------------------------------------------------------------------------------------
     OpenGLVertexArray::OpenGLVertexArray()
     {

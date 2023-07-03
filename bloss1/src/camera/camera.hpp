@@ -44,6 +44,8 @@ namespace bls
             vec3 get_right();
             vec3 get_up();
             f32 get_zoom();
+            f32 get_near();
+            f32 get_far();
 
         private:
             void update_view_matrix();
