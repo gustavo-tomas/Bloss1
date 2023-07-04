@@ -8,6 +8,7 @@
 #include "renderer/texture.hpp"
 #include "renderer/buffers.hpp"
 #include "renderer/primitives/cube.hpp"
+#include "renderer/primitives/quad.hpp"
 
 namespace bls
 {
@@ -23,12 +24,13 @@ namespace bls
         private:
             std::shared_ptr<Shader> hdr_to_cubemap_shader;
             std::shared_ptr<Shader> skybox_shader;
-            std::shared_ptr<Shader> irradiance_shader;
+            std::shared_ptr<Shader> irradiance_shader, prefilter_shader, brdf_shader;
 
             Cube* cube;
+            Quad* quad;
 
             std::shared_ptr<Texture> hdr_texture;
-            u32 env_cubemap, irradiance_map;
+            u32 env_cubemap, irradiance_map, prefilter_map, brdf_texture;
             FrameBuffer* captureFBO;
             RenderBuffer* captureRBO;
     };

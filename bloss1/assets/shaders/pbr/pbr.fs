@@ -21,6 +21,8 @@ struct Textures {
 
     // IBL
     samplerCube irradianceMap;
+    samplerCube prefilterMap;
+    sampler2D brdfLut;
 };
 
 uniform Textures textures;
@@ -38,6 +40,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 FresnelSchlick(float cosTheta, vec3 F0);
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 
 void main() {
 
@@ -104,10 +107,18 @@ void main() {
     // Irradiance (ambient light)
     vec3 irradiance = texture(textures.irradianceMap, N).rgb;
 
-    vec3 kS = FresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, Roughness);
+    vec3 kS = F;
     vec3 kD = (1.0 - kS) * (1.0 - Metalness);
     vec3 diffuse = irradiance * Albedo.rgb;
-    vec3 ambient = (kD * diffuse) * AO;
+
+    // Sample the pre-filter map and the BRDF lut and combine them together to get the IBL specular part
+    const float MAX_REFLECTION_LOD = 4.0;
+    vec3 prefilteredColor = textureLod(textures.prefilterMap, R, Roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf = texture(textures.brdfLut, vec2(max(dot(N, V), 0.0), Roughness)).rg;
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+    vec3 ambient = (kD * diffuse + specular) * AO;
 
     vec3 color = ambient + Lo;
 
@@ -155,4 +166,8 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 
 vec3 FresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
