@@ -28,4 +28,5 @@ $ scripts/clean.sh
 - [Entity Component Systems - Nico Schoeman](https://www.youtube.com/watch?v=XrRPGfQ4ru0)
 - [Hazel engine](https://github.com/TheCherno/Hazel)
 - [mreinstein/ecs](https://github.com/mreinstein/ecs)
+- [learnopengl](https://learnopengl.com)
 - [The book of shaders](https://thebookofshaders.com)
