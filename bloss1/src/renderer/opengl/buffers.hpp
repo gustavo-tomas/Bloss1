@@ -43,6 +43,8 @@ namespace bls
             ~OpenGLFrameBuffer();
 
             void bind() override;
+            void bind_read() override;
+            void bind_draw() override;
             void unbind() override;
             void attach_texture(Texture* texture) override;
             void draw() override;

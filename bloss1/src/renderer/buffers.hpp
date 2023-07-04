@@ -48,6 +48,8 @@ namespace bls
             virtual ~FrameBuffer() { };
 
             virtual void bind() = 0;
+            virtual void bind_read() = 0;
+            virtual void bind_draw() = 0;
             virtual void unbind() = 0;
             virtual void attach_texture(Texture* texture) = 0;
             virtual void draw() = 0;

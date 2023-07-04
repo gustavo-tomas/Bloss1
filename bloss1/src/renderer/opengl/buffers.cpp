@@ -86,6 +86,16 @@ namespace bls
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     }
 
+    void OpenGLFrameBuffer::bind_read()
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+    }
+
+    void OpenGLFrameBuffer::bind_draw()
+    {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
+    }
+
     void OpenGLFrameBuffer::unbind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
