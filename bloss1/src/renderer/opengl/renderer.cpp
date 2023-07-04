@@ -20,7 +20,7 @@ namespace bls
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
         // Cull triangles which normal is not towards the camera
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE); // @TODO: investigate skybox
 
         // Remove cubemap seams
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);

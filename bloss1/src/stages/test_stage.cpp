@@ -13,6 +13,7 @@ namespace bls
     TestStage::~TestStage()
     {
         delete controller;
+        delete skybox;
     }
 
     void TestStage::start()
@@ -92,6 +93,10 @@ namespace bls
 
         g_buffer->unbind();
 
+        // Create a skybox
+        skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024);
+
+        // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
 
         running = true;
@@ -220,8 +225,19 @@ namespace bls
             attachments[i]->bind(i);
         }
 
+        // Bind IBL maps
+        skybox->bind(*pbr_shader.get(), 10);
+
         // Render light quad
-        quad->Render();
+        quad->render();
+
+        // Copy content of geometry's depth buffer to default framebuffer's depth buffer
+        // -----------------------------------------------------------------------------------------------------------------
+        g_buffer->bind_and_blit(width, height);
+        g_buffer->unbind();
+
+        // Draw the skybox last
+        skybox->draw(view, projection);
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))

@@ -51,6 +51,8 @@ namespace bls
             virtual void bind_read() = 0;
             virtual void bind_draw() = 0;
             virtual void unbind() = 0;
+            virtual void blit(u32 width, u32 height) = 0;
+            virtual void bind_and_blit(u32 width, u32 height) = 0;
             virtual void attach_texture(Texture* texture) = 0;
             virtual void draw() = 0;
             virtual bool check() = 0;

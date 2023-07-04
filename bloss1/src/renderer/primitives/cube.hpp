@@ -40,7 +40,7 @@ namespace bls
                 std::cout << "cube destroyed successfully\n";
             };
 
-            void Render()
+            void render()
             {
                 vao->bind();
                 renderer.draw_indexed(indices.size());

@@ -46,6 +46,8 @@ namespace bls
             void bind_read() override;
             void bind_draw() override;
             void unbind() override;
+            void blit(u32 width, u32 height) override;
+            void bind_and_blit(u32 width, u32 height) override;
             void attach_texture(Texture* texture) override;
             void draw() override;
             bool check() override;

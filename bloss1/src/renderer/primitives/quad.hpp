@@ -34,7 +34,7 @@ namespace bls
                 std::cout << "quad destroyed successfully\n";
             };
 
-            void Render()
+            void render()
             {
                 vao->bind();
                 renderer.draw_indexed(indices.size());

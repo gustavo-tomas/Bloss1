@@ -1,9 +1,11 @@
 #include "renderer/renderer.hpp"
 #include "renderer/model.hpp"
+#include "renderer/skybox.hpp"
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/shader.hpp"
 #include "renderer/opengl/buffers.hpp"
 #include "renderer/opengl/texture.hpp"
+#include "renderer/opengl/skybox.hpp"
 #include "managers/shader_manager.hpp"
 #include "managers/texture_manager.hpp"
 #include "managers/model_manager.hpp"
@@ -17,6 +19,15 @@ namespace bls
         #else
         std::cerr << "no valid renderer defined\n";
         exit(1);
+        #endif
+    }
+
+    Skybox* Skybox::create(const str& path, u32 dimensions)
+    {
+        #ifdef _OPENGL
+        return new OpenGLSkybox(path, dimensions);
+        #else
+        return nullptr;
         #endif
     }
 

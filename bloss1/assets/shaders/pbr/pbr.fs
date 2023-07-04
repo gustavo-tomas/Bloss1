@@ -10,12 +10,17 @@ in VS_OUT {
 
 // Textures
 struct Textures {
+
+    // Material params
     sampler2D position;
     sampler2D normal;
     sampler2D albedo;
     sampler2D arm;
     sampler2D tbnNormal;
     sampler2D depth;
+
+    // IBL
+    samplerCube irradianceMap;
 };
 
 uniform Textures textures;
@@ -54,8 +59,9 @@ void main() {
     }
 
     // Normalized vectors
-    vec3 V = normalize(viewPos - FragPos); // Normalized view direction
     vec3 N = TBNNormal;                       // Normalized normal
+    vec3 V = normalize(viewPos - FragPos); // Normalized view direction
+    vec3 R = reflect(-V, N);             // Normalized reflection
 
     // Metalness for a PBR workflow
     vec3 F0 = vec3(0.04);
@@ -83,6 +89,7 @@ void main() {
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
         vec3 specular = numerator / denominator;
 
+        // Fresnel
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - Metalness;
@@ -94,7 +101,14 @@ void main() {
         Lo += (kD * Albedo.rgb / PI + specular) * radiance * NdotL;
     }
 
-    vec3 ambient = vec3(0.03) * Albedo.rgb * AO;
+    // Irradiance (ambient light)
+    vec3 irradiance = texture(textures.irradianceMap, N).rgb;
+
+    vec3 kS = FresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = (1.0 - kS) * (1.0 - Metalness);
+    vec3 diffuse = irradiance * Albedo.rgb;
+    vec3 ambient = (kD * diffuse) * AO;
+
     vec3 color = ambient + Lo;
 
     // HDR tonemapping
