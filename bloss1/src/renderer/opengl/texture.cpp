@@ -96,13 +96,13 @@ namespace bls
                 GLenum internal_format = 0, data_format = 0;
                 if (num_components == 4)
                 {
-                    internal_format = GL_RGBA8;
+                    internal_format = (texture_type == TextureType::Diffuse) ? GL_SRGB8_ALPHA8 : GL_RGBA8;
                     data_format = GL_RGBA;
                 }
 
                 else if (num_components == 3)
                 {
-                    internal_format = GL_RGB8;
+                    internal_format = (texture_type == TextureType::Diffuse) ? GL_SRGB8 : GL_RGB8;
                     data_format = GL_RGB;
                 }
 

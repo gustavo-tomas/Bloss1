@@ -41,10 +41,10 @@ namespace bls
                                         );
 
         // Add point lights
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(20000.0f)));
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(20000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(20000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(20000.0f)));
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
 
         // Create shaders
 
@@ -94,7 +94,8 @@ namespace bls
         g_buffer->unbind();
 
         // Create a skybox
-        skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024);
+        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 512);
+        skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024);
 
         // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);

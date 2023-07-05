@@ -29,8 +29,8 @@ namespace bls
         // glEnable(GL_BLEND);
         // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Gamma correction
-        // glEnable(GL_FRAMEBUFFER_SRGB);
+        // Gamma correction (done by the shaders)
+        glDisable(GL_FRAMEBUFFER_SRGB);
 
         // Multisampling (MSAA)
         // glEnable(GL_MULTISAMPLE);
