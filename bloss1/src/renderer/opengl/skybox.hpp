@@ -15,7 +15,12 @@ namespace bls
     class OpenGLSkybox : public Skybox
     {
         public:
-            OpenGLSkybox(const str& path, u32 dimensions);
+            OpenGLSkybox(const str& path,
+                         const u32 skybox_resolution,
+                         const u32 irradiance_resolution,
+                         const u32 brdf_resolution,
+                         const u32 prefilter_resolution,
+                         const u32 max_mip_levels);
             ~OpenGLSkybox();
 
             void bind(Shader& shader, u32 slot) override;

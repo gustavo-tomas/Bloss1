@@ -7,13 +7,13 @@
 
 namespace bls
 {
-    OpenGLSkybox::OpenGLSkybox(const str& path, u32 dimensions)
+    OpenGLSkybox::OpenGLSkybox(const str& path,
+                               const u32 skybox_resolution,
+                               const u32 irradiance_resolution,
+                               const u32 brdf_resolution,
+                               const u32 prefilter_resolution,
+                               const u32 max_mip_levels)
     {
-        // @TODO: maybe make configurable
-        const u32 max_mip_levels = 5;
-        const u32 prefilter_resolution = 128;
-        const u32 brdf_resolution = 512;
-
         // Shaders
         hdr_to_cubemap_shader = Shader::create("hdr_to_cubemap", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.vs", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.fs");
         skybox_shader = Shader::create("skybox", "bloss1/assets/shaders/pbr/skybox.vs", "bloss1/assets/shaders/pbr/skybox.fs");
@@ -31,7 +31,7 @@ namespace bls
         // Setup framebuffers
         // -------------------------------------------------------------------------------------------------------------
         captureFBO = FrameBuffer::create();
-        captureRBO = RenderBuffer::create(dimensions, dimensions, AttachmentType::Depth);
+        captureRBO = RenderBuffer::create(skybox_resolution, skybox_resolution, AttachmentType::Depth);
 
         hdr_texture = Texture::create(path, path, TextureType::None);
 
@@ -40,7 +40,7 @@ namespace bls
         glGenTextures(1, &env_cubemap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, env_cubemap);
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, dimensions, dimensions, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, skybox_resolution, skybox_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -69,7 +69,7 @@ namespace bls
 
         glBindTextureUnit(0, hdr_texture->get_id());
 
-        glViewport(0, 0, dimensions, dimensions); // don't forget to configure the viewport to the capture dimensions.
+        glViewport(0, 0, skybox_resolution, skybox_resolution); // don't forget to configure the viewport to the capture skybox_resolution.
         captureFBO->bind();
         for (u32 i = 0; i < 6; i++)
         {
@@ -79,6 +79,10 @@ namespace bls
 
             cube->render();
         }
+
+        if (!captureFBO->check())
+            exit(1);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Create an irradiance cubemap
@@ -86,7 +90,7 @@ namespace bls
         glGenTextures(1, &irradiance_map);
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradiance_map);
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, irradiance_resolution, irradiance_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -96,7 +100,7 @@ namespace bls
 
         captureFBO->bind();
         captureRBO->bind();
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, irradiance_resolution, irradiance_resolution);
 
         // Configure irradiance shader
         // -------------------------------------------------------------------------------------------------------------
@@ -106,7 +110,7 @@ namespace bls
 
         glBindTextureUnit(0, env_cubemap);
 
-        glViewport(0, 0, 32, 32); // don't forget to configure the viewport to the capture dimensions.
+        glViewport(0, 0, irradiance_resolution, irradiance_resolution); // don't forget to configure the viewport to the capture skybox_resolution.
         captureFBO->bind();
         for (u32 i = 0; i < 6; i++)
         {
@@ -116,6 +120,10 @@ namespace bls
 
             cube->render();
         }
+
+        if (!captureFBO->check())
+            exit(1);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Configure pre filtering map for specular reflections
@@ -124,7 +132,7 @@ namespace bls
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilter_map);
 
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, prefilter_resolution, prefilter_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, prefilter_resolution, prefilter_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -143,11 +151,11 @@ namespace bls
         glBindTextureUnit(0, env_cubemap);
 
         captureFBO->bind();
-        for (u32 mip = 0; mip < max_mip_levels; mip++)
+        for (u32 mip = 0; mip < max_mip_levels; mip++) // max mip levels must be < log2(prefilter_resolution)
         {
             // Resize framebuffer according to mip-level size
-            u32 mipWidth  = prefilter_resolution * pow(0.5, mip);
-            u32 mipHeight = prefilter_resolution * pow(0.5, mip);
+            u32 mipWidth, mipHeight;
+            mipWidth = mipHeight = prefilter_resolution * pow(0.5, mip);
 
             captureRBO->bind();
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
@@ -164,6 +172,10 @@ namespace bls
                 cube->render();
             }
         }
+
+        if (!captureFBO->check())
+            exit(1);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         // Generate texture for the BRDF convolution
@@ -172,7 +184,7 @@ namespace bls
 
         // Pre-allocate enough memory for the BRDF texture.
         glBindTexture(GL_TEXTURE_2D, brdf_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, brdf_resolution, brdf_resolution, 0, GL_RG, GL_FLOAT, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, brdf_resolution, brdf_resolution, 0, GL_RG, GL_FLOAT, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -188,9 +200,12 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad->render();
 
+        if (!captureFBO->check())
+            exit(1);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // Reset the viewport to the screen dimensions
+        // Reset the viewport to the screen skybox_resolution
         auto width = Game::get().get_window().get_width();
         auto height = Game::get().get_window().get_height();
         glViewport(0, 0, width, height);

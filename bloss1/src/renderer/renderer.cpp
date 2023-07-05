@@ -22,10 +22,15 @@ namespace bls
         #endif
     }
 
-    Skybox* Skybox::create(const str& path, u32 dimensions)
+    Skybox* Skybox::create(const str& path,
+                           const u32 skybox_resolution,
+                           const u32 irradiance_resolution,
+                           const u32 brdf_resolution,
+                           const u32 prefilter_resolution,
+                           const u32 max_mip_levels)
     {
         #ifdef _OPENGL
-        return new OpenGLSkybox(path, dimensions);
+        return new OpenGLSkybox(path, skybox_resolution, irradiance_resolution, brdf_resolution, prefilter_resolution, max_mip_levels);
         #else
         return nullptr;
         #endif

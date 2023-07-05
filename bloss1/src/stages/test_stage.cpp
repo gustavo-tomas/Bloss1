@@ -94,8 +94,8 @@ namespace bls
         g_buffer->unbind();
 
         // Create a skybox
-        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 512);
-        skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024);
+        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
+        skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10);
 
         // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
