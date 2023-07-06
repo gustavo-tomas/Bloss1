@@ -13,6 +13,7 @@ namespace bls
     TestStage::~TestStage()
     {
         delete controller;
+        delete skybox;
     }
 
     void TestStage::start()
@@ -33,14 +34,17 @@ namespace bls
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
-        // Add lights
+        // Add directional lights
         dir_light_id = directional_light(*ecs,
                                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
+                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f))
+                                        );
 
-        point_light_id = point_light(*ecs,
-                                     Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                     PointLight(vec3(0.2f), vec3(1.0f), vec3(1.0f), 1.0f, 0.0001f, 0.000001f));
+        // Add point lights
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
 
         // Create shaders
 
@@ -48,7 +52,7 @@ namespace bls
         g_buffer_shader = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
 
         // PBR shader
-        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr.vs", "bloss1/assets/shaders/pbr.fs");
+        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
 
         // Create framebuffer textures
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
@@ -89,6 +93,11 @@ namespace bls
 
         g_buffer->unbind();
 
+        // Create a skybox
+        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
+        skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10);
+
+        // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
 
         running = true;
@@ -191,6 +200,23 @@ namespace bls
 
         pbr_shader->bind();
 
+        // Set camera position
+        pbr_shader->set_uniform3("viewPos", position);
+
+        // Set lights uniforms
+        u32 light_counter = 0;
+        auto& point_lights = ecs->point_lights;
+        auto& light_transforms = ecs->transforms;
+        for (auto& [id, light] : point_lights)
+        {
+            auto transform = light_transforms[id].get();
+
+            pbr_shader->set_uniform3("pointLightPositions[" + to_str(light_counter) + "]", transform->position);
+            pbr_shader->set_uniform3("pointLightColors[" + to_str(light_counter) + "]", light->diffuse);
+
+            light_counter++;
+        }
+
         // @TODO: this is hardcoded
         std::vector<str> textures = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
         auto attachments = g_buffer->get_attachments();
@@ -200,8 +226,19 @@ namespace bls
             attachments[i]->bind(i);
         }
 
+        // Bind IBL maps
+        skybox->bind(*pbr_shader.get(), 10);
+
         // Render light quad
-        quad->Render();
+        quad->render();
+
+        // Copy content of geometry's depth buffer to default framebuffer's depth buffer
+        // -----------------------------------------------------------------------------------------------------------------
+        g_buffer->bind_and_blit(width, height);
+        g_buffer->unbind();
+
+        // Draw the skybox last
+        skybox->draw(view, projection);
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))

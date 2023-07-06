@@ -8,6 +8,7 @@
 #include "core/window.hpp"
 #include "ecs/ecs.hpp"
 #include "renderer/renderer.hpp"
+#include "renderer/skybox.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/texture.hpp"
 #include "renderer/primitives/quad.hpp"
@@ -40,11 +41,12 @@ namespace bls
             std::unique_ptr<FrameBuffer> g_buffer;
             std::unique_ptr<RenderBuffer> render_buffer;
 
+            Skybox* skybox;
+
             // @TODO: temporary
             std::shared_ptr<Texture> position_texture, normal_texture, albedo_texture, arm_texture, tbn_texture, depth_texture;
 
             u32 dir_light_id;
-            u32 point_light_id;
 
             bool running;
     };

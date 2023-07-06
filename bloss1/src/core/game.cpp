@@ -46,7 +46,8 @@ namespace bls
     void Game::run()
     {
         // Time variation
-        f64 last_time = window->get_time(), current_time = 0, dt = 0;
+        f64 last_time = window->get_time(), current_time = 0, time_counter = 0, dt = 0;
+        u32 frame_counter = 0;
 
         // The game loop
         while (running)
@@ -65,6 +66,15 @@ namespace bls
             current_time = window->get_time();
             dt = current_time - last_time;
             last_time = current_time;
+
+            // Print FPS
+            frame_counter++;
+            time_counter += dt;
+            if (time_counter >= 1.0)
+            {
+                printf("%.3lf ms/frame - %d fps\n", 1000.0 / (f64) frame_counter, frame_counter);
+                frame_counter = time_counter = 0;
+            }
 
             // Update running stage
             stages->update(dt);

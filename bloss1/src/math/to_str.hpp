@@ -19,4 +19,12 @@ namespace bls
 
         return "(" + x + ", " + y + ", " + z + ", " + w + ")";
     }
+
+    template<typename T>
+    inline str to_str(T num)
+    {
+        const str num_str = std::to_string(num);
+
+        return num_str;
+    }
 };

@@ -20,7 +20,7 @@ namespace bls
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
         // Cull triangles which normal is not towards the camera
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE); // @TODO: investigate skybox
 
         // Remove cubemap seams
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -29,8 +29,8 @@ namespace bls
         // glEnable(GL_BLEND);
         // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Gamma correction
-        // glEnable(GL_FRAMEBUFFER_SRGB);
+        // Gamma correction (done by the shaders)
+        glDisable(GL_FRAMEBUFFER_SRGB);
 
         // Multisampling (MSAA)
         // glEnable(GL_MULTISAMPLE);

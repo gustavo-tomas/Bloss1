@@ -21,7 +21,14 @@ namespace bls
                 vbo = VertexBuffer::create(static_cast<void*>(vertices.data()), vertices.size() * sizeof(f32));
                 ebo = IndexBuffer::create(indices, indices.size());
 
-                vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 0, (void*) 0);
+                // Position
+                vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) 0);
+
+                // Normal
+                vao->add_vertex_buffer(1, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) (3 * sizeof(f32)));
+
+                // Texture coordinates
+                vao->add_vertex_buffer(2, 2, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) (6 * sizeof(f32)));
             };
 
             ~Cube()
@@ -33,7 +40,7 @@ namespace bls
                 std::cout << "cube destroyed successfully\n";
             };
 
-            void Render()
+            void render()
             {
                 vao->bind();
                 renderer.draw_indexed(indices.size());
@@ -49,16 +56,18 @@ namespace bls
             std::vector<f32> vertices =
             {
                 // Front face
-                -1.0f, -1.0f, 1.0f, // (0)
-                1.0f,  -1.0f, 1.0f, // (1)
-                1.0f,   1.0f, 1.0f, // (2)
-                -1.0f,  1.0f, 1.0f, // (3)
+                //Position           // Normals         // Texture coordinates
+                -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // (0)
+                1.0f,  -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // (1)
+                1.0f,   1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // (2)
+                -1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // (3)
 
                 // Back face
-                -1.0f, -1.0f, -1.0f, // (4)
-                1.0f,  -1.0f, -1.0f, // (5)
-                1.0f,   1.0f, -1.0f, // (6)
-                -1.0f,  1.0f, -1.0f  // (7)
+                //Position            // Normals          // Texture coordinates
+                -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // (4)
+                1.0f,  -1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // (5)
+                1.0f,   1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f, // (6)
+                -1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f  // (7)
             };
 
             std::vector<u32> indices =

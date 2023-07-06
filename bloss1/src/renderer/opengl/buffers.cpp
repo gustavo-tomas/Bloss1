@@ -86,9 +86,31 @@ namespace bls
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
     }
 
+    void OpenGLFrameBuffer::bind_read()
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, FBO);
+    }
+
+    void OpenGLFrameBuffer::bind_draw()
+    {
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FBO);
+    }
+
     void OpenGLFrameBuffer::unbind()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void OpenGLFrameBuffer::blit(u32 width, u32 height)
+    {
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    }
+
+    void OpenGLFrameBuffer::bind_and_blit(u32 width, u32 height)
+    {
+        bind_read();
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // Draw to default framebuffer
+        blit(width, height);
     }
 
     void OpenGLFrameBuffer::attach_texture(Texture* texture)
@@ -128,7 +150,7 @@ namespace bls
     {
         glGenRenderbuffers(1, &RBO);
         glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
         this->width = width;
