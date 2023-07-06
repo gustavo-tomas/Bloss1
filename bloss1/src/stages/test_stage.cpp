@@ -140,19 +140,20 @@ namespace bls
         // Render all entities
         for (const auto& [id, model] : ecs->models)
         {
+            // Remember: scale -> rotate -> translate
             auto transform = ecs->transforms[id].get();
-            auto scale_mat = scale(mat4(1.0f), transform->scale);
-            auto translation_mat = translate(mat4(1.0f), transform->position);
+            auto model_matrix = mat4(1.0f);
+
+            // Translate
+            model_matrix = translate(model_matrix, transform->position);
 
             // Rotate
-            auto pitch_quat = angle_axis(radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-            auto yaw_quat = angle_axis(radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
-            auto roll_quat = angle_axis(radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-            auto rotation_quat = normalize(yaw_quat * pitch_quat * roll_quat);
-            auto rotation_mat = to_mat4(rotation_quat);
+            model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            model_matrix = rotate(model_matrix, radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
+            model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
 
-            // Remember: scale -> rotate -> translate
-            auto model_matrix = translation_mat * rotation_mat * scale_mat;
+            // Scale
+            model_matrix = scale(model_matrix, transform->scale);
 
             // Bind and update data to shader
             g_buffer_shader->set_uniform4("model", model_matrix);
