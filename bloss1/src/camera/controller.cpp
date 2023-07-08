@@ -61,8 +61,8 @@ namespace bls
 
     void CameraController::on_mouse_move(const MouseMoveEvent& event)
     {
-        // X and Y offsets are inverted
-        f32 x_offset = event.x_position - mouse_x;
+        // Calculate X and Y offsets
+        f32 x_offset = mouse_x - event.x_position;
         f32 y_offset = mouse_y - event.y_position;
 
         // Rotation is done with callbacks for a more smooth feeling
@@ -77,13 +77,13 @@ namespace bls
         mouse_x = event.x_position;
         mouse_y = event.y_position;
 
-        camera->set_rotation(pitch, yaw);
+        camera->set_rotation(pitch, yaw, 0.0f);
     }
 
     void CameraController::on_mouse_scroll(const MouseScrollEvent& event)
     {
         f32 zoom = camera->get_zoom() - event.y_offset;
-        zoom = clamp(zoom, 1.0f, 45.0f);
+        zoom = clamp(zoom, 45.0f, 90.0f);
 
         camera->set_zoom(zoom);
     }

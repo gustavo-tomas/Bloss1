@@ -2,17 +2,17 @@
 
 namespace bls
 {
-    Camera::Camera(vec3 position, vec3 front, vec3 world_up,
-                   f32 yaw, f32 pitch,
+    Camera::Camera(vec3 position, vec3 world_up, vec3 world_front,
+                   f32 pitch, f32 yaw, f32 roll,
                    f32 zoom, f32 near, f32 far)
     {
         this->position = position;
-
-        this->front = front;
         this->world_up = world_up;
+        this->world_front = world_front;
 
         this->yaw = yaw;
         this->pitch = pitch;
+        this->roll = roll;
 
         this->zoom = zoom;
 
@@ -33,10 +33,11 @@ namespace bls
         update_view_matrix();
     }
 
-    void Camera::set_rotation(f32 pitch, f32 yaw)
+    void Camera::set_rotation(f32 pitch, f32 yaw, f32 roll)
     {
-        this->yaw = yaw;
         this->pitch = pitch;
+        this->yaw = yaw;
+        this->roll = roll;
         update_view_matrix();
     }
 
@@ -66,7 +67,7 @@ namespace bls
 
     vec3 Camera::get_rotation()
     {
-        return vec3(pitch, yaw, 0.0f);
+        return vec3(pitch, yaw, roll);
     }
 
     vec3 Camera::get_front()
@@ -101,14 +102,22 @@ namespace bls
 
     void Camera::update_view_matrix()
     {
-        front = vec3(cos(radians(yaw)) * cos(radians(pitch)),
-                     sin(radians(pitch)),
-                     sin(radians(yaw)) * cos(radians(pitch)));
-        front = normalize(front);
+        // View matrix is the inverse of the camera's model matrix
+        mat4 rotate_x = rotate(mat4(1.0f), radians(pitch), vec3(1.0f, 0.0f, 0.0f));
+        mat4 rotate_y = rotate(mat4(1.0f), radians(yaw),   vec3(0.0f, 1.0f, 0.0f));
+        mat4 rotate_z = rotate(mat4(1.0f), radians(roll),  vec3(0.0f, 0.0f, 1.0f));
 
+        mat4 translate = glm::translate(mat4(1.0f), position);
+
+        mat4 model = translate * rotate_z * rotate_y * rotate_x;
+
+        view_matrix = inverse(model);
+
+        // Update direction vectors
+        mat3 rotation = mat3(model);
+
+        front = normalize(rotation * world_front);
         right = normalize(cross(front, world_up));
         up    = normalize(cross(right, front));
-
-        view_matrix = look_at(position, position + front, up);
     }
 };
