@@ -78,6 +78,12 @@ namespace bls
     }
 
     template<typename T>
+    auto mix(T x, T y, T alpha)
+    {
+        return glm::mix(x, y, alpha);
+    }
+
+    template<typename T>
     auto to_mat4(T quat)
     {
         return glm::toMat4(quat);
