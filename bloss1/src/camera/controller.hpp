@@ -30,7 +30,7 @@ namespace bls
             void update_controller(f32 dt, const vec3& front, const vec3& right, const vec3& up);
 
             Camera* camera;
-            f32 mouse_x, mouse_y;
+            f32 mouse_x, mouse_y, zoom;
             f32 speed, sensitivity;
 
             vec3& target_position;

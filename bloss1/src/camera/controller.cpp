@@ -14,6 +14,7 @@ namespace bls
         this->speed = speed;
         this->sensitivity = sensitivity;
 
+        zoom = camera->get_zoom();
         mouse_x = Input::get_mouse_x();
         mouse_y = Input::get_mouse_y();
 
@@ -122,12 +123,11 @@ namespace bls
         trigger_left  += 1.0f;
         trigger_right += 1.0f;
 
-        f32 zoom = camera->get_zoom();
         if (trigger_left >= TOLERANCE)
-            zoom += trigger_left * 5.0f;
+            zoom += trigger_left * dt * 15.0f;
 
         if (trigger_right >= TOLERANCE)
-            zoom -= trigger_right * 5.0f;
+            zoom -= trigger_right * dt * 15.0f;
 
         zoom = clamp(zoom, 45.0f, 90.0f);
 
@@ -160,7 +160,7 @@ namespace bls
 
     void CameraController::on_mouse_scroll(const MouseScrollEvent& event)
     {
-        f32 zoom = camera->get_zoom() - event.y_offset * 5.0f;
+        zoom -= event.y_offset * 5.0f;
         zoom = clamp(zoom, 45.0f, 90.0f);
 
         camera->set_target_zoom(zoom);
