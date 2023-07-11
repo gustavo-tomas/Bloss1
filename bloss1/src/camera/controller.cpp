@@ -3,13 +3,18 @@
 
 namespace bls
 {
-    CameraController::CameraController(f32 speed, f32 sensitivity)
+    CameraController::CameraController(vec3& target_position, vec3& target_rotation, vec3 target_offset,
+                                       f32 speed, f32 sensitivity)
+        : target_position(target_position), target_rotation(target_rotation)
     {
-        camera = new Camera();
+        camera = new Camera(target_position, target_offset, target_rotation.x, target_rotation.y);
+
+        this->target_offset = target_offset;
 
         this->speed = speed;
         this->sensitivity = sensitivity;
 
+        zoom = camera->get_zoom();
         mouse_x = Input::get_mouse_x();
         mouse_y = Input::get_mouse_y();
 
@@ -25,67 +30,140 @@ namespace bls
 
     void CameraController::update(f32 dt)
     {
-        f32 velocity = speed * dt;
+        // @TODO: use quaternions?
+        // Calculate player direction vectors
+        vec3 front =
+        {
+            cos(radians(target_rotation.y))* cos(radians(target_rotation.x)),
+            sin(radians(target_rotation.x)),
+            sin(radians(target_rotation.y))* cos(radians(target_rotation.x))
+        };
+        front = normalize(front);
 
-        auto position = camera->get_position();
-        auto front = camera->get_front();
-        auto right = camera->get_right();
-        auto up = camera->get_up();
+        vec3 right = normalize(cross(front, { 0.0f, 1.0f, 0.0f }));
+        vec3 up    = normalize(cross(right, front));
 
-        // Forward
-        if (Input::is_key_pressed(KEY_W))
-            position += front * velocity;
+        update_keyboard(dt, front, right, up);
+        update_controller(dt, front, right, up);
+    }
 
-        // Backward
-        if (Input::is_key_pressed(KEY_S))
-            position -= front * velocity;
+    void CameraController::update_keyboard(f32 dt, const vec3& front, const vec3& right, const vec3& up)
+    {
+        // Define movement mappings
+        std::map<u32, vec3> movement_mappings =
+        {
+            { KEY_W,          front },
+            { KEY_S,         -front },
+            { KEY_D,          right },
+            { KEY_A,         -right },
+            { KEY_SPACE,         up },
+            { KEY_LEFT_CONTROL, -up }
+        };
 
-        // Right
-        if (Input::is_key_pressed(KEY_D))
-            position += right * velocity;
+        // Update speed based on input
+        for (const auto& [key, direction] : movement_mappings)
+            if (Input::is_key_pressed(key))
+                target_position += direction * speed * dt;
 
-        // Left
-        if (Input::is_key_pressed(KEY_A))
-            position -= right * velocity;
+        camera->set_target_position(target_position);
+    }
 
-        // Up
-        if (Input::is_key_pressed(KEY_SPACE))
-            position += up * velocity;
+    void CameraController::update_controller(f32 dt, const vec3& front, const vec3& right, const vec3&)
+    {
+        // Tolerance to better handle floating point fuckery
+        const f32 TOLERANCE = 0.2f;
 
-        // Down
-        if (Input::is_key_pressed(KEY_LEFT_CONTROL))
-            position -= up * velocity;
+        // Position
+        // -------------------------------------------------------------------------------------------------------------
+        auto left_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_X);
+        auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
-        camera->set_position(position);
+        if (fabs(left_y) >= TOLERANCE)
+            target_position += front * speed * -left_y * dt;
+
+        if (fabs(left_x) >= TOLERANCE)
+            target_position += right * speed * left_x * dt;
+
+        camera->set_target_position(target_position);
+
+        // Rotation
+        // -------------------------------------------------------------------------------------------------------------
+        auto right_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_X);
+        auto right_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_Y);
+
+        f32 x_offset = 0.0f;
+        f32 y_offset = 0.0f;
+
+        // Calculate X and Y offsets
+        if (fabs(right_x) >= TOLERANCE)
+            x_offset = right_x * 10.0f;
+
+        if (fabs(right_y) >= TOLERANCE)
+            y_offset = -right_y * 10.0f;
+
+        // Rotation is done with callbacks for a more smooth feeling
+        f32 pitch = target_rotation.x + y_offset * sensitivity;
+        f32 yaw   = target_rotation.y + x_offset * sensitivity;
+
+        pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
+        // yaw = fmod(fmod(yaw, 360.0f) + 360.0f, 360.0f); // @TODO: fix yaw overflow
+
+        // Update target rotation
+        target_rotation.x = pitch;
+        target_rotation.y = yaw;
+
+        camera->set_target_rotation(target_rotation.x, target_rotation.y);
+
+        // Zoom
+        // -------------------------------------------------------------------------------------------------------------
+        auto trigger_left  = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_TRIGGER);
+        auto trigger_right = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_TRIGGER);
+
+        // Normalize trigger value between [0, 2]
+        trigger_left  += 1.0f;
+        trigger_right += 1.0f;
+
+        if (trigger_left >= TOLERANCE)
+            zoom += trigger_left * dt * 15.0f;
+
+        if (trigger_right >= TOLERANCE)
+            zoom -= trigger_right * dt * 15.0f;
+
+        zoom = clamp(zoom, 45.0f, 90.0f);
+
+        camera->set_target_zoom(zoom);
     }
 
     void CameraController::on_mouse_move(const MouseMoveEvent& event)
     {
         // Calculate X and Y offsets
-        f32 x_offset = mouse_x - event.x_position;
+        f32 x_offset = event.x_position - mouse_x;
         f32 y_offset = mouse_y - event.y_position;
 
         // Rotation is done with callbacks for a more smooth feeling
-        auto rotation = camera->get_rotation();
-        f32 pitch = rotation.x + y_offset * sensitivity;
-        f32 yaw = rotation.y + x_offset * sensitivity;
+        f32 pitch = target_rotation.x + y_offset * sensitivity;
+        f32 yaw = target_rotation.y + x_offset * sensitivity;
 
-        // Constrain pitch to avoid flipping
-        pitch = clamp(pitch, -89.0f, 89.0f);
+        pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
+        // yaw = fmod(fmod(yaw, 360.0f) + 360.0f, 360.0f); // @TODO: fix yaw overflow
 
         // Update last mouse values
         mouse_x = event.x_position;
         mouse_y = event.y_position;
 
-        camera->set_rotation(pitch, yaw, 0.0f);
+        // Update target rotation
+        target_rotation.x = pitch;
+        target_rotation.y = yaw;
+
+        camera->set_target_rotation(target_rotation.x, target_rotation.y);
     }
 
     void CameraController::on_mouse_scroll(const MouseScrollEvent& event)
     {
-        f32 zoom = camera->get_zoom() - event.y_offset;
+        zoom -= event.y_offset * 5.0f;
         zoom = clamp(zoom, 45.0f, 90.0f);
 
-        camera->set_zoom(zoom);
+        camera->set_target_zoom(zoom);
     }
 
     Camera& CameraController::get_camera()

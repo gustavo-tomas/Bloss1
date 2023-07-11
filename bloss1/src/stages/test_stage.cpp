@@ -18,10 +18,7 @@ namespace bls
 
     void TestStage::start()
     {
-        // Create a camera
-        controller = new CameraController();
-
-        // Create ECS
+        // Create the ECS
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
@@ -33,6 +30,10 @@ namespace bls
             player(*ecs, Transform(vec3(i * 10.0f, 5.0f, 5.0f), vec3(0.0f), vec3(5.0f)));
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
+
+        // Create a camera and controller
+        vec3 offset = vec3(15.0f, 7.0f, 50.0f);
+        controller = new CameraController(ecs->transforms[0]->position, ecs->transforms[0]->rotation, offset);
 
         // Add directional lights
         dir_light_id = directional_light(*ecs,
@@ -107,6 +108,7 @@ namespace bls
     {
         // Update camera controller
         controller->update(dt);
+        controller->get_camera().update(dt);
 
         // Update all systems in registration order
         // @TODO: for now do nothing
@@ -147,10 +149,24 @@ namespace bls
             // Translate
             model_matrix = translate(model_matrix, transform->position);
 
-            // Rotate
-            model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-            model_matrix = rotate(model_matrix, radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
-            model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+            // @TODO: i dont know what im doing but it works
+
+            // Player model matrix
+            if (id == 0)
+            {
+                // Rotate
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            }
+
+            else
+            {
+                // Rotate
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+            }
 
             // Scale
             model_matrix = scale(model_matrix, transform->scale);

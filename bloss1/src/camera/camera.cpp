@@ -2,24 +2,36 @@
 
 namespace bls
 {
-    Camera::Camera(vec3 position, vec3 world_up, vec3 world_front,
-                   f32 pitch, f32 yaw, f32 roll,
-                   f32 zoom, f32 near, f32 far)
+    Camera::Camera(vec3 target_position, vec3 target_offset,
+                   f32 target_pitch, f32 target_yaw,
+                   vec3 world_up,
+                   f32 zoom, f32 near, f32 far,
+                   f32 lerp_factor)
     {
-        this->position = position;
-        this->world_up = world_up;
-        this->world_front = world_front;
+        this->target_position = target_position;
+        this->target_offset = target_offset;
+        this->position = target_position;
 
-        this->yaw = yaw;
-        this->pitch = pitch;
-        this->roll = roll;
+        this->target_pitch = target_pitch;
+        this->target_yaw = target_yaw;
+        this->target_zoom = zoom;
+
+        this->world_up = world_up;
 
         this->zoom = zoom;
-
         this->near = near;
         this->far = far;
 
-        update_view_matrix();
+        // Higher is more responsive
+        this->lerp_factor = lerp_factor;
+
+        front = vec3(cos(radians(target_yaw)) * cos(radians(target_pitch)),
+                     sin(radians(target_pitch)),
+                     sin(radians(target_yaw)) * cos(radians(target_pitch)));
+        front = normalize(front);
+
+        right = normalize(cross(front, world_up));
+        up    = normalize(cross(right, front));
     }
 
     Camera::~Camera()
@@ -27,23 +39,25 @@ namespace bls
         std::cout << "camera destroyed successfully\n";
     }
 
-    void Camera::set_position(const vec3& position)
+    void Camera::set_target_position(const vec3& position)
     {
-        this->position = position;
-        update_view_matrix();
+        target_position = position;
     }
 
-    void Camera::set_rotation(f32 pitch, f32 yaw, f32 roll)
+    void Camera::set_target_rotation(f32 pitch, f32 yaw)
     {
-        this->pitch = pitch;
-        this->yaw = yaw;
-        this->roll = roll;
-        update_view_matrix();
+        target_pitch = pitch;
+        target_yaw = yaw;
     }
 
-    void Camera::set_zoom(f32 zoom)
+    void Camera::set_target_offset(const vec3& offset)
     {
-        this->zoom = zoom;
+        target_offset = offset;
+    }
+
+    void Camera::set_target_zoom(f32 zoom)
+    {
+        this->target_zoom = zoom;
     }
 
     mat4 Camera::get_view_matrix()
@@ -65,26 +79,6 @@ namespace bls
         return position;
     }
 
-    vec3 Camera::get_rotation()
-    {
-        return vec3(pitch, yaw, roll);
-    }
-
-    vec3 Camera::get_front()
-    {
-        return front;
-    }
-
-    vec3 Camera::get_right()
-    {
-        return right;
-    }
-
-    vec3 Camera::get_up()
-    {
-        return up;
-    }
-
     f32 Camera::get_zoom()
     {
         return zoom;
@@ -100,24 +94,27 @@ namespace bls
         return far;
     }
 
-    void Camera::update_view_matrix()
+    void Camera::update(f32 dt)
     {
-        // View matrix is the inverse of the camera's model matrix
-        mat4 rotate_x = rotate(mat4(1.0f), radians(pitch), vec3(1.0f, 0.0f, 0.0f));
-        mat4 rotate_y = rotate(mat4(1.0f), radians(yaw),   vec3(0.0f, 1.0f, 0.0f));
-        mat4 rotate_z = rotate(mat4(1.0f), radians(roll),  vec3(0.0f, 0.0f, 1.0f));
+        auto target_front = vec3(cos(radians(target_yaw)) * cos(radians(target_pitch)),
+                                 sin(radians(target_pitch)),
+                                 sin(radians(target_yaw)) * cos(radians(target_pitch)));
+        target_front = normalize(target_front);
 
-        mat4 translate = glm::translate(mat4(1.0f), position);
+        auto target_right = normalize(cross(target_front, world_up));
+        auto target_up    = normalize(cross(target_right, target_front));
 
-        mat4 model = translate * rotate_z * rotate_y * rotate_x;
+        target_position = target_position + target_front * (-target_offset.z);
+        target_position = target_position + target_up * target_offset.y;
+        target_position = target_position + target_right * target_offset.x;
 
-        view_matrix = inverse(model);
+        f32 delta_lerp = clamp(lerp_factor * dt, 0.0f, 1.0f);
+        position = mix(position, target_position, delta_lerp);
+        front    = mix(front, target_front, delta_lerp);
+        up       = mix(up, target_up, delta_lerp);
 
-        // Update direction vectors
-        mat3 rotation = mat3(model);
+        zoom = mix(zoom, target_zoom, delta_lerp);
 
-        front = normalize(rotation * world_front);
-        right = normalize(cross(front, world_up));
-        up    = normalize(cross(right, front));
+        view_matrix = look_at(position, position + front, up);
     }
 };

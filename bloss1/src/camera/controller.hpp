@@ -15,7 +15,8 @@ namespace bls
     class CameraController
     {
         public:
-            CameraController(f32 speed = SPEED, f32 sensitivity = SENSITIVITY);
+            CameraController(vec3& target_position, vec3& target_rotation, vec3 target_offset,
+                             f32 speed = SPEED, f32 sensitivity = SENSITIVITY);
             ~CameraController();
 
             void update(f32 dt);
@@ -25,8 +26,15 @@ namespace bls
             Camera& get_camera();
 
         private:
+            void update_keyboard(f32 dt, const vec3& front, const vec3& right, const vec3& up);
+            void update_controller(f32 dt, const vec3& front, const vec3& right, const vec3& up);
+
             Camera* camera;
-            f32 mouse_x, mouse_y;
+            f32 mouse_x, mouse_y, zoom;
             f32 speed, sensitivity;
+
+            vec3& target_position;
+            vec3& target_rotation;
+            vec3 target_offset;
     };
 };
