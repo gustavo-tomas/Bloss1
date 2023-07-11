@@ -26,6 +26,9 @@ namespace bls
             Camera& get_camera();
 
         private:
+            void update_keyboard(f32 dt, const vec3& front, const vec3& right, const vec3& up);
+            void update_controller(f32 dt, const vec3& front, const vec3& right, const vec3& up);
+
             Camera* camera;
             f32 mouse_x, mouse_y;
             f32 speed, sensitivity;
