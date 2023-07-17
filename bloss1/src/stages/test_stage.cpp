@@ -101,6 +101,10 @@ namespace bls
         // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
 
+        // Create font
+        inder_font = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
+        lena_font  = Font::create("lena", "bloss1/assets/font/lena.ttf");
+
         running = true;
     }
 
@@ -256,6 +260,10 @@ namespace bls
 
         // Draw the skybox last
         skybox->draw(view, projection);
+
+        // Render text
+        inder_font->render("owowowowow", 20.0f, 20.0f, 0.5f, { 0.95f, 0.6f, 0.4f });
+        lena_font->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
