@@ -11,6 +11,7 @@
 #include "renderer/skybox.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/texture.hpp"
+#include "renderer/font.hpp"
 #include "renderer/primitives/quad.hpp"
 #include "camera/controller.hpp"
 
@@ -45,6 +46,7 @@ namespace bls
 
             // @TODO: temporary
             std::shared_ptr<Texture> position_texture, normal_texture, albedo_texture, arm_texture, tbn_texture, depth_texture;
+            std::shared_ptr<Font> lena_font, inder_font;
 
             u32 dir_light_id;
 

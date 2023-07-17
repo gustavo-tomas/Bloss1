@@ -66,6 +66,12 @@ namespace bls
     }
 
     template<typename T>
+    auto ortho(T left, T right, T bottom, T top)
+    {
+        return glm::ortho(left, right, bottom, top);
+    }
+
+    template<typename T>
     auto scale(T mat, T vec)
     {
         return glm::scale(mat, vec);

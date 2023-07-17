@@ -1,14 +1,17 @@
 #include "renderer/renderer.hpp"
 #include "renderer/model.hpp"
 #include "renderer/skybox.hpp"
+#include "renderer/font.hpp"
 #include "renderer/opengl/renderer.hpp"
 #include "renderer/opengl/shader.hpp"
 #include "renderer/opengl/buffers.hpp"
 #include "renderer/opengl/texture.hpp"
 #include "renderer/opengl/skybox.hpp"
+#include "renderer/opengl/font.hpp"
 #include "managers/shader_manager.hpp"
 #include "managers/texture_manager.hpp"
 #include "managers/model_manager.hpp"
+#include "managers/font_manager.hpp"
 
 namespace bls
 {
@@ -80,6 +83,20 @@ namespace bls
         auto texture = std::make_shared<OpenGLTexture>(path, texture_type);
         TextureManager::get().load(name, texture);
         return texture;
+        #else
+        return nullptr;
+        #endif
+    }
+
+    std::shared_ptr<Font> Font::create(const str& name, const str& path)
+    {
+        if (FontManager::get().exists(name))
+            return FontManager::get().get_font(name);
+
+        #ifdef _OPENGL
+        auto font = std::make_shared<OpenGLFont>(path);
+        FontManager::get().load(name, font);
+        return font;
         #else
         return nullptr;
         #endif
