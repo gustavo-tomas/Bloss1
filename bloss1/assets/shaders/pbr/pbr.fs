@@ -129,7 +129,7 @@ void main() {
     color = pow(color, vec3(1.0 / 2.2));
 
     // Final color
-    fragColor = vec4(color, 1.0f);
+    fragColor = vec4(color, 1.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {

@@ -59,27 +59,39 @@ namespace bls
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
 
         // Position
-        position_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        position_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
+                                           TextureParameter::Repeat, TextureParameter::Repeat,
+                                           TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(position_texture.get());
 
         // Normal
-        normal_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        normal_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
+                                         TextureParameter::Repeat, TextureParameter::Repeat,
+                                         TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(normal_texture.get());
 
         // Albedo
-        albedo_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8);
+        albedo_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8,
+                                         TextureParameter::Repeat, TextureParameter::Repeat,
+                                         TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(albedo_texture.get());
 
         // ARM
-        arm_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8);
+        arm_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8,
+                                      TextureParameter::Repeat, TextureParameter::Repeat,
+                                      TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(arm_texture.get());
 
         // TBN normal
-        tbn_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F);
+        tbn_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
+                                      TextureParameter::Repeat, TextureParameter::Repeat,
+                                      TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(tbn_texture.get());
 
         // Depth
-        depth_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGB32F);
+        depth_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGB32F,
+                                        TextureParameter::Repeat, TextureParameter::Repeat,
+                                        TextureParameter::Nearest, TextureParameter::Nearest);
         g_buffer->attach_texture(depth_texture.get());
 
         g_buffer->draw();

@@ -36,18 +36,38 @@ namespace bls
         return 0;
     }
 
-    OpenGLTexture::OpenGLTexture(u32 width, u32 height, ImageFormat format)
+    static GLenum convert_to_opengl_parameter_format(TextureParameter parameter)
+    {
+        switch (parameter)
+        {
+            case TextureParameter::Repeat:  return GL_REPEAT;
+            case TextureParameter::ClampToEdge: return GL_CLAMP_TO_EDGE;
+            case TextureParameter::Nearest: return GL_NEAREST;
+            case TextureParameter::Linear: return GL_LINEAR;
+            default: std::cerr << "invalid texture parameter: '" << parameter << "'\n"; exit(1);
+        }
+
+        return 0;
+    }
+
+    OpenGLTexture::OpenGLTexture(u32 width, u32 height, ImageFormat format,
+                                 TextureParameter wrap_s, TextureParameter wrap_t,
+                                 TextureParameter min_filter, TextureParameter mag_filter)
     {
         auto internal_format = convert_to_opengl_internal_format(format);
+        auto internal_wrap_s = convert_to_opengl_parameter_format(wrap_s);
+        auto internal_wrap_t = convert_to_opengl_parameter_format(wrap_t);
+        auto internal_min_filter = convert_to_opengl_parameter_format(min_filter);
+        auto internal_mag_filter = convert_to_opengl_parameter_format(mag_filter);
 
         // Create texture
         glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
         glTextureStorage2D(texture_id, 1, internal_format, width, height);
 
-        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // @TODO: this should also be configurable
-        glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_S, internal_wrap_s);
+        glTextureParameteri(texture_id, GL_TEXTURE_WRAP_T, internal_wrap_t);
+        glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, internal_min_filter);
+        glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, internal_mag_filter);
 
         this->type = TextureType::None; // Type doesn't really matter for this kind of texture
         this->width = width;

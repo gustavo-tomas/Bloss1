@@ -21,6 +21,11 @@ namespace bls
         RGBA32F
     };
 
+    enum TextureParameter
+    {
+        Repeat, ClampToEdge, Nearest, Linear
+    };
+
     class Texture
     {
         public:
@@ -33,7 +38,9 @@ namespace bls
             virtual u32 get_height() = 0;
             virtual TextureType get_type() = 0;
 
-            static std::shared_ptr<Texture> create(u32 width, u32 height, ImageFormat format);
+            static std::shared_ptr<Texture> create(u32 width, u32 height, ImageFormat format,
+                                                   TextureParameter wrap_s, TextureParameter wrap_t,
+                                                   TextureParameter min_filter, TextureParameter mag_filter);
             static std::shared_ptr<Texture> create(const str& name, const str& path, TextureType texture_type);
     };
 };
