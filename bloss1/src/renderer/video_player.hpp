@@ -23,8 +23,7 @@ namespace bls
             VideoPlayer(const str& file);
             ~VideoPlayer();
 
-            void render(f32 dt);
-            bool finished();
+            void render();
 
         private:
             void open_file(const str& file);
@@ -35,7 +34,7 @@ namespace bls
             std::shared_ptr<Texture> curr_frame;
             std::shared_ptr<Shader> shader;
 
-            u32 frame_width, frame_height;
+            u32 frame_width, frame_height, frame_rate;
 
             u8* data;
             u8* dest[4];

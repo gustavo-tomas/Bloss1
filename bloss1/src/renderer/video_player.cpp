@@ -1,5 +1,6 @@
 #include "renderer/video_player.hpp"
 #include "core/game.hpp"
+#include "core/input.hpp"
 
 namespace bls
 {
@@ -33,13 +34,41 @@ namespace bls
         std::cout << "video player destroyed successfully\n";
     }
 
-    void VideoPlayer::render(f32 dt)
+    void VideoPlayer::render()
     {
-        if (finished())
-            return;
+        // @TODO: Create a stage for this?
 
-        read_frame();
-        render_frame();
+        Game::get().set_target_fps(frame_rate);
+
+        auto& window = Game::get().get_window();
+        auto& renderer = Game::get().get_renderer();
+
+        f64 last_time = window.get_time(), current_time = 0;
+        f64 target_spf = (1.0 / static_cast<f64>(frame_rate));
+
+        while (read_frames)
+        {
+            current_time = window.get_time();
+            last_time = current_time;
+
+            renderer.clear();
+            renderer.set_viewport(0, 0, window.get_width(), window.get_height());
+
+            read_frame();
+            render_frame();
+
+            window.update();
+
+            // Exit the stage
+            if (Input::is_key_pressed(KEY_SPACE))
+                read_frames = false;
+
+            f64 elapsed = window.get_time() - last_time;
+            if (target_spf - elapsed > 0.0)
+                window.sleep(target_spf - elapsed);
+        }
+
+        Game::get().set_target_fps(0);
     }
 
     void VideoPlayer::open_file(const str& file)
@@ -114,6 +143,11 @@ namespace bls
         // Set frame dimensions
         frame_width = codec_params->width;
         frame_height = codec_params->height;
+
+        // Set frame rate
+        i32 num = format_context->streams[video_stream_index]->r_frame_rate.num;
+        i32 den = format_context->streams[video_stream_index]->r_frame_rate.den;
+        frame_rate = num / den;
 
         // Allocate dest data
         for (u32 i = 0; i < 4; i++)
@@ -198,10 +232,5 @@ namespace bls
         shader->bind();
         curr_frame->bind(0);
         quad->render();
-    }
-
-    bool VideoPlayer::finished()
-    {
-        return !read_frames;
     }
 };
