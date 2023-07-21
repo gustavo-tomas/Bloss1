@@ -28,6 +28,8 @@ namespace bls
             Window& get_window();
             Renderer& get_renderer();
 
+            void set_target_fps(u32 fps);
+
         private:
             void on_window_close(const WindowCloseEvent& event);
             void on_window_resize(const WindowResizeEvent& event);
@@ -40,7 +42,7 @@ namespace bls
             std::unique_ptr<Renderer> renderer;
             std::unique_ptr<Stage> stages; // For now just one stage
 
-            bool running;
-            bool minimized;
+            f64 target_spf;
+            bool running, minimized;
     };
 };
