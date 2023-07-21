@@ -118,7 +118,7 @@ namespace bls
         lena_font  = Font::create("lena", "bloss1/assets/font/lena.ttf");
 
         // Create a video player
-        video_player = std::make_unique<VideoPlayer>();
+        video_player = std::make_unique<VideoPlayer>("bloss1/assets/videos/mh_pro_skate.mp4");
 
         // // Play the video
         // video_player->render_frame();
