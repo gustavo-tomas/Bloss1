@@ -117,6 +117,12 @@ namespace bls
         inder_font = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
         lena_font  = Font::create("lena", "bloss1/assets/font/lena.ttf");
 
+        // Create a video player
+        video_player = std::make_unique<VideoPlayer>();
+
+        // // Play the video
+        // video_player->render_frame();
+
         running = true;
     }
 
