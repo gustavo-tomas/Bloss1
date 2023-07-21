@@ -38,6 +38,8 @@ namespace bls
             virtual u32 get_height() = 0;
             virtual TextureType get_type() = 0;
 
+            virtual void set_data(void* pixels) = 0;
+
             static std::shared_ptr<Texture> create(u32 width, u32 height, ImageFormat format,
                                                    TextureParameter wrap_s, TextureParameter wrap_t,
                                                    TextureParameter min_filter, TextureParameter mag_filter);
