@@ -141,7 +141,10 @@ namespace bls
             }
 
             if (packet->stream_index != video_stream_index)
+            {
+                av_packet_unref(packet);
                 continue;
+            }
 
             res = avcodec_send_packet(codec_context, packet);
             if (res < 0)
@@ -152,7 +155,10 @@ namespace bls
 
             res = avcodec_receive_frame(codec_context, frame);
             if (res == AVERROR(EAGAIN) || res == AVERROR_EOF)
+            {
+                av_packet_unref(packet);
                 continue;
+            }
 
             else if (res < 0)
             {
