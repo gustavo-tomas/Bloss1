@@ -18,6 +18,7 @@ namespace bls
             ~GlfwWindow();
 
             void update() override;
+            void sleep(f64 seconds) override;
 
             void set_event_callback(const EventCallback& callback) override;
 

@@ -10,18 +10,6 @@
 
 namespace bls
 {
-    // static GLenum convert_to_opengl_image_format(ImageFormat format)
-    // {
-    //     switch (format)
-    //     {
-    //         case ImageFormat::RGB8:  return GL_RGB;
-    //         case ImageFormat::RGBA8: return GL_RGBA;
-    //         default: std::cerr << "invalid image format: '" << format << "'\n"; exit(1);
-    //     }
-
-    //     return 0;
-    // }
-
     static GLenum convert_to_opengl_internal_format(ImageFormat format)
     {
         switch (format)
@@ -176,6 +164,11 @@ namespace bls
     void OpenGLTexture::bind(u32 slot)
     {
         glBindTextureUnit(slot, texture_id);
+    }
+
+    void OpenGLTexture::set_data(void* pixels)
+    {
+        glTextureSubImage2D(texture_id, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
 
     u32 OpenGLTexture::get_id()

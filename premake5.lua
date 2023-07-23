@@ -21,7 +21,7 @@ project "bloss1"
     -- @TODO: Don't forget to add all dependencies to the vendor folder
     includedirs { "%{prj.name}/src", "vendor/", "/usr/include/freetype2" }
 
-    linkoptions { "-lglfw", "-lGL", "-lGLEW", "-lassimp", "-lfreetype" }
+    linkoptions { "-lglfw", "-lGL", "-lGLEW", "-lassimp", "-lfreetype", "-lavcodec", "-lavformat", "-lavutil", "-lswscale" }
 
     -- Change project APIs here
     defines { "_GLFW", "_OPENGL" }

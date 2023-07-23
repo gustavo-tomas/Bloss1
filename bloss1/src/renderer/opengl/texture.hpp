@@ -24,6 +24,8 @@ namespace bls
             u32 get_height() override;
             TextureType get_type() override;
 
+            void set_data(void* pixels) override;
+
         private:
             str path;
             u32 texture_id;

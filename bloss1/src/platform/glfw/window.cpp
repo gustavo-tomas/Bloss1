@@ -136,6 +136,11 @@ namespace bls
         glfwSwapBuffers(native_window);
     }
 
+    void GlfwWindow::sleep(f64 seconds)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(static_cast<i64>(seconds * 1'000'000)));
+    }
+
     void GlfwWindow::set_event_callback(const EventCallback& callback)
     {
         window_data.event_callback = callback;

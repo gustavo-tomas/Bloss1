@@ -15,6 +15,7 @@ namespace bls
         }
 
         instance = this;
+        set_target_fps(0);
 
         // Create a window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
@@ -81,6 +82,11 @@ namespace bls
 
             // Update window
             window->update();
+
+            // Sleep to match target spf
+            f64 elapsed = window->get_time() - last_time;
+            if (target_spf - elapsed > 0.0)
+                window->sleep(target_spf - elapsed);
         }
     }
 
@@ -129,6 +135,12 @@ namespace bls
     Window& Game::get_window()
     {
         return *window;
+    }
+
+    void Game::set_target_fps(u32 fps)
+    {
+        fps = (fps == 0) ? 100'000 : fps;
+        target_spf = 1.0 / static_cast<f64>(fps);
     }
 
     void Game::on_window_close(const WindowCloseEvent&)

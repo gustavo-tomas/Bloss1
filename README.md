@@ -31,3 +31,4 @@ $ scripts/clean.sh
 - [mreinstein/ecs](https://github.com/mreinstein/ecs)
 - [learnopengl](https://learnopengl.com)
 - [The book of shaders](https://thebookofshaders.com)
+- [video-app](https://github.com/bmewj/video-app)

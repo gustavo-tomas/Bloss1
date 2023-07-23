@@ -17,6 +17,8 @@ namespace bls
             virtual ~Window() { }
 
             virtual void update() = 0;
+            virtual void sleep(f64 seconds) = 0;
+
             virtual u32 get_width() const = 0;
             virtual u32 get_height() const = 0;
 
