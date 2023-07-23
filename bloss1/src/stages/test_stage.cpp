@@ -120,8 +120,8 @@ namespace bls
         // Create a video player
         video_player = std::make_unique<VideoPlayer>("bloss1/assets/videos/mh_pro_skate.mp4");
 
-        // // Play the video
-        // video_player->render_frame();
+        // Play the video
+        video_player->play_video();
 
         running = true;
     }

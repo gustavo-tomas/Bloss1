@@ -23,7 +23,7 @@ namespace bls
             VideoPlayer(const str& file);
             ~VideoPlayer();
 
-            void render();
+            void play_video();
 
         private:
             void open_file(const str& file);

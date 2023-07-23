@@ -34,7 +34,7 @@ namespace bls
         std::cout << "video player destroyed successfully\n";
     }
 
-    void VideoPlayer::render()
+    void VideoPlayer::play_video()
     {
         // @TODO: Create a stage for this?
 
