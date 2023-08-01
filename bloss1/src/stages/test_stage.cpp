@@ -5,7 +5,8 @@
 
 namespace bls
 {
-    TestStage::TestStage(Renderer& renderer, Window& window) : renderer(renderer), window(window)
+    TestStage::TestStage(Renderer& renderer, Window& window, AudioEngine& audio_engine)
+        : renderer(renderer), window(window), audio_engine(audio_engine)
     {
 
     }
@@ -18,7 +19,9 @@ namespace bls
 
     void TestStage::start()
     {
-        audio = std::make_unique<Audio>();
+        // Load audios
+        audio_engine.load("test", "bloss1/assets/sounds/test.wav", true);
+        audio_engine.play("test");
 
         // Create the ECS
         ecs = std::unique_ptr<ECS>(new ECS());

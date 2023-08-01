@@ -9,6 +9,7 @@
 #include "core/event.hpp"
 #include "stages/stage.hpp"
 #include "renderer/renderer.hpp"
+#include "audio/audio_engine.hpp"
 
 namespace bls
 {
@@ -27,6 +28,7 @@ namespace bls
             static Game& get(); // im sorry i can change
             Window& get_window();
             Renderer& get_renderer();
+            AudioEngine& get_audio_engine();
 
             void set_target_fps(u32 fps);
 
@@ -40,6 +42,7 @@ namespace bls
 
             std::unique_ptr<Window> window;
             std::unique_ptr<Renderer> renderer;
+            std::unique_ptr<AudioEngine> audio_engine;
             std::unique_ptr<Stage> stages; // For now just one stage
 
             f64 target_spf;

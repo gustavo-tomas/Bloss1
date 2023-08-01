@@ -15,14 +15,14 @@
 #include "renderer/video_player.hpp"
 #include "renderer/primitives/quad.hpp"
 #include "camera/controller.hpp"
-#include "audio.hpp"
+#include "audio/audio_engine.hpp"
 
 namespace bls
 {
     class TestStage : public Stage
     {
         public:
-            TestStage(Renderer& renderer, Window& window);
+            TestStage(Renderer& renderer, Window& window, AudioEngine& audio_engine);
             ~TestStage();
 
             void start() override;
@@ -35,6 +35,7 @@ namespace bls
 
             Renderer& renderer;
             Window& window;
+            AudioEngine& audio_engine;
 
             std::unique_ptr<Quad> quad;
 
@@ -44,7 +45,6 @@ namespace bls
             std::shared_ptr<Shader> g_buffer_shader;
             std::unique_ptr<FrameBuffer> g_buffer;
             std::unique_ptr<RenderBuffer> render_buffer;
-            std::unique_ptr<Audio> audio;
 
             Skybox* skybox;
 

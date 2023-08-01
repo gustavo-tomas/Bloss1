@@ -17,13 +17,17 @@ namespace bls
         instance = this;
         set_target_fps(0);
 
-        // Create a window
+        // Create the window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
         window->set_event_callback(BIND_EVENT_FN(Game::on_event));
 
-        // Create a renderer
+        // Create the renderer
         renderer = std::unique_ptr<Renderer>(Renderer::create());
         renderer->initialize();
+
+        // Create the audio engine
+        // @TODO: might wanna create a wrapper just like the renderer
+        audio_engine = std::make_unique<AudioEngine>();
 
         // Register callbacks
         EventSystem::register_callback<WindowCloseEvent>(BIND_EVENT_FN(Game::on_window_close));
@@ -31,8 +35,8 @@ namespace bls
         EventSystem::register_callback<KeyPressEvent>(BIND_EVENT_FN(Game::on_key_press));
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
 
-        // Register initial stage
-        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get())); // oof
+        // Register initial stage // oof
+        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get(), *audio_engine.get()));
         stages->start();
 
         running = true;
@@ -130,6 +134,11 @@ namespace bls
     Renderer& Game::get_renderer()
     {
         return *renderer;
+    }
+
+    AudioEngine& Game::get_audio_engine()
+    {
+        return *audio_engine;
     }
 
     Window& Game::get_window()
