@@ -19,7 +19,6 @@ namespace bls
     void TestStage::start()
     {
         audio = std::make_unique<Audio>();
-        return;
 
         // Create the ECS
         ecs = std::unique_ptr<ECS>(new ECS());

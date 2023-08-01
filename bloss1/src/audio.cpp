@@ -1,32 +1,43 @@
 #include "audio.hpp"
 
 #include "soloud/include/soloud.h"
-#include "soloud/include/soloud_speech.h"
+#include "soloud/include/soloud_wav.h"
 #include "soloud/include/soloud_thread.h"
 
 namespace bls
 {
     Audio::Audio()
     {
-        // Define a couple of variables
-        SoLoud::Soloud soloud;  // SoLoud engine core
-        SoLoud::Speech speech;  // A sound source (speech, in this case)
+        // Declare some variables
+        SoLoud::Soloud soloud; // Engine core
+        SoLoud::Wav wav;       // One sample source
 
-        // Configure sound source
-        speech.setText("1 2 3   1 2 3   Hello world. Welcome to So-Loud.");
-
-        // initialize SoLoud.
+        // Initialize SoLoud (automatic back-end selection)
+        // also, enable visualization for FFT calc
         soloud.init();
+        soloud.setVisualizationEnable(1);
 
-        // Play the sound source (we could do this several times if we wanted)
-        soloud.play(speech);
+        std::cout << "Welcome to Soloud!\n";
 
-        // Wait until sounds have finished
-        while (soloud.getActiveVoiceCount() > 0)
+        // Load a wave file
+        auto res = wav.load("bloss1/assets/sounds/test.wav");
+        if (res != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
         {
-            // Still going, sleep for a bit
-            SoLoud::Thread::sleep(100);
+            std::cout << "OOPS\n";
+            exit(1);
         }
+        // wav.setLooping(1);                          // Tell SoLoud to loop the sound
+
+        i32 handle1 = soloud.play(wav);             // Play it
+        // soloud.setVolume(handle1, 0.5f);            // Set volume; 1.0f is "normal"
+        // soloud.setPan(handle1, -0.2f);              // Set pan; -1 is left, 1 is right
+        // soloud.setRelativePlaySpeed(handle1, 0.7f); // Play a bit slower; 1.0f is normal
+
+        // Wait for voice to finish
+        while (soloud.getVoiceCount() > 0)
+            SoLoud::Thread::sleep(100); // Still going, sleep for a bit
+
+        soloud.stop(handle1); // stop the wind sound
 
         // Clean up SoLoud
         soloud.deinit();
