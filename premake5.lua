@@ -6,6 +6,9 @@ workspace "bloss1"
     cppdialect "C++17"
     configurations { "debug", "release" }
 
+    -- Run vendor premakes here
+    include "vendor/soloud"
+
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
     location "bloss1"

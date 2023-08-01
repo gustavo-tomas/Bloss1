@@ -1,0 +1,3 @@
+[submodule "vendor/soloud"]
+	path = vendor/soloud
+	url = https://github.com/gustavo-tomas/soloud.git

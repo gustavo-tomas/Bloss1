@@ -15,6 +15,7 @@
 #include "renderer/video_player.hpp"
 #include "renderer/primitives/quad.hpp"
 #include "camera/controller.hpp"
+#include "audio.hpp"
 
 namespace bls
 {
@@ -43,6 +44,7 @@ namespace bls
             std::shared_ptr<Shader> g_buffer_shader;
             std::unique_ptr<FrameBuffer> g_buffer;
             std::unique_ptr<RenderBuffer> render_buffer;
+            std::unique_ptr<Audio> audio;
 
             Skybox* skybox;
 
