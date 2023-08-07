@@ -5,7 +5,8 @@
 
 namespace bls
 {
-    TestStage::TestStage(Renderer& renderer, Window& window) : renderer(renderer), window(window)
+    TestStage::TestStage(Renderer& renderer, Window& window, AudioEngine& audio_engine)
+        : renderer(renderer), window(window), audio_engine(audio_engine)
     {
 
     }
@@ -18,6 +19,11 @@ namespace bls
 
     void TestStage::start()
     {
+        // Load audios
+        audio_engine.load("test", "bloss1/assets/sounds/toc.wav", true);
+        audio_engine.set_echo_filter("test", 0.2f, 0.15f);
+        audio_engine.play("test");
+
         // Create the ECS
         ecs = std::unique_ptr<ECS>(new ECS());
 

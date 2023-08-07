@@ -6,6 +6,12 @@ workspace "bloss1"
     cppdialect "C++17"
     configurations { "debug", "release" }
 
+    -- Change backends here
+    defines { "_GLFW", "_OPENGL", "WITH_ALSA" }
+
+    -- Run vendor premakes here
+    include "vendor/soloud"
+
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
     location "bloss1"
@@ -21,11 +27,18 @@ project "bloss1"
     -- @TODO: Don't forget to add all dependencies to the vendor folder
     includedirs { "%{prj.name}/src", "vendor/", "/usr/include/freetype2" }
 
-    linkoptions { "-lglfw", "-lGL", "-lGLEW", "-lassimp", "-lfreetype", "-lavcodec", "-lavformat", "-lavutil", "-lswscale" }
+    linkoptions
+    {
+        "-lglfw", "-lGL", "-lGLEW",
+        "-lassimp",
+        "-lfreetype",
+        "-lavcodec", "-lavformat", "-lavutil", "-lswscale",
+        "-lasound" -- linux only
+    }
 
-    -- Change project APIs here
-    defines { "_GLFW", "_OPENGL" }
-    
+    -- Links vendor libraries here
+    links { "soloud" }
+
     filter "system:linux"
         pic "On"
 
