@@ -1,4 +1,5 @@
 #include "audio/audio_engine.hpp"
+#include "soloud/include/soloud_echofilter.h"
 
 namespace bls
 {
@@ -18,6 +19,12 @@ namespace bls
 
     void AudioEngine::load(const str& name, const str& path, bool looping)
     {
+        if (audios.count(name))
+        {
+            std::cerr << "audio '" << name << "' is already loaded\n";
+            exit(1);
+        }
+
         // Load a wav/ogg/mp3 file
         SoLoud::Wav* wav = new SoLoud::Wav();
 
@@ -44,5 +51,14 @@ namespace bls
         // soloud.setVolume(handle, 0.15f);           // Set volume; 1.0f is "normal"
         // soloud.setPan(handle, -0.2f);              // Set pan; -1 is left, 1 is right
         // soloud.setRelativePlaySpeed(handle, 0.7f); // Play a bit slower; 1.0f is normal
+    }
+
+    void AudioEngine::set_echo_filter(const str& name, f32 delay, f32 decay)
+    {
+        if (!filters.count(name))
+            filters[name] = std::make_unique<SoLoud::EchoFilter>();
+
+        static_cast<SoLoud::EchoFilter*>(filters[name].get())->setParams(delay, decay);
+        audios[name]->setFilter(0, filters[name].get());
     }
 };

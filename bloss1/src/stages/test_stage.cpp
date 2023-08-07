@@ -20,7 +20,8 @@ namespace bls
     void TestStage::start()
     {
         // Load audios
-        audio_engine.load("test", "bloss1/assets/sounds/test.wav", true);
+        audio_engine.load("test", "bloss1/assets/sounds/toc.wav", true);
+        audio_engine.set_echo_filter("test", 0.2f, 0.15f);
         audio_engine.play("test");
 
         // Create the ECS
