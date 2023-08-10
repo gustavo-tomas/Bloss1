@@ -62,6 +62,8 @@ namespace bls
             std::map<u32, std::unique_ptr<ModelComponent>> models;
             std::map<u32, std::unique_ptr<DirectionalLight>> dir_lights;
             std::map<u32, std::unique_ptr<PointLight>> point_lights;
+            std::map<u32, std::unique_ptr<PhysicsObject>> physics_objects;
+            std::map<u32, std::unique_ptr<Collider>> colliders;
 
         private:
             // Entities IDs

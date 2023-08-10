@@ -20,15 +20,15 @@ namespace bls
     void TestStage::start()
     {
         // Load audios
-        audio_engine.load("test", "bloss1/assets/sounds/toc.wav", true);
-        audio_engine.set_echo_filter("test", 0.2f, 0.15f);
-        audio_engine.play("test");
+        // audio_engine.load("test", "bloss1/assets/sounds/toc.wav", false);
+        // audio_engine.set_echo_filter("test", 0.2f, 0.15f);
+        // audio_engine.play("test");
 
         // Create the ECS
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
-        ecs->add_system(transform_system);
+        ecs->add_system(physics_system);
         ecs->add_system(render_system);
 
         // Add some entities to the world
@@ -124,10 +124,10 @@ namespace bls
         lena_font  = Font::create("lena", "bloss1/assets/font/lena.ttf");
 
         // Create a video player
-        video_player = std::make_unique<VideoPlayer>("bloss1/assets/videos/mh_pro_skate.mp4");
+        // video_player = std::make_unique<VideoPlayer>("bloss1/assets/videos/mh_pro_skate.mp4");
 
-        // Play the video
-        video_player->play_video();
+        // // Play the video
+        // video_player->play_video();
 
         running = true;
     }
@@ -139,7 +139,6 @@ namespace bls
         controller->get_camera().update(dt);
 
         // Update all systems in registration order
-        // @TODO: for now do nothing
         auto& systems = ecs->systems;
         for (auto& system : systems)
             system(*ecs, dt);

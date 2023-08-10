@@ -19,6 +19,8 @@ namespace bls
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
+        ecs.colliders[id] = std::make_unique<SphereCollider>(10.0f);
 
         return id;
     }
@@ -31,6 +33,7 @@ namespace bls
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.colliders[id] = std::make_unique<PlaneCollider>(transform.position, transform.scale.x);
 
         return id;
     }
