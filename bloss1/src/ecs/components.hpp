@@ -85,7 +85,7 @@ namespace bls
         public:
             enum ColliderType
             {
-                Plane, Sphere
+                Box, Sphere
             };
 
             Collider(ColliderType type)
@@ -95,14 +95,13 @@ namespace bls
             ColliderType type;
     };
 
-    class PlaneCollider : public Collider
+    class BoxCollider : public Collider
     {
         public:
-            PlaneCollider(const vec3& plane, f32 distance)
-                : Collider(ColliderType::Plane), plane(plane), distance(distance) { }
+            BoxCollider(f32 width, f32 height, f32 depth)
+                : Collider(ColliderType::Box), width(width), height(height), depth(depth) { }
 
-            vec3 plane;
-            f32 distance;
+            f32 width, height, depth;
     };
 
     class SphereCollider : public Collider

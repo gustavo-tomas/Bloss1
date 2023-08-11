@@ -28,7 +28,7 @@ namespace bls
         for (auto& [id, object] : objects)
         {
             // Apply forces
-            object->force += vec3(0.0f, object->mass * -9.8f, 0.0f); // @TODO: set a constant for gravity
+            // object->force += vec3(0.0f, object->mass * -9.8f, 0.0f); // @TODO: set a constant for gravity
             object->velocity += object->force / object->mass * dt;
             transforms[id]->position += object->velocity * dt;
 
@@ -38,7 +38,7 @@ namespace bls
     }
 
     i32 test_collision(Collider* col_a, Transform* trans_a, Collider* col_b, Transform* trans_b);
-    i32 test_collision(PlaneCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
+    i32 test_collision(BoxCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
     i32 test_collision(SphereCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
 
     void resolve_collisions(ECS& ecs, f32 dt)
@@ -65,31 +65,46 @@ namespace bls
 
     i32 test_collision(Collider* col_a, Transform* trans_a, Collider* col_b, Transform* trans_b)
     {
-        // Plane v. Sphere
-        if (col_a->type == Collider::Plane && col_b->type == Collider::Sphere)
-            return test_collision(static_cast<PlaneCollider*>(col_a), trans_a, static_cast<SphereCollider*>(col_b), trans_b);
+        // Box v. Sphere
+        if (col_a->type == Collider::Box && col_b->type == Collider::Sphere)
+            return test_collision(static_cast<BoxCollider*>(col_a), trans_a, static_cast<SphereCollider*>(col_b), trans_b);
 
-        // Sphere v. Plane
-        else if (col_a->type == Collider::Sphere && col_b->type == Collider::Plane)
-            return test_collision(static_cast<PlaneCollider*>(col_b), trans_b, static_cast<SphereCollider*>(col_a), trans_a);
+        // Sphere v. Box
+        else if (col_a->type == Collider::Sphere && col_b->type == Collider::Box)
+            return test_collision(static_cast<BoxCollider*>(col_b), trans_b, static_cast<SphereCollider*>(col_a), trans_a);
 
         // Sphere v. Sphere
         else if (col_a->type == Collider::Sphere && col_b->type == Collider::Sphere)
             return test_collision(static_cast<SphereCollider*>(col_a), trans_a, static_cast<SphereCollider*>(col_b), trans_b);
+
+        // Box v. Box
+        else if (col_a->type == Collider::Box && col_b->type == Collider::Box)
+            return test_collision(static_cast<BoxCollider*>(col_a), trans_a, static_cast<BoxCollider*>(col_b), trans_b);
 
         // Invalid colliders
         std::cerr << "invalid colliders\n";
         exit(1);
     }
 
-    // Plane v. Sphere
-    i32 test_collision(PlaneCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b)
+    // Sphere v. Sphere
+    i32 test_collision(SphereCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b)
+    {
+        // Only the x is taken in account when calculating the scaled sphere radius
+        auto dist = distance(trans_a->position, trans_b->position);
+        if (dist < (col_a->radius * trans_a->scale.x) + (col_b->radius * trans_b->scale.x))
+            return 1;
+
+        return 0;
+    }
+
+    // Box v. Sphere
+    i32 test_collision(BoxCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b)
     {
         return 0;
     }
 
-    // Sphere v. Sphere
-    i32 test_collision(SphereCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b)
+    // Box v. Box
+    i32 test_collision(BoxCollider* col_a, Transform* trans_a, BoxCollider* col_b, Transform* trans_b)
     {
         return 0;
     }
