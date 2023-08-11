@@ -42,6 +42,12 @@ namespace bls
     }
 
     template<typename T>
+    auto distance(T p0, T p1)
+    {
+        return glm::distance(p0, p1);
+    }
+
+    template<typename T>
     auto normalize(T x)
     {
         return glm::normalize(x);
