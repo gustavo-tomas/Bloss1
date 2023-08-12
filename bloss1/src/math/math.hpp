@@ -42,6 +42,18 @@ namespace bls
     }
 
     template<typename T>
+    auto min(T x, T y)
+    {
+        return glm::min(x, y);
+    }
+
+    template<typename T>
+    auto max(T x, T y)
+    {
+        return glm::max(x, y);
+    }
+
+    template<typename T>
     auto distance(T p0, T p1)
     {
         return glm::distance(p0, p1);
