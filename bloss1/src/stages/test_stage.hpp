@@ -14,6 +14,7 @@
 #include "renderer/font.hpp"
 #include "renderer/video_player.hpp"
 #include "renderer/primitives/quad.hpp"
+#include "renderer/primitives/line.hpp"
 #include "camera/controller.hpp"
 #include "audio/audio_engine.hpp"
 
@@ -38,11 +39,13 @@ namespace bls
             AudioEngine& audio_engine;
 
             std::unique_ptr<Quad> quad;
+            std::vector<std::unique_ptr<Line>> lines;
 
             CameraController* controller;
             std::unique_ptr<VideoPlayer> video_player;
             std::shared_ptr<Shader> pbr_shader;
             std::shared_ptr<Shader> g_buffer_shader;
+            std::shared_ptr<Shader> line_shader;
             std::unique_ptr<FrameBuffer> g_buffer;
             std::unique_ptr<RenderBuffer> render_buffer;
 

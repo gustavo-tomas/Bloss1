@@ -33,7 +33,7 @@ namespace bls
 
         // Add some entities to the world
         for (u32 i = 0; i < 5; i++)
-            player(*ecs, Transform(vec3(i * 10.0f, 5.0f, 5.0f), vec3(0.0f), vec3(5.0f)));
+            player(*ecs, Transform(vec3(i * 10.0f, 5.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
@@ -60,6 +60,9 @@ namespace bls
 
         // PBR shader
         pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
+
+        // Debug shader
+        line_shader = Shader::create("line", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
 
         // Create framebuffer textures
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
@@ -118,6 +121,11 @@ namespace bls
 
         // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
+
+        // Create axis lines for debugging               // Start    // End
+        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
+        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
+        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
 
         // Create font
         inder_font = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
@@ -287,6 +295,29 @@ namespace bls
         // Render text
         inder_font->render("owowowowow", 20.0f, 20.0f, 0.5f, { 0.95f, 0.6f, 0.4f });
         lena_font->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
+
+        // Render debug lines
+        line_shader->bind();
+
+        line_shader->set_uniform4("projection", projection);
+        line_shader->set_uniform4("view", view);
+        line_shader->set_uniform4("model", mat4(1.0f));
+
+        for (u64 i = 0; i < lines.size(); i++)
+        {
+            vec3 color = { 1.0f, 0.0f, 0.0f };
+
+            if (i == 1)
+                color = { 0.0f, 1.0f, 0.0f };
+
+            else if (i == 2)
+                color = { 0.0f, 0.0f, 1.0f };
+
+            line_shader->set_uniform3("color", color);
+            lines[i]->render();
+        }
+
+        line_shader->unbind();
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
