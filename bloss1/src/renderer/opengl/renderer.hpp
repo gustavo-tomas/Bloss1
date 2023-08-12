@@ -24,5 +24,6 @@ namespace bls
             void clear() override;
             void draw_indexed(u32 count) override;
             void draw_arrays(u32 count) override;
+            void draw_lines(u32 count) override;
     };
 };
