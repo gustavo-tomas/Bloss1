@@ -40,6 +40,7 @@ namespace bls
     i32 test_collision(Collider* col_a, Transform* trans_a, Collider* col_b, Transform* trans_b);
     i32 test_collision(BoxCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
     i32 test_collision(SphereCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
+    i32 test_collision(BoxCollider* col_a, Transform* trans_a, BoxCollider* col_b, Transform* trans_b);
 
     void resolve_collisions(ECS& ecs, f32 dt)
     {
@@ -91,7 +92,7 @@ namespace bls
     {
         // Only the x is taken in account when calculating the scaled sphere radius
         auto dist = distance(trans_a->position, trans_b->position);
-        if (dist < (col_a->radius * trans_a->scale.x) + (col_b->radius * trans_b->scale.x))
+        if (dist < col_a->radius + col_b->radius)
             return 1;
 
         return 0;
@@ -100,12 +101,58 @@ namespace bls
     // Box v. Sphere
     i32 test_collision(BoxCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b)
     {
-        return 0;
+        // Point where the box 'begins'
+        f32 min_x = trans_a->position.x - col_a->width;
+        f32 min_y = trans_a->position.y - col_a->height;
+        f32 min_z = trans_a->position.z - col_a->depth;
+
+        // Point where the box 'ends'
+        f32 max_x = trans_a->position.x + col_a->width;
+        f32 max_y = trans_a->position.y + col_a->height;
+        f32 max_z = trans_a->position.z + col_a->depth;
+
+        f32 x = max(min_x, min(trans_b->position.x, max_x));
+        f32 y = max(min_y, min(trans_b->position.y, max_y));
+        f32 z = max(min_z, min(trans_b->position.z, max_z));
+
+        // Distance squared
+        f32 distance_2 = (
+                             (x - trans_b->position.x) * (x - trans_b->position.x) +
+                             (y - trans_b->position.y) * (y - trans_b->position.y) +
+                             (z - trans_b->position.z) * (z - trans_b->position.z)
+                         );
+
+        return distance_2 < col_b->radius * col_b->radius;
     }
 
     // Box v. Box
     i32 test_collision(BoxCollider* col_a, Transform* trans_a, BoxCollider* col_b, Transform* trans_b)
     {
-        return 0;
+        // Point where the box 'begins'
+        f32 min_x_a = trans_a->position.x - col_a->width;
+        f32 min_y_a = trans_a->position.y - col_a->height;
+        f32 min_z_a = trans_a->position.z - col_a->depth;
+
+        f32 min_x_b = trans_b->position.x - col_b->width;
+        f32 min_y_b = trans_b->position.y - col_b->height;
+        f32 min_z_b = trans_b->position.z - col_b->depth;
+
+        // Point where the box 'ends'
+        f32 max_x_a = trans_a->position.x + col_a->width;
+        f32 max_y_a = trans_a->position.y + col_a->height;
+        f32 max_z_a = trans_a->position.z + col_a->depth;
+
+        f32 max_x_b = trans_b->position.x + col_b->width;
+        f32 max_y_b = trans_b->position.y + col_b->height;
+        f32 max_z_b = trans_b->position.z + col_b->depth;
+
+        return (
+                   min_x_a <= max_x_b &&
+                   max_x_a >= min_x_b &&
+                   min_y_a <= max_y_b &&
+                   max_y_a >= min_y_b &&
+                   min_z_a <= max_z_b &&
+                   max_z_a >= min_z_b
+               );
     }
 };
