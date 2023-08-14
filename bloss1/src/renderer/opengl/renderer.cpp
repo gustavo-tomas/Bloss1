@@ -34,29 +34,22 @@ namespace bls
 
         // Multisampling (MSAA)
         // glEnable(GL_MULTISAMPLE);
-
-        // Wireframe mode
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    void OpenGLRenderer::set_uniform()
-    {
-
-    }
-
-    void OpenGLRenderer::set_texture()
-    {
-
-    }
-
-    void OpenGLRenderer::set_render_target()
-    {
-
     }
 
     void OpenGLRenderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
     {
         glViewport(x, y, width, height);
+    }
+
+    void OpenGLRenderer::set_debug_mode(bool active)
+    {
+        // Wireframe mode
+        if (active)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // Normal mode
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     void OpenGLRenderer::clear_color(const vec4& color)
