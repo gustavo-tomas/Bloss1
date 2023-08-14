@@ -237,7 +237,7 @@ namespace bls
                 }
 
                 mesh->vao->bind();
-                renderer.draw_indexed(mesh->indices.size());
+                renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
 
                 // Reset
                 mesh->vao->unbind();
@@ -337,7 +337,11 @@ namespace bls
             switch (collider->type)
             {
                 case Collider::ColliderType::Sphere:
-                    // @TODO: create a sphere primitive
+                    collider_sphere = std::make_unique<Sphere>(renderer,
+                                      ecs->transforms[id]->position,
+                                      static_cast<SphereCollider*>(collider.get())->radius);
+
+                    collider_sphere->render();
                     break;
 
                 case Collider::ColliderType::Box:

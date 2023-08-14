@@ -41,7 +41,7 @@ namespace bls
             void render()
             {
                 vao->bind();
-                renderer.draw_lines(2);
+                renderer.draw_arrays(RenderingMode::Lines, 2);
                 vao->unbind();
             };
 

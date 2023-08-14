@@ -61,7 +61,7 @@ namespace bls
             void render()
             {
                 vao->bind();
-                renderer.draw_indexed(indices.size());
+                renderer.draw_indexed(RenderingMode::Triangles, indices.size());
                 vao->unbind();
             };
 

@@ -20,8 +20,7 @@ namespace bls
 
             void clear_color(const vec4& color) override;
             void clear() override;
-            void draw_indexed(u32 count) override;
-            void draw_arrays(u32 count) override;
-            void draw_lines(u32 count) override;
+            void draw_indexed(RenderingMode mode, u32 count) override;
+            void draw_arrays(RenderingMode mode, u32 count) override;
     };
 };

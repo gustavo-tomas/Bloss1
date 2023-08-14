@@ -4,6 +4,19 @@
 
 namespace bls
 {
+    static GLenum convert_to_opengl_rendering_mode(RenderingMode mode)
+    {
+        switch (mode)
+        {
+            case RenderingMode::Lines:  return GL_LINES;
+            case RenderingMode::Triangles: return GL_TRIANGLES;
+            case RenderingMode::TriangleStrip: return GL_TRIANGLE_STRIP;
+            default: std::cerr << "invalid rendering mode: '" << mode << "'\n"; exit(1);
+        }
+
+        return 0;
+    }
+
     OpenGLRenderer::~OpenGLRenderer()
     {
         std::cout << "opengl renderer destroyed successfully\n";
@@ -62,18 +75,15 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::draw_indexed(u32 count)
+    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count)
     {
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+        auto opengl_mode = convert_to_opengl_rendering_mode(mode);
+        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, 0);
     }
 
-    void OpenGLRenderer::draw_arrays(u32 count)
+    void OpenGLRenderer::draw_arrays(RenderingMode mode, u32 count)
     {
-        glDrawArrays(GL_TRIANGLES, 0, count);
-    }
-
-    void OpenGLRenderer::draw_lines(u32 count)
-    {
-        glDrawArrays(GL_LINES, 0, count);
+        auto opengl_mode = convert_to_opengl_rendering_mode(mode);
+        glDrawArrays(opengl_mode, 0, count);
     }
 };

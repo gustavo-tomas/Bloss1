@@ -8,6 +8,11 @@
 
 namespace bls
 {
+    enum RenderingMode
+    {
+        Lines, Triangles, TriangleStrip
+    };
+
     // Renderer backend (OpenGL, Vulkan, Metal, DirectX, ...)
     class Renderer
     {
@@ -21,9 +26,8 @@ namespace bls
 
             virtual void clear_color(const vec4& color) = 0;
             virtual void clear() = 0;
-            virtual void draw_indexed(u32 count) = 0;
-            virtual void draw_arrays(u32 count) = 0;
-            virtual void draw_lines(u32 count) = 0;
+            virtual void draw_indexed(RenderingMode mode, u32 count) = 0;
+            virtual void draw_arrays(RenderingMode mode, u32 count) = 0;
 
             // Must be implemented by the platform
             static Renderer* create();
