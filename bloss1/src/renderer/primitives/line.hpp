@@ -21,7 +21,7 @@ namespace bls
                     end.x, end.y, end.z
                 };
 
-                // Setup plane VAO
+                // Setup VAO
                 vao = VertexArray::create();
                 vao->bind();
 
