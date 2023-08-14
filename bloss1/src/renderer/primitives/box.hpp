@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @brief Simple test cube (also for rendering).
+ * @brief Simple box primitive with normals and texture coords.
  */
 
 #include "renderer/renderer.hpp"
@@ -9,11 +9,29 @@
 
 namespace bls
 {
-    class Cube
+    class Box
     {
         public:
-            Cube(Renderer& renderer) : renderer(renderer)
+            Box(Renderer& renderer, const vec3& position = vec3(0.0f), f32 width = 1.0f, f32 height = 1.0f, f32 depth = 1.0f)
+                : renderer(renderer)
             {
+                vertices =
+                {
+                    // Front face
+                    // Position                                                     // Normals         // Texture coordinates
+                    position.x + -width, position.y + -height, position.z + depth,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // (0)
+                    position.x +  width, position.y + -height, position.z + depth,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // (1)
+                    position.x +  width, position.y +  height, position.z + depth,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // (2)
+                    position.x + -width, position.y +  height, position.z + depth,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // (3)
+
+                    // Back face
+                    // Position                                                      // Normals          // Texture coordinates
+                    position.x + -width, position.y + -height, position.z + -depth,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // (4)
+                    position.x +  width, position.y + -height, position.z + -depth,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // (5)
+                    position.x +  width, position.y +  height, position.z + -depth,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f, // (6)
+                    position.x + -width, position.y +  height, position.z + -depth,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f  // (7)
+                };
+
                 // Setup cube VAO
                 vao = VertexArray::create();
                 vao->bind();
@@ -31,13 +49,13 @@ namespace bls
                 vao->add_vertex_buffer(2, 2, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) (6 * sizeof(f32)));
             };
 
-            ~Cube()
+            ~Box()
             {
                 delete vao;
                 delete vbo;
                 delete ebo;
 
-                std::cout << "cube destroyed successfully\n";
+                // std::cout << "box destroyed successfully\n";
             };
 
             void render()
@@ -53,22 +71,7 @@ namespace bls
             VertexBuffer* vbo;
             IndexBuffer* ebo;
 
-            std::vector<f32> vertices =
-            {
-                // Front face
-                //Position           // Normals         // Texture coordinates
-                -1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // (0)
-                1.0f,  -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // (1)
-                1.0f,   1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // (2)
-                -1.0f,  1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // (3)
-
-                // Back face
-                //Position            // Normals          // Texture coordinates
-                -1.0f, -1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // (4)
-                1.0f,  -1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // (5)
-                1.0f,   1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f, // (6)
-                -1.0f,  1.0f, -1.0f,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f  // (7)
-            };
+            std::vector<f32> vertices;
 
             std::vector<u32> indices =
             {

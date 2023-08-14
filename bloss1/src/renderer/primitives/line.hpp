@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @brief Simple test line (also for rendering).
+ * @brief Simple line primitive with start and end points.
  */
 
 #include "renderer/renderer.hpp"
@@ -35,7 +35,7 @@ namespace bls
                 delete vao;
                 delete vbo;
 
-                std::cout << "line destroyed successfully\n";
+                // std::cout << "line destroyed successfully\n";
             };
 
             void render()
@@ -50,11 +50,6 @@ namespace bls
             VertexArray* vao;
             VertexBuffer* vbo;
 
-            // Will be filled in the constructor
-            std::vector<f32> vertices =
-            {
-                0.0f, 0.0f, 0.0f,
-                0.0f, -10.0f, 0.0f
-            };
+            std::vector<f32> vertices;
     };
 };
