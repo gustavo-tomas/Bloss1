@@ -122,10 +122,10 @@ namespace bls
         // Create a quad for rendering
         quad = std::make_unique<Quad>(renderer);
 
-        // Create axis lines for debugging               // Start    // End
-        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
-        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
-        lines.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
+        // Create axes lines for debugging              // Start    // End
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
 
         // Create font
         inder_font = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
@@ -297,13 +297,26 @@ namespace bls
         lena_font->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
 
         // Render debug lines
+        render_colliders(projection, view);
+
+        // Exit the stage
+        if (Input::is_key_pressed(KEY_ESCAPE))
+            running = false;
+    }
+
+    void TestStage::render_colliders(const mat4& projection, const mat4& view)
+    {
+        renderer.set_debug_mode(true);
+
         line_shader->bind();
 
         line_shader->set_uniform4("projection", projection);
         line_shader->set_uniform4("view", view);
         line_shader->set_uniform4("model", mat4(1.0f));
+        line_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
 
-        for (u64 i = 0; i < lines.size(); i++)
+        // Render axes lines
+        for (u64 i = 0; i < axes.size(); i++)
         {
             vec3 color = { 1.0f, 0.0f, 0.0f };
 
@@ -314,14 +327,35 @@ namespace bls
                 color = { 0.0f, 0.0f, 1.0f };
 
             line_shader->set_uniform3("color", color);
-            lines[i]->render();
+            axes[i]->render();
+        }
+
+        // Render colliders
+        for (const auto& [id, collider] : ecs->colliders)
+        {
+            line_shader->set_uniform3("color", { 0.8f, 0.8f, 0.0f });
+            switch (collider->type)
+            {
+                case Collider::ColliderType::Sphere:
+                    // @TODO: create a sphere primitive
+                    break;
+
+                case Collider::ColliderType::Box:
+                    collider_box = std::make_unique<Box>(renderer, ecs->transforms[id]->position,
+                                                         static_cast<BoxCollider*>(collider.get())->width,
+                                                         static_cast<BoxCollider*>(collider.get())->height,
+                                                         static_cast<BoxCollider*>(collider.get())->depth);
+
+                    collider_box->render();
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         line_shader->unbind();
-
-        // Exit the stage
-        if (Input::is_key_pressed(KEY_ESCAPE))
-            running = false;
+        renderer.set_debug_mode(false);
     }
 
     bool TestStage::is_running()
