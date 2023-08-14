@@ -7,7 +7,7 @@
 #include "renderer/skybox.hpp"
 #include "renderer/texture.hpp"
 #include "renderer/buffers.hpp"
-#include "renderer/primitives/cube.hpp"
+#include "renderer/primitives/box.hpp"
 #include "renderer/primitives/quad.hpp"
 
 namespace bls
@@ -31,7 +31,7 @@ namespace bls
             std::shared_ptr<Shader> skybox_shader;
             std::shared_ptr<Shader> irradiance_shader, prefilter_shader, brdf_shader;
 
-            Cube* cube;
+            Box* cube;
             Quad* quad;
 
             std::shared_ptr<Texture> hdr_texture;

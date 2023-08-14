@@ -25,7 +25,7 @@ namespace bls
         skybox_shader->set_uniform1("environmentMap", 0U);
 
         // Cube setup
-        cube = new Cube(Game::get().get_renderer());
+        cube = new Box(Game::get().get_renderer());
         quad = new Quad(Game::get().get_renderer());
 
         // Setup framebuffers
