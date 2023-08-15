@@ -48,6 +48,9 @@ namespace bls
         auto& transforms = ecs.transforms;
         for (auto& [id_a, collider_a] : colliders)
         {
+            // Assume no collision happens
+            collider_a->color = vec3(0.0f);
+
             for (auto& [id_b, collider_b] : colliders)
             {
                 // Test only unique pairs
@@ -57,7 +60,8 @@ namespace bls
                 bool collision = test_collision(collider_a.get(), transforms[id_a].get(), collider_b.get(), transforms[id_b].get());
                 if (collision)
                 {
-                    std::cout << "COLLISION: " << id_a << ", " << id_b << std::endl;
+                    collider_a->color = { 1.0f, 0.0f, 0.0f };
+                    collider_b->color = { 1.0f, 0.0f, 0.0f };
                     // solve_collision(a, b, points);
                 }
             }

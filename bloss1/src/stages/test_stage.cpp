@@ -33,7 +33,7 @@ namespace bls
 
         // Add some entities to the world
         for (u32 i = 0; i < 5; i++)
-            player(*ecs, Transform(vec3(i * 10.0f, 5.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
+            player(*ecs, Transform(vec3(i * 10.0f, 6.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
@@ -333,7 +333,7 @@ namespace bls
         // Render colliders
         for (const auto& [id, collider] : ecs->colliders)
         {
-            line_shader->set_uniform3("color", { 0.8f, 0.8f, 0.0f });
+            line_shader->set_uniform3("color", collider->color);
             switch (collider->type)
             {
                 case Collider::ColliderType::Sphere:

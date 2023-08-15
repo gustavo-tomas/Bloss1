@@ -92,7 +92,9 @@ namespace bls
                 : type(type) { }
 
             virtual ~Collider() { }
+
             ColliderType type;
+            vec3 color;
     };
 
     class BoxCollider : public Collider
