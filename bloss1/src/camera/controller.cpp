@@ -4,8 +4,9 @@
 namespace bls
 {
     CameraController::CameraController(vec3& target_position, vec3& target_rotation, vec3 target_offset,
+                                       PhysicsObject& target_object,
                                        f32 speed, f32 sensitivity)
-        : target_position(target_position), target_rotation(target_rotation)
+        : target_position(target_position), target_rotation(target_rotation), target_object(target_object)
     {
         camera = new Camera(target_position, target_offset, target_rotation.x, target_rotation.y);
 
@@ -63,7 +64,7 @@ namespace bls
         // Update speed based on input
         for (const auto& [key, direction] : movement_mappings)
             if (Input::is_key_pressed(key))
-                target_position += direction * speed * dt;
+                target_object.force += direction * speed * dt;
 
         camera->set_target_position(target_position);
     }
@@ -79,10 +80,10 @@ namespace bls
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
         if (fabs(left_y) >= TOLERANCE)
-            target_position += front * speed * -left_y * dt;
+            target_object.force += front * speed * -left_y * dt;
 
         if (fabs(left_x) >= TOLERANCE)
-            target_position += right * speed * left_x * dt;
+            target_object.force += right * speed * left_x * dt;
 
         camera->set_target_position(target_position);
 

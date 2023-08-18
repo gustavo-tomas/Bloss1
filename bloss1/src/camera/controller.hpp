@@ -6,9 +6,10 @@
 
 #include "camera/camera.hpp"
 #include "core/event.hpp"
+#include "ecs/ecs.hpp"
 
-const f32 SPEED        = 50.0f;
-const f32 SENSITIVITY  = 0.03f;
+const f32 SPEED       = 12000.0f;
+const f32 SENSITIVITY = 0.03f;
 
 namespace bls
 {
@@ -16,6 +17,7 @@ namespace bls
     {
         public:
             CameraController(vec3& target_position, vec3& target_rotation, vec3 target_offset,
+                             PhysicsObject& target_object,
                              f32 speed = SPEED, f32 sensitivity = SENSITIVITY);
             ~CameraController();
 
@@ -36,5 +38,6 @@ namespace bls
             vec3& target_position;
             vec3& target_rotation;
             vec3 target_offset;
+            PhysicsObject& target_object;
     };
 };

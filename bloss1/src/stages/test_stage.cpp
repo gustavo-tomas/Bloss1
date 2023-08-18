@@ -39,7 +39,7 @@ namespace bls
 
         // Create a camera and controller
         vec3 offset = vec3(15.0f, 7.0f, 50.0f);
-        controller = new CameraController(ecs->transforms[0]->position, ecs->transforms[0]->rotation, offset);
+        controller = new CameraController(ecs->transforms[0]->position, ecs->transforms[0]->rotation, offset, *ecs->physics_objects[0].get());
 
         // Add directional lights
         dir_light_id = directional_light(*ecs,
