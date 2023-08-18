@@ -30,7 +30,7 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        auto model = Model::create("sponza", "bloss1/assets/models/floor/square_floor_4k.gltf", false);
+        auto model = Model::create("sponza", "bloss1/assets/models/floor/square_floor_fixed.gltf", false);
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
