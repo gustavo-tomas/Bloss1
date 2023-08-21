@@ -4,23 +4,6 @@
 // @TODO: finish and cleanup
 namespace bls
 {
-    f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
-    {
-        if (velocity > 0)
-        {
-            velocity -= deceleration / mass * dt;
-            return max(velocity, 0.0f);
-        }
-
-        else if (velocity < 0)
-        {
-            velocity += deceleration / mass * dt;
-            return min(velocity, 0.0f);
-        }
-
-        return 0.0f;
-    }
-
     // @TODO: finish
     void physics_system(ECS& ecs, f32 dt)
     {
@@ -285,5 +268,22 @@ namespace bls
         //            min_z_a <= max_z_b &&
         //            max_z_a >= min_z_b
         //        );
+    }
+
+    f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
+    {
+        if (velocity > 0)
+        {
+            velocity -= deceleration / mass * dt;
+            return max(velocity, 0.0f);
+        }
+
+        else if (velocity < 0)
+        {
+            velocity += deceleration / mass * dt;
+            return min(velocity, 0.0f);
+        }
+
+        return 0.0f;
     }
 };
