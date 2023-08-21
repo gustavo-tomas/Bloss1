@@ -1,4 +1,5 @@
 #include "ecs/systems.hpp"
+#include "ecs/systems/physics_system.hpp"
 
 // @TODO: finish and cleanup
 namespace bls
@@ -21,7 +22,6 @@ namespace bls
     }
 
     // @TODO: finish
-    void resolve_collisions(ECS& ecs, f32 dt);
     void physics_system(ECS& ecs, f32 dt)
     {
         resolve_collisions(ecs, dt);
@@ -67,30 +67,6 @@ namespace bls
             object->force = vec3(0.0f);
         }
     }
-
-    struct Collision
-    {
-        vec3 point_a;
-        vec3 point_b;
-        bool has_collision;
-    };
-
-    Collision test_collision(Collider* col_a, Transform* trans_a, Collider* col_b, Transform* trans_b);
-    Collision test_collision(BoxCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
-    Collision test_collision(SphereCollider* col_a, Transform* trans_a, SphereCollider* col_b, Transform* trans_b);
-    Collision test_collision(BoxCollider* col_a, Transform* trans_a, BoxCollider* col_b, Transform* trans_b);
-
-    void solve_collision(Transform* trans_a, PhysicsObject* object_a, SphereCollider* collider_a,
-                         Transform* trans_b, PhysicsObject* object_b, SphereCollider* collider_b,
-                         Collision collision, f32 dt);
-
-    void solve_collision(Transform* trans_a, PhysicsObject* object_a, BoxCollider* collider_a,
-                         Transform* trans_b, PhysicsObject* object_b, SphereCollider* collider_b,
-                         Collision collision, f32 dt);
-
-    void solve_collision(Transform* trans_a, PhysicsObject* object_a, Collider* collider_a,
-                         Transform* trans_b, PhysicsObject* object_b, Collider* collider_b,
-                         Collision collision, f32 dt);
 
     void resolve_collisions(ECS& ecs, f32 dt)
     {
