@@ -88,20 +88,21 @@ namespace bls
                 Box, Sphere
             };
 
-            Collider(ColliderType type)
-                : type(type) { }
+            Collider(ColliderType type, bool immovable)
+                : type(type), immovable(immovable) { }
 
             virtual ~Collider() { }
 
             ColliderType type;
             vec3 color;
+            bool immovable;
     };
 
     class BoxCollider : public Collider
     {
         public:
-            BoxCollider(f32 width, f32 height, f32 depth)
-                : Collider(ColliderType::Box), width(width), height(height), depth(depth) { }
+            BoxCollider(f32 width, f32 height, f32 depth, bool immovable = false)
+                : Collider(ColliderType::Box, immovable), width(width), height(height), depth(depth) { }
 
             f32 width, height, depth;
     };
@@ -109,8 +110,8 @@ namespace bls
     class SphereCollider : public Collider
     {
         public:
-            SphereCollider(f32 radius)
-                : Collider(ColliderType::Sphere), radius(radius) { }
+            SphereCollider(f32 radius, bool immovable = false)
+                : Collider(ColliderType::Sphere, immovable), radius(radius) { }
 
             f32 radius;
     };
