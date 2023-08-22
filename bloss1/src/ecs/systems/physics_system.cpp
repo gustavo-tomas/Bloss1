@@ -101,49 +101,32 @@ namespace bls
             auto col_b = static_cast<SphereCollider*>(collider_b);
 
             // Point where the box 'begins'
-            f32 min_x = trans_a->position.x - col_a->width;
-            f32 min_y = trans_a->position.y - col_a->height;
-            f32 min_z = trans_a->position.z - col_a->depth;
+            vec3 min_aabb = vec3(0.0f);
+            min_aabb.x = trans_a->position.x - col_a->width;
+            min_aabb.y = trans_a->position.y - col_a->height;
+            min_aabb.z = trans_a->position.z - col_a->depth;
 
             // Point where the box 'ends'
-            f32 max_x = trans_a->position.x + col_a->width;
-            f32 max_y = trans_a->position.y + col_a->height;
-            f32 max_z = trans_a->position.z + col_a->depth;
+            vec3 max_aabb = vec3(0.0f);
+            max_aabb.x = trans_a->position.x + col_a->width;
+            max_aabb.y = trans_a->position.y + col_a->height;
+            max_aabb.z = trans_a->position.z + col_a->depth;
 
-            f32 x = max(min_x, min(trans_b->position.x, max_x));
-            f32 y = max(min_y, min(trans_b->position.y, max_y));
-            f32 z = max(min_z, min(trans_b->position.z, max_z));
+            // AABB closest point to the sphere
+            vec3 closest_point_aabb = vec3(0.0f);
+            closest_point_aabb.x = clamp(trans_b->position.x, min_aabb.x, max_aabb.x);
+            closest_point_aabb.y = clamp(trans_b->position.y, min_aabb.y, max_aabb.y);
+            closest_point_aabb.z = clamp(trans_b->position.z, min_aabb.z, max_aabb.z);
 
-            // Distance squared
-            f32 distance_2 = (
-                                 (x - trans_b->position.x) * (x - trans_b->position.x) +
-                                 (y - trans_b->position.y) * (y - trans_b->position.y) +
-                                 (z - trans_b->position.z) * (z - trans_b->position.z)
-                             );
+            // Sphere closest point to AABB
+            vec3 vector_to_closest = normalize(closest_point_aabb - trans_b->position);
+            vec3 closest_point_sphere = trans_b->position + vector_to_closest * col_b->radius;
 
-            // @TODO
-            if (distance_2 < col_b->radius * col_b->radius)
+            f32 dist_aabb_to_sphere = distance(trans_b->position, closest_point_aabb);
+            if (dist_aabb_to_sphere <= col_b->radius)
             {
-                // Calculate the penetration depth along each axis
-                f32 penetrationX = 0.0, penetrationY = 0.0, penetrationZ = 0.0;
-
-                if (trans_b->position.x < min_x)
-                    penetrationX = min_x - trans_b->position.x;
-                else if (trans_b->position.x > max_x)
-                    penetrationX = trans_b->position.x - max_x;
-
-                if (trans_b->position.y < min_y)
-                    penetrationY = min_y - trans_b->position.y;
-                else if (trans_b->position.y > max_y)
-                    penetrationY = col_b->radius - (trans_b->position.y - max_y);
-
-                if (trans_b->position.z < min_z)
-                    penetrationZ = min_z - trans_b->position.z;
-                else if (trans_b->position.z > max_z)
-                    penetrationZ = trans_b->position.z - max_z;
-
-                collision.point_a = vec3(penetrationX, penetrationY, penetrationZ);
-                collision.point_b = vec3(0.0f);
+                collision.point_a = closest_point_aabb;
+                collision.point_b = closest_point_sphere;
                 collision.has_collision = true;
             }
 
@@ -233,8 +216,13 @@ namespace bls
         // Box v. Sphere
         if (collider_a->type == Collider::Box && collider_b->type == Collider::Sphere)
         {
-            // Move the sphere to resolve overlap
-            trans_b->position += vec3(0.0f, collision.point_a.y, 0.0f);
+            vec3 normal = collision.point_a - collision.point_b;
+            f32 dist = glm::length(normal);
+
+            normal /= dist;
+
+            // trans_a->position -= normal * dist * 0.5f;
+            trans_b->position -= normal * dist * 0.5f;
             return;
         }
 
