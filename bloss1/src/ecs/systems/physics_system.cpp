@@ -209,47 +209,16 @@ namespace bls
         auto trans_a = ecs.transforms[id_a].get();
         auto trans_b = ecs.transforms[id_b].get();
 
-        // Sphere v. Box
-        if (collider_a->type == Collider::Sphere && collider_b->type == Collider::Box)
-        {
-            // Swap
-            auto temp = collider_a;
-            collider_a = collider_b;
-            collider_b = temp;
-        }
+        vec3 normal = collision.point_a - collision.point_b;
+        f32 dist = glm::length(normal);
 
-        // Box v. Sphere
-        if (collider_a->type == Collider::Box && collider_b->type == Collider::Sphere)
-        {
-            vec3 normal = collision.point_a - collision.point_b;
-            f32 dist = glm::length(normal);
+        normal /= dist;
 
-            normal /= dist;
-
-            // trans_a->position -= normal * dist * 0.5f;
-            trans_b->position -= normal * dist * 0.5f;
-            return;
-        }
-
-        // Sphere v. Sphere
-        else if (collider_a->type == Collider::Sphere && collider_b->type == Collider::Sphere)
-        {
-            vec3 normal = collision.point_a - collision.point_b;
-            f32 dist = glm::length(normal);
-
-            normal /= dist;
-
+        if (!collider_a->immovable)
             trans_a->position += normal * dist * 0.5f;
+
+        if (!collider_b->immovable)
             trans_b->position -= normal * dist * 0.5f;
-
-            return;
-        }
-
-        // Box v. Box
-        // else if (collider_a->type == Collider::Box && collider_b->type == Collider::Box)
-        //     return solve_collision(trans_a, object_a, static_cast<BoxCollider*>(collider_a),
-        //                            trans_b, static_cast<BoxCollider*>(collider_b),
-        //                            collision, dt);
     }
 
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
