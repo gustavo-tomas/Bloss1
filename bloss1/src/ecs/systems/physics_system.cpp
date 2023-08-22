@@ -123,7 +123,7 @@ namespace bls
             vec3 closest_point_sphere = trans_b->position + vector_to_closest * col_b->radius;
 
             f32 dist_aabb_to_sphere = distance(trans_b->position, closest_point_aabb);
-            if (dist_aabb_to_sphere <= col_b->radius)
+            if (dist_aabb_to_sphere < col_b->radius)
             {
                 collision.point_a = closest_point_aabb;
                 collision.point_b = closest_point_sphere;
@@ -139,14 +139,19 @@ namespace bls
             auto col_a = static_cast<SphereCollider*>(collider_a);
             auto col_b = static_cast<SphereCollider*>(collider_b);
 
-            auto dist = distance(trans_a->position, trans_b->position);
-            if (dist < col_a->radius + col_b->radius)
+            // Insert tolerance to avoid equal points
+            const f32 TOL = 0.002;
+            f32 dist = distance(trans_a->position, trans_b->position);
+            if (dist < col_a->radius + col_b->radius - TOL)
             {
-                vec3 pa = trans_a->position + (dist - col_b->radius);
-                vec3 pb = trans_b->position + (dist - col_a->radius);
+                // SphereA closest point to SphereB
+                vec3 vector_to_center_b = normalize(trans_b->position - trans_a->position);
+                vec3 vector_to_center_a = normalize(trans_a->position - trans_b->position);
+                vec3 closest_point_sphere_a = trans_b->position + vector_to_center_a * col_b->radius;
+                vec3 closest_point_sphere_b = trans_a->position + vector_to_center_b * col_a->radius;
 
-                collision.point_a = pa;
-                collision.point_b = pb;
+                collision.point_a = closest_point_sphere_a;
+                collision.point_b = closest_point_sphere_b;
                 collision.has_collision = true;
             }
 
@@ -229,20 +234,14 @@ namespace bls
         // Sphere v. Sphere
         else if (collider_a->type == Collider::Sphere && collider_b->type == Collider::Sphere)
         {
-            auto col_a = static_cast<SphereCollider*>(collider_a);
-            auto col_b = static_cast<SphereCollider*>(collider_b);
-
             vec3 normal = collision.point_a - collision.point_b;
             f32 dist = glm::length(normal);
 
             normal /= dist;
 
-            // Calculate the separation distance (overlap)
-            f32 overlap = col_a->radius + col_b->radius - dist;
+            trans_a->position += normal * dist * 0.5f;
+            trans_b->position -= normal * dist * 0.5f;
 
-            // Move the spheres to resolve overlap
-            trans_a->position += normal * overlap * 0.5f;
-            trans_b->position -= normal * overlap * 0.5f;
             return;
         }
 
