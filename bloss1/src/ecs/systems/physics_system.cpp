@@ -165,33 +165,40 @@ namespace bls
             auto col_b = static_cast<BoxCollider*>(collider_b);
 
             // Point where the box 'begins'
-            f32 min_x_a = trans_a->position.x - col_a->width;
-            f32 min_y_a = trans_a->position.y - col_a->height;
-            f32 min_z_a = trans_a->position.z - col_a->depth;
+            vec3 min_aabb_a = vec3(0.0f);
+            min_aabb_a.x = trans_a->position.x - col_a->width;
+            min_aabb_a.y = trans_a->position.y - col_a->height;
+            min_aabb_a.z = trans_a->position.z - col_a->depth;
 
-            f32 min_x_b = trans_b->position.x - col_b->width;
-            f32 min_y_b = trans_b->position.y - col_b->height;
-            f32 min_z_b = trans_b->position.z - col_b->depth;
+            vec3 min_aabb_b = vec3(0.0f);
+            min_aabb_b.x = trans_b->position.x - col_b->width;
+            min_aabb_b.y = trans_b->position.y - col_b->height;
+            min_aabb_b.z = trans_b->position.z - col_b->depth;
 
             // Point where the box 'ends'
-            f32 max_x_a = trans_a->position.x + col_a->width;
-            f32 max_y_a = trans_a->position.y + col_a->height;
-            f32 max_z_a = trans_a->position.z + col_a->depth;
+            vec3 max_aabb_a = vec3(0.0f);
+            max_aabb_a.x = trans_a->position.x + col_a->width;
+            max_aabb_a.y = trans_a->position.y + col_a->height;
+            max_aabb_a.z = trans_a->position.z + col_a->depth;
 
-            f32 max_x_b = trans_b->position.x + col_b->width;
-            f32 max_y_b = trans_b->position.y + col_b->height;
-            f32 max_z_b = trans_b->position.z + col_b->depth;
+            vec3 max_aabb_b = vec3(0.0f);
+            max_aabb_b.x = trans_b->position.x + col_b->width;
+            max_aabb_b.y = trans_b->position.y + col_b->height;
+            max_aabb_b.z = trans_b->position.z + col_b->depth;
 
-            return { };
+            bool intersecting = (min_aabb_a.x <= max_aabb_b.x && max_aabb_a.x >= min_aabb_b.x &&
+                                 min_aabb_a.y <= max_aabb_b.y && max_aabb_a.y >= min_aabb_b.y &&
+                                 min_aabb_a.z <= max_aabb_b.z && max_aabb_a.z >= min_aabb_b.z);
 
-            // return (
-            //            min_x_a <= max_x_b &&
-            //            max_x_a >= min_x_b &&
-            //            min_y_a <= max_y_b &&
-            //            max_y_a >= min_y_b &&
-            //            min_z_a <= max_z_b &&
-            //            max_z_a >= min_z_b
-            //        );
+            // @TODO: finish collision response
+            if (intersecting)
+            {
+                // collision.point_a = ;
+                // collision.point_b = ;
+                // collision.has_collision = true;
+            }
+
+            return collision;
         }
 
         // Invalid colliders
