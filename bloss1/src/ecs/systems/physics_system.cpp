@@ -13,16 +13,17 @@ namespace bls
         auto& colliders = ecs.colliders;
         for (auto& [id, object] : objects)
         {
-            // Negative mass == floor
-            if (object->mass > 0.0f)
+            // Do not apply forces to immovable ojbects
+            if (!colliders[id]->immovable)
             {
                 // Apply forces
                 object->force += vec3(0.0f, object->mass * -9.8f, 0.0f); // @TODO: set a constant for gravity
-                object->velocity += object->force / object->mass * dt;
+                object->velocity += (object->force / object->mass) * dt;
 
                 // Apply deceleration
-                object->velocity.x = apply_deceleration(object->velocity.x, 10.0f, object->mass, dt);
-                object->velocity.z = apply_deceleration(object->velocity.z, 10.0f, object->mass, dt);
+                object->velocity.x = apply_deceleration(object->velocity.x, 20.0f, object->mass, dt);
+                object->velocity.y = apply_deceleration(object->velocity.y, 1.0f, object->mass, dt);
+                object->velocity.z = apply_deceleration(object->velocity.z, 20.0f, object->mass, dt);
 
                 transforms[id]->position += object->velocity * dt;
             }
@@ -232,13 +233,13 @@ namespace bls
     {
         if (velocity > 0)
         {
-            velocity -= deceleration / mass * dt;
+            velocity -= (deceleration / mass) * dt;
             return max(velocity, 0.0f);
         }
 
         else if (velocity < 0)
         {
-            velocity += deceleration / mass * dt;
+            velocity += (deceleration / mass) * dt;
             return min(velocity, 0.0f);
         }
 
