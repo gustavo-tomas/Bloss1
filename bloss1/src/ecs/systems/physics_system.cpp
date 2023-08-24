@@ -28,6 +28,7 @@ namespace bls
                 transforms[id]->position += object->velocity * dt;
             }
 
+            // @TODO: use continuous collision detection
             // Prevent objects from clipping the floor
             f32 vertical_side = 0.0f;
             if (colliders[id]->type == Collider::ColliderType::Sphere)
