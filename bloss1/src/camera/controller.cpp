@@ -48,7 +48,7 @@ namespace bls
         update_controller(dt, front, right, up);
     }
 
-    void CameraController::update_keyboard(f32 dt, const vec3& front, const vec3& right, const vec3& up)
+    void CameraController::update_keyboard(f32, const vec3& front, const vec3& right, const vec3& up)
     {
         // Define movement mappings
         std::map<u32, vec3> movement_mappings =

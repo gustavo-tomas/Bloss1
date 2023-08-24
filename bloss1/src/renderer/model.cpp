@@ -9,6 +9,7 @@ namespace bls
     {
         importer = new Assimp::Importer();
         this->path = path;
+        this->bone_counter = 0;
 
         u32 flags = aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace;
         if (flip_uvs)
@@ -74,11 +75,7 @@ namespace bls
             vec3 vector;
 
             // Set bone data
-            // for (u32 j = 0; j < MAX_BONE_PER_VERTEX; j++)
-            // {
-            //     vertex.boneIDs[j] = -1;
-            //     vertex.weights[j] = 0.0f;
-            // }
+            SetVertexBoneDataToDefault(vertex);
 
             // Position
             vector.x = mesh->mVertices[i].x;
@@ -151,7 +148,7 @@ namespace bls
         // textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
 
         // Bone weight
-        // ExtractBoneWeightForVertices(vertices, mesh);
+        ExtractBoneWeightForVertices(vertices, mesh);
 
         auto vao = VertexArray::create();
         vao->bind();
@@ -173,6 +170,12 @@ namespace bls
 
         // Bitangent
         vao->add_vertex_buffer(4, 3, ShaderDataType::Float, false, sizeof(Mesh::Vertex), (void*) offsetof(Mesh::Vertex, Mesh::Vertex::bitangent));
+
+        // Bone ids
+        vao->add_vertex_buffer(5, 4, ShaderDataType::Int, false, sizeof(Mesh::Vertex), (void*) offsetof(Mesh::Vertex, Mesh::Vertex::bone_ids));
+
+        // Weights
+        vao->add_vertex_buffer(6, 4, ShaderDataType::Float, false, sizeof(Mesh::Vertex), (void*) offsetof(Mesh::Vertex, Mesh::Vertex::weights));
 
         return new Mesh(vao, vbo, ebo, vertices, indices, textures);
     }
