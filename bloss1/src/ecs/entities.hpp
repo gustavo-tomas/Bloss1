@@ -19,6 +19,9 @@ namespace bls
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
+        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
+        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x, transform.scale.y, transform.scale.z);
 
         return id;
     }
@@ -27,10 +30,12 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        auto model = Model::create("sponza", "bloss1/assets/models/floor/square_floor_4k.gltf", false);
+        auto model = Model::create("sponza", "bloss1/assets/models/floor/square_floor_fixed.gltf", false);
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>(vec3(0.0f), vec3(0.0f), -1.0f);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 10.0f, transform.scale.y * 0.01f, transform.scale.z * 10.0f, true);
 
         return id;
     }

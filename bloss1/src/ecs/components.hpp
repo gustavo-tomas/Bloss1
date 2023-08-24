@@ -66,4 +66,53 @@ namespace bls
 
             Model* model;
     };
+
+    // @TODO: for now, the object position is the same as the model's
+    class PhysicsObject : public Component
+    {
+        public:
+            PhysicsObject(const vec3& velocity = vec3(0.0f), const vec3& force = vec3(0.0f), f32 mass = 1.0f)
+                : velocity(velocity), force(force), mass(mass) { }
+
+            vec3 velocity;
+            vec3 force;
+            f32 mass;
+    };
+
+    // Collider interface
+    class Collider : public Component
+    {
+        public:
+            enum ColliderType
+            {
+                Box, Sphere
+            };
+
+            Collider(ColliderType type, bool immovable)
+                : type(type), immovable(immovable) { }
+
+            virtual ~Collider() { }
+
+            ColliderType type;
+            vec3 color;
+            bool immovable;
+    };
+
+    class BoxCollider : public Collider
+    {
+        public:
+            BoxCollider(f32 width, f32 height, f32 depth, bool immovable = false)
+                : Collider(ColliderType::Box, immovable), width(width), height(height), depth(depth) { }
+
+            f32 width, height, depth;
+    };
+
+    class SphereCollider : public Collider
+    {
+        public:
+            SphereCollider(f32 radius, bool immovable = false)
+                : Collider(ColliderType::Sphere, immovable), radius(radius) { }
+
+            f32 radius;
+    };
 };

@@ -4,6 +4,19 @@
 
 namespace bls
 {
+    static GLenum convert_to_opengl_rendering_mode(RenderingMode mode)
+    {
+        switch (mode)
+        {
+            case RenderingMode::Lines:  return GL_LINES;
+            case RenderingMode::Triangles: return GL_TRIANGLES;
+            case RenderingMode::TriangleStrip: return GL_TRIANGLE_STRIP;
+            default: std::cerr << "invalid rendering mode: '" << mode << "'\n"; exit(1);
+        }
+
+        return 0;
+    }
+
     OpenGLRenderer::~OpenGLRenderer()
     {
         std::cout << "opengl renderer destroyed successfully\n";
@@ -20,7 +33,7 @@ namespace bls
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
         // Cull triangles which normal is not towards the camera
-        // glEnable(GL_CULL_FACE); // @TODO: investigate skybox
+        glEnable(GL_CULL_FACE);
 
         // Remove cubemap seams
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -34,29 +47,22 @@ namespace bls
 
         // Multisampling (MSAA)
         // glEnable(GL_MULTISAMPLE);
-
-        // Wireframe mode
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-
-    void OpenGLRenderer::set_uniform()
-    {
-
-    }
-
-    void OpenGLRenderer::set_texture()
-    {
-
-    }
-
-    void OpenGLRenderer::set_render_target()
-    {
-
     }
 
     void OpenGLRenderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
     {
         glViewport(x, y, width, height);
+    }
+
+    void OpenGLRenderer::set_debug_mode(bool active)
+    {
+        // Wireframe mode
+        if (active)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // Normal mode
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
     void OpenGLRenderer::clear_color(const vec4& color)
@@ -69,13 +75,15 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::draw_indexed(u32 count)
+    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count)
     {
-        glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+        auto opengl_mode = convert_to_opengl_rendering_mode(mode);
+        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, 0);
     }
 
-    void OpenGLRenderer::draw_arrays(u32 count)
+    void OpenGLRenderer::draw_arrays(RenderingMode mode, u32 count)
     {
-        glDrawArrays(GL_TRIANGLES, 0, count);
+        auto opengl_mode = convert_to_opengl_rendering_mode(mode);
+        glDrawArrays(opengl_mode, 0, count);
     }
 };

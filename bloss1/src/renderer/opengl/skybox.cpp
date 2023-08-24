@@ -14,6 +14,9 @@ namespace bls
                                const u32 prefilter_resolution,
                                const u32 max_mip_levels)
     {
+        // Disable face culling during maps creation
+        glDisable(GL_CULL_FACE);
+
         // Shaders
         hdr_to_cubemap_shader = Shader::create("hdr_to_cubemap", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.vs", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.fs");
         skybox_shader = Shader::create("skybox", "bloss1/assets/shaders/pbr/skybox.vs", "bloss1/assets/shaders/pbr/skybox.fs");
@@ -25,7 +28,7 @@ namespace bls
         skybox_shader->set_uniform1("environmentMap", 0U);
 
         // Cube setup
-        cube = new Cube(Game::get().get_renderer());
+        cube = new Box(Game::get().get_renderer());
         quad = new Quad(Game::get().get_renderer());
 
         // Setup framebuffers
@@ -209,6 +212,7 @@ namespace bls
         auto width = Game::get().get_window().get_width();
         auto height = Game::get().get_window().get_height();
         glViewport(0, 0, width, height);
+        glEnable(GL_CULL_FACE);
     }
 
     OpenGLSkybox::~OpenGLSkybox()
@@ -243,6 +247,8 @@ namespace bls
 
     void OpenGLSkybox::draw(const mat4& view, const mat4& projection)
     {
+        // Disable face culling during drawing
+        glDisable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);
 
         // Render cubemap
@@ -255,5 +261,6 @@ namespace bls
         cube->render();
 
         glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
     }
 };
