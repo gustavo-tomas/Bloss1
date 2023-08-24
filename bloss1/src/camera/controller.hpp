@@ -8,7 +8,7 @@
 #include "core/event.hpp"
 #include "ecs/ecs.hpp"
 
-const f32 SPEED       = 12000.0f;
+const f32 SPEED       = 80.0f;
 const f32 SENSITIVITY = 0.03f;
 
 namespace bls

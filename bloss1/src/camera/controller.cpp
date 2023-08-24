@@ -62,9 +62,10 @@ namespace bls
         };
 
         // Update speed based on input
+        // Don't use dt here - the physics system will multiply the final force by dt on the same frame
         for (const auto& [key, direction] : movement_mappings)
             if (Input::is_key_pressed(key))
-                target_object.force += direction * speed * dt;
+                target_object.force += direction * speed;
 
         camera->set_target_position(target_position);
     }
@@ -80,10 +81,10 @@ namespace bls
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
         if (fabs(left_y) >= TOLERANCE)
-            target_object.force += front * speed * -left_y * dt;
+            target_object.force += front * speed * -left_y;
 
         if (fabs(left_x) >= TOLERANCE)
-            target_object.force += right * speed * left_x * dt;
+            target_object.force += right * speed * left_x;
 
         camera->set_target_position(target_position);
 
@@ -102,9 +103,9 @@ namespace bls
         if (fabs(right_y) >= TOLERANCE)
             y_offset = -right_y * 10.0f;
 
-        // Rotation is done with callbacks for a more smooth feeling
-        f32 pitch = target_rotation.x + y_offset * sensitivity;
-        f32 yaw   = target_rotation.y + x_offset * sensitivity;
+        // Calculate rotation
+        f32 pitch = target_rotation.x + y_offset * sensitivity * dt * 250.0f;
+        f32 yaw   = target_rotation.y + x_offset * sensitivity * dt * 250.0f;
 
         pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
         // yaw = fmod(fmod(yaw, 360.0f) + 360.0f, 360.0f); // @TODO: fix yaw overflow
