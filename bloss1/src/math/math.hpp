@@ -23,6 +23,8 @@ namespace bls
     typedef glm::mat4 mat4;
     typedef glm::mat3 mat3;
 
+    typedef glm::quat quat;
+
     template<typename T>
     auto value_ptr(T x)
     {
