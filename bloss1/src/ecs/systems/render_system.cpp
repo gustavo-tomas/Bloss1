@@ -9,6 +9,21 @@ namespace bls
         // Shaders
         auto g_buffer_shader = ShaderManager::get().get_shader("g_buffer");
 
+        // Update animators
+        for (const auto& [id, model] : ecs.models)
+        {
+            auto animator = model->model->animator.get();
+            if (!animator)
+                continue;
+
+            animator->update(dt);
+
+            // Update bone matrices
+            auto bone_matrices = animator->get_final_bone_matrices();
+            for (u32 i = 0; i < bone_matrices.size(); i++)
+                g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
+        }
+
         // Render all entities
         auto& renderer = Game::get().get_renderer();
         for (const auto& [id, model] : ecs.models)
