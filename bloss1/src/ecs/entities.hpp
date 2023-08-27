@@ -26,6 +26,18 @@ namespace bls
         return id;
     }
 
+    u32 vampire(ECS& ecs, const Transform& transform)
+    {
+        u32 id = ecs.get_id();
+
+        auto model = Model::create("vampire", "bloss1/assets/models/vampire/dancing_vampire.dae", true);
+
+        ecs.models[id] = std::make_unique<ModelComponent>(model.get());
+        ecs.transforms[id] = std::make_unique<Transform>(transform);
+
+        return id;
+    }
+
     u32 floor(ECS& ecs, const Transform& transform)
     {
         u32 id = ecs.get_id();
@@ -34,7 +46,7 @@ namespace bls
 
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.physics_objects[id] = std::make_unique<PhysicsObject>(vec3(0.0f), vec3(0.0f), -1.0f);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 10.0f, transform.scale.y * 0.01f, transform.scale.z * 10.0f, true);
 
         return id;
