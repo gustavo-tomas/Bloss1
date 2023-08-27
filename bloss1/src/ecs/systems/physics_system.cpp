@@ -219,7 +219,7 @@ namespace bls
         auto trans_b = ecs.transforms[id_b].get();
 
         vec3 normal = collision.point_a - collision.point_b;
-        f32 dist = glm::length(normal);
+        f32 dist = length(normal);
 
         normal /= dist;
 
