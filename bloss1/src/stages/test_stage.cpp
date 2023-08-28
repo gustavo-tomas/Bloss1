@@ -33,10 +33,10 @@ namespace bls
 
         // Add some entities to the world
         for (u32 i = 0; i < 5; i++)
-            player(*ecs, Transform(vec3(i * 10.0f, 6.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
+            player(*ecs, Transform(vec3(i * 10.0f, 30.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
-        vampire(*ecs, Transform(vec3(-20.0f, 0.0f, 0.0f), vec3(0.0f), vec3(0.001f, 0.001f, 0.001f)));
+        vampire(*ecs, Transform(vec3(-20.0f, 10.0f, 0.0f), vec3(0.0f), vec3(0.001f, 0.001f, 0.001f)));
 
         // Create a camera and controller
         vec3 offset = vec3(15.0f, 7.0f, 50.0f);

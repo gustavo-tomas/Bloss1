@@ -1,7 +1,10 @@
 #include "ecs/systems.hpp"
 #include "ecs/systems/physics_system.hpp"
 
+#define GRAVITY 9.8f
+
 // @TODO: finish and cleanup
+// @TODO: use continuous collision detection
 namespace bls
 {
     void physics_system(ECS& ecs, f32 dt)
@@ -17,7 +20,7 @@ namespace bls
             if (!colliders[id]->immovable)
             {
                 // Apply forces
-                object->force += vec3(0.0f, object->mass * -9.8f, 0.0f); // @TODO: set a constant for gravity
+                object->force += vec3(0.0f, object->mass * -GRAVITY, 0.0f);
                 object->velocity += (object->force / object->mass) * dt;
 
                 // Apply deceleration
@@ -26,22 +29,6 @@ namespace bls
                 object->velocity.z = apply_deceleration(object->velocity.z, 20.0f, object->mass, dt);
 
                 transforms[id]->position += object->velocity * dt;
-            }
-
-            // @TODO: use continuous collision detection
-            // Prevent objects from clipping the floor
-            f32 vertical_side = 0.0f;
-            if (colliders[id]->type == Collider::ColliderType::Sphere)
-                vertical_side = static_cast<SphereCollider*>(colliders[id].get())->radius;
-
-            else if (colliders[id]->type == Collider::ColliderType::Box)
-                vertical_side = static_cast<BoxCollider*>(colliders[id].get())->height / 2.0f;
-
-            const f32 TOL = 0.025f;
-            if (transforms[id]->position.y - vertical_side <= 0.0f + TOL)
-            {
-                transforms[id]->position.y = vertical_side;
-                object->velocity.y = 0.0f;
             }
 
             // Reset forces
@@ -114,21 +101,28 @@ namespace bls
             max_aabb.y = trans_a->position.y + col_a->height;
             max_aabb.z = trans_a->position.z + col_a->depth;
 
-            // AABB closest point to the sphere
-            vec3 closest_point_aabb = vec3(0.0f);
-            closest_point_aabb.x = clamp(trans_b->position.x, min_aabb.x, max_aabb.x);
-            closest_point_aabb.y = clamp(trans_b->position.y, min_aabb.y, max_aabb.y);
-            closest_point_aabb.z = clamp(trans_b->position.z, min_aabb.z, max_aabb.z);
+            // 1) find point 'pbox' on box the closest to the sphere centre.
+            vec3 closest_point_aabb;
 
-            // Sphere closest point to AABB
-            vec3 vector_to_closest = normalize(closest_point_aabb - trans_b->position);
-            vec3 closest_point_sphere = trans_b->position + vector_to_closest * col_b->radius;
+            // For each coordinate axis, if the point coordinate value is
+            // outside box, clamp it to the box, else keep it as is
+            for (u32 i = 0; i < 3; i++)
+            {
+                f32 v = trans_b->position[i];
+                v = max(v, min_aabb[i]);
+                v = min(v, max_aabb[i]);
+                closest_point_aabb[i] = v;
+            }
 
-            f32 dist_aabb_to_sphere = distance(trans_b->position, closest_point_aabb);
+            // 2) if 'pbox' is outside the sphere no collision.
+            f32 dist_aabb_to_sphere = distance(closest_point_aabb, trans_b->position);
             if (dist_aabb_to_sphere < col_b->radius)
             {
-                collision.point_a = closest_point_aabb;
-                collision.point_b = closest_point_sphere;
+                // 3) find point 'pshpere' on sphere surface the closest to point 'pbox'.
+                vec3 closest_point_sphere = trans_b->position + normalize(closest_point_aabb - trans_b->position) * col_b->radius;
+
+                collision.point_a = closest_point_sphere;
+                collision.point_b = closest_point_aabb;
                 collision.has_collision = true;
             }
 
@@ -218,16 +212,24 @@ namespace bls
         auto trans_a = ecs.transforms[id_a].get();
         auto trans_b = ecs.transforms[id_b].get();
 
-        vec3 normal = collision.point_a - collision.point_b;
-        f32 dist = length(normal);
+        auto object_a = ecs.physics_objects[id_a].get();
+        auto object_b = ecs.physics_objects[id_b].get();
 
-        normal /= dist;
+        vec3 delta = collision.point_a - collision.point_b;
+        f32 dist = length(delta);
+        vec3 normal = delta / dist;
 
         if (!collider_a->immovable)
+        {
             trans_a->position += normal * dist * 0.5f;
+            object_a->velocity += normal * dot(object_a->velocity, delta);
+        }
 
         if (!collider_b->immovable)
+        {
             trans_b->position -= normal * dist * 0.5f;
+            object_b->velocity -= normal * dot(object_b->velocity, delta);
+        }
     }
 
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
