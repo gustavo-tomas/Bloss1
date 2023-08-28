@@ -9,25 +9,26 @@ namespace bls
         // Shaders
         auto g_buffer_shader = ShaderManager::get().get_shader("g_buffer");
 
-        // Update animators
-        for (const auto& [id, model] : ecs.models)
-        {
-            auto animator = model->model->animator.get();
-            if (!animator)
-                continue;
-
-            animator->update(dt);
-
-            // Update bone matrices
-            auto bone_matrices = animator->get_final_bone_matrices();
-            for (u32 i = 0; i < bone_matrices.size(); i++)
-                g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
-        }
-
         // Render all entities
         auto& renderer = Game::get().get_renderer();
         for (const auto& [id, model] : ecs.models)
         {
+            // Reset bone matrices
+            for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
+                g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", mat4(1.0f));
+
+            // Update animators
+            auto animator = model->model->animator.get();
+            if (animator)
+            {
+                animator->update(dt);
+
+                // Update bone matrices
+                auto bone_matrices = animator->get_final_bone_matrices();
+                for (u32 i = 0; i < bone_matrices.size(); i++)
+                    g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
+            }
+
             // Remember: scale -> rotate -> translate
             auto transform = ecs.transforms[id].get();
             auto model_matrix = mat4(1.0f);
