@@ -107,12 +107,7 @@ namespace bls
             // For each coordinate axis, if the point coordinate value is
             // outside box, clamp it to the box, else keep it as is
             for (u32 i = 0; i < 3; i++)
-            {
-                f32 v = trans_b->position[i];
-                v = max(v, min_aabb[i]);
-                v = min(v, max_aabb[i]);
-                closest_point_aabb[i] = v;
-            }
+                closest_point_aabb[i] = clamp(trans_b->position[i], min_aabb[i], max_aabb[i]);
 
             // 2) if 'pbox' is outside the sphere no collision.
             f32 dist_aabb_to_sphere = distance(closest_point_aabb, trans_b->position);
