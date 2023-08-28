@@ -58,11 +58,17 @@ namespace bls
     {
         // Wireframe mode
         if (active)
+        {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glDisable(GL_CULL_FACE);
+        }
 
         // Normal mode
         else
+        {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_CULL_FACE);
+        }
     }
 
     void OpenGLRenderer::clear_color(const vec4& color)
