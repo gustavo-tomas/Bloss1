@@ -40,6 +40,20 @@ namespace bls
         return id;
     }
 
+    u32 abomination(ECS& ecs, const Transform& transform)
+    {
+        u32 id = ecs.get_id();
+
+        auto model = Model::create("abomination", "bloss1/assets/models/abomination/abomination.fbx", false);
+
+        ecs.models[id] = std::make_unique<ModelComponent>(model.get());
+        ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
+        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f);
+
+        return id;
+    }
+
     u32 floor(ECS& ecs, const Transform& transform)
     {
         u32 id = ecs.get_id();
