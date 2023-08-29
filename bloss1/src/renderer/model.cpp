@@ -42,6 +42,10 @@ namespace bls
                 if (animator.get() == nullptr)
                     animator = std::make_unique<Animator>(animations[name].get());
             }
+
+            std::cout << "animations found:\n";
+            for (const auto& [name, anim] : animations)
+                std::cout << "> " << name << "\n";
         }
     }
 
