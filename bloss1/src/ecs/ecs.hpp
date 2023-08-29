@@ -58,6 +58,7 @@ namespace bls
 
             // Table of components
             // @TODO: use templates or smth
+            std::map<u32, str> names;
             std::map<u32, std::unique_ptr<Transform>> transforms;
             std::map<u32, std::unique_ptr<ModelComponent>> models;
             std::map<u32, std::unique_ptr<DirectionalLight>> dir_lights;

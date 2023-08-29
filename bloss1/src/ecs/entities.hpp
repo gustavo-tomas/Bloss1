@@ -17,6 +17,7 @@ namespace bls
         // auto model = Model::create("player", "bloss1/assets/models/box/planter_box_01_2k.gltf", false);
         auto model = Model::create("player", "bloss1/assets/models/sphere/rusted_sphere.gltf", false);
 
+        ecs.names[id] = "player";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
@@ -32,6 +33,7 @@ namespace bls
 
         auto model = Model::create("vampire", "bloss1/assets/models/vampire/dancing_vampire.dae", true);
 
+        ecs.names[id] = "vampire";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
@@ -46,6 +48,7 @@ namespace bls
 
         auto model = Model::create("abomination", "bloss1/assets/models/abomination/abomination.fbx", false);
 
+        ecs.names[id] = "abomination";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
@@ -58,8 +61,9 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        auto model = Model::create("sponza", "bloss1/assets/models/floor/square_floor_fixed.gltf", false);
+        auto model = Model::create("floor", "bloss1/assets/models/floor/square_floor_fixed.gltf", false);
 
+        ecs.names[id] = "floor";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
@@ -76,6 +80,7 @@ namespace bls
         // auto model = Model::create("directional_light", "bloss1/assets/models/debug", false);
 
         // ecs.models[id] = std::make_unique<ModelComponent>(model.get());
+        ecs.names[id] = "directional_light";
         ecs.dir_lights[id] = std::make_unique<DirectionalLight>(light);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
 
@@ -90,6 +95,7 @@ namespace bls
         // auto model = Model::create("directional_light", "bloss1/assets/models/debug", false);
 
         // ecs.models[id] = std::make_unique<ModelComponent>(model.get());
+        ecs.names[id] = "point_light";
         ecs.point_lights[id] = std::make_unique<PointLight>(light);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
 

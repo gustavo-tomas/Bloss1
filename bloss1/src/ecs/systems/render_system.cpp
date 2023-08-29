@@ -39,7 +39,7 @@ namespace bls
             // @TODO: i dont know what im doing but it works
 
             // Player model matrix
-            if (id == 0)
+            if (ecs.names[id] == "player")
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
