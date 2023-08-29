@@ -20,8 +20,8 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
-        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x, transform.scale.y, transform.scale.z);
+        // ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
 
         return id;
     }

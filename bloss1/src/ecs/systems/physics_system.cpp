@@ -184,9 +184,37 @@ namespace bls
             // @TODO: finish collision response
             if (intersecting)
             {
-                // collision.point_a = ;
-                // collision.point_b = ;
-                // collision.has_collision = true;
+                vec3 closest_point_aabb_a_to_b, closest_point_aabb_b_to_a;
+                for (u16 i = 0; i < 3; i++)
+                {
+                    closest_point_aabb_a_to_b[i] = clamp(trans_b->position[i], min_aabb_a[i], max_aabb_a[i]);
+                    closest_point_aabb_b_to_a[i] = clamp(trans_a->position[i], min_aabb_b[i], max_aabb_b[i]);
+                }
+
+                vec3 penetration_depths = closest_point_aabb_a_to_b - closest_point_aabb_b_to_a;
+                vec3 min_penetration_vector = vec3(0.0f);
+                f32 min_penetration_value = std::numeric_limits<f32>::max();
+                for (u16 i = 0; i < 3; i++)
+                {
+                    if (glm::abs(penetration_depths[i]) > 0.0f && glm::abs(penetration_depths[i]) < glm::abs(min_penetration_value))
+                    {
+                        min_penetration_value = penetration_depths[i];
+                        min_penetration_vector = vec3(0.0f);
+                        min_penetration_vector[i] = 1.0f;
+                    }
+                }
+
+                if (min_penetration_value == std::numeric_limits<f32>::max() || min_penetration_value == 0.0f)
+                {
+                    min_penetration_value = 0.001f;
+                    min_penetration_vector = vec3(1.0f, 0.0f, 0.0f);
+                }
+
+                vec3 displacement = min_penetration_value * (min_penetration_vector);
+
+                collision.point_b = displacement;
+                collision.point_a = vec3(0.0f);
+                collision.has_collision = true;
             }
 
             return collision;
