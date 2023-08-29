@@ -344,15 +344,10 @@ namespace bls
     i32 Bone::get_position_index(f32 animation_time)
     {
         for (i32 index = 0; index < num_positions - 1; index++)
-        {
             if (animation_time < positions[index + 1].time_stamp)
-            {
                 return index;
-            }
-        }
 
         assert(false);
-        // return -1; // @TODO: handle errors
     }
 
     i32 Bone::get_rotation_index(f32 animation_time)
