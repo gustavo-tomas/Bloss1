@@ -38,7 +38,9 @@ namespace bls
             {
                 str name = scene->mAnimations[i]->mName.C_Str();
                 animations[name] = std::make_unique<Animation>(scene->mRootNode, scene->mAnimations[i], bone_info_map, bone_counter);
-                animator = std::make_unique<Animator>(animations[name].get());
+
+                if (animator.get() == nullptr)
+                    animator = std::make_unique<Animator>(animations[name].get());
             }
         }
     }

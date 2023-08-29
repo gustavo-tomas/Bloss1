@@ -115,9 +115,12 @@ namespace bls
                 // 3) find point 'pshpere' on sphere surface the closest to point 'pbox'.
                 vec3 closest_point_sphere = trans_b->position + normalize(closest_point_aabb - trans_b->position) * col_b->radius;
 
-                collision.point_a = closest_point_sphere;
-                collision.point_b = closest_point_aabb;
-                collision.has_collision = true;
+                if (closest_point_sphere != closest_point_aabb)
+                {
+                    collision.point_a = closest_point_sphere;
+                    collision.point_b = closest_point_aabb;
+                    collision.has_collision = true;
+                }
             }
 
             return collision;
