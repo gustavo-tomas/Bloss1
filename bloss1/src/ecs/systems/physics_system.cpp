@@ -3,7 +3,6 @@
 
 #define GRAVITY 9.8f
 
-// @TODO: finish and cleanup
 // @TODO: use continuous collision detection
 namespace bls
 {
@@ -181,40 +180,68 @@ namespace bls
                                  min_aabb_a.y <= max_aabb_b.y && max_aabb_a.y >= min_aabb_b.y &&
                                  min_aabb_a.z <= max_aabb_b.z && max_aabb_a.z >= min_aabb_b.z);
 
-            // @TODO: finish collision response
             if (intersecting)
             {
-                vec3 closest_point_aabb_a_to_b, closest_point_aabb_b_to_a;
-                for (u16 i = 0; i < 3; i++)
-                {
-                    closest_point_aabb_a_to_b[i] = clamp(trans_b->position[i], min_aabb_a[i], max_aabb_a[i]);
-                    closest_point_aabb_b_to_a[i] = clamp(trans_a->position[i], min_aabb_b[i], max_aabb_b[i]);
-                }
+                vec3 overlap;
+                overlap.x = max(0.0f, min(max_aabb_a.x, max_aabb_b.x) - max(min_aabb_a.x, min_aabb_b.x));
+                overlap.y = max(0.0f, min(max_aabb_a.y, max_aabb_b.y) - max(min_aabb_a.y, min_aabb_b.y));
+                overlap.z = max(0.0f, min(max_aabb_a.z, max_aabb_b.z) - max(min_aabb_a.z, min_aabb_b.z));
 
-                vec3 penetration_depths = closest_point_aabb_a_to_b - closest_point_aabb_b_to_a;
-                vec3 min_penetration_vector = vec3(0.0f);
-                f32 min_penetration_value = std::numeric_limits<f32>::max();
-                for (u16 i = 0; i < 3; i++)
+                vec3 penetration_depth = vec3(0.0f);
+                if (overlap.x < overlap.y && overlap.x < overlap.z)
                 {
-                    if (glm::abs(penetration_depths[i]) > 0.0f && glm::abs(penetration_depths[i]) < glm::abs(min_penetration_value))
+                    if (min_aabb_a.x < min_aabb_b.x)
                     {
-                        min_penetration_value = penetration_depths[i];
-                        min_penetration_vector = vec3(0.0f);
-                        min_penetration_vector[i] = 1.0f;
+                        max_aabb_a.x -= overlap.x;
+                        min_aabb_b.x += overlap.x;
+                        penetration_depth.x = -overlap.x;
+                    }
+                    else
+                    {
+                        min_aabb_a.x += overlap.x;
+                        max_aabb_b.x -= overlap.x;
+                        penetration_depth.x = overlap.x;
                     }
                 }
 
-                if (min_penetration_value == std::numeric_limits<f32>::max() || min_penetration_value == 0.0f)
+                else if (overlap.y < overlap.z)
                 {
-                    min_penetration_value = 0.001f;
-                    min_penetration_vector = vec3(1.0f, 0.0f, 0.0f);
+                    if (min_aabb_a.y < min_aabb_b.y)
+                    {
+                        max_aabb_a.y -= overlap.y;
+                        min_aabb_b.y += overlap.y;
+                        penetration_depth.y = -overlap.y;
+                    }
+                    else
+                    {
+                        min_aabb_a.y += overlap.y;
+                        max_aabb_b.y -= overlap.y;
+                        penetration_depth.y = overlap.y;
+                    }
                 }
 
-                vec3 displacement = min_penetration_value * (min_penetration_vector);
+                else
+                {
+                    if (min_aabb_a.z < min_aabb_b.z)
+                    {
+                        max_aabb_a.z -= overlap.z;
+                        min_aabb_b.z += overlap.z;
+                        penetration_depth.z = -overlap.z;
+                    }
+                    else
+                    {
+                        min_aabb_a.z += overlap.z;
+                        max_aabb_b.z -= overlap.z;
+                        penetration_depth.z = +overlap.z;
+                    }
+                }
 
-                collision.point_b = displacement;
-                collision.point_a = vec3(0.0f);
-                collision.has_collision = true;
+                if (length(penetration_depth) > 0.0f)
+                {
+                    collision.point_a = penetration_depth;
+                    collision.point_b = vec3(0.0f);
+                    collision.has_collision = true;
+                }
             }
 
             return collision;

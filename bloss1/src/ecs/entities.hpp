@@ -20,8 +20,8 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        // ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
-        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
+        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
+        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
 
         return id;
     }
@@ -35,7 +35,7 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(5.0f, 5.0f, 5.0f, true);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(5.0f, 5.0f, 5.0f);
 
         return id;
     }
@@ -49,7 +49,7 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 10.0f, transform.scale.y * 0.1f, transform.scale.z * 10.0f, true);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 10.0f, transform.scale.y * 1.0f, transform.scale.z * 10.0f, true);
 
         return id;
     }
