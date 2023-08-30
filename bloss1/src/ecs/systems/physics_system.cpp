@@ -259,27 +259,27 @@ namespace bls
     // -----------------------------------------------------------------------------------------------------------------
     void solve_collision(ECS& ecs, u32 id_a, u32 id_b, Collision collision)
     {
-        auto collider_a = ecs.colliders[id_a].get();
-        auto collider_b = ecs.colliders[id_b].get();
-
-        auto trans_a = ecs.transforms[id_a].get();
-        auto trans_b = ecs.transforms[id_b].get();
-
-        auto object_a = ecs.physics_objects[id_a].get();
-        auto object_b = ecs.physics_objects[id_b].get();
-
         vec3 delta = collision.point_a - collision.point_b;
         f32 dist = length(delta);
         vec3 normal = delta / dist;
 
+        auto collider_a = ecs.colliders[id_a].get();
+        auto collider_b = ecs.colliders[id_b].get();
+
         if (!collider_a->immovable)
         {
+            auto trans_a = ecs.transforms[id_a].get();
+            auto object_a = ecs.physics_objects[id_a].get();
+
             trans_a->position += normal * dist * 0.5f;
             object_a->velocity += normal * dot(object_a->velocity, delta);
         }
 
         if (!collider_b->immovable)
         {
+            auto trans_b = ecs.transforms[id_b].get();
+            auto object_b = ecs.physics_objects[id_b].get();
+
             trans_b->position -= normal * dist * 0.5f;
             object_b->velocity -= normal * dot(object_b->velocity, delta);
         }
