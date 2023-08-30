@@ -6,6 +6,7 @@
 
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
+#include "core/timer.hpp"
 
 namespace bls
 {
@@ -113,5 +114,23 @@ namespace bls
                 : Collider(ColliderType::Sphere, immovable), radius(radius) { }
 
             f32 radius;
+    };
+
+    // Key frame for animating transforms
+    struct KeyFrame
+    {
+        Transform transform;
+        f32 duration;
+    };
+
+    class TransformAnimation : public Component
+    {
+        public:
+            TransformAnimation(std::vector<KeyFrame> key_frames)
+                : key_frames(key_frames), curr_frame_idx(0) { }
+
+            std::vector<KeyFrame> key_frames;
+            u32 curr_frame_idx;
+            Timer timer;
     };
 };

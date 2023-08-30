@@ -65,6 +65,7 @@ namespace bls
             std::map<u32, std::unique_ptr<PointLight>> point_lights;
             std::map<u32, std::unique_ptr<PhysicsObject>> physics_objects;
             std::map<u32, std::unique_ptr<Collider>> colliders;
+            std::map<u32, std::unique_ptr<TransformAnimation>> transform_animations;
 
         private:
             // Entities IDs

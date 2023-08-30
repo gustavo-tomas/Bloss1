@@ -51,8 +51,13 @@ namespace bls
         ecs.names[id] = "abomination";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f, true);
+
+        std::vector<KeyFrame> key_frames;
+        key_frames.push_back({ transform, 3.0f });
+        key_frames.push_back({ Transform(transform.position + vec3(0.0f, 20.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), transform.scale / 2.0f), 2.0f });
+        key_frames.push_back({ Transform(transform.position - vec3(0.0f, 20.0f, 0.0f), vec3(0.0f), transform.scale), 1.0f });
+        ecs.transform_animations[id] = std::make_unique<TransformAnimation>(key_frames);
 
         return id;
     }
