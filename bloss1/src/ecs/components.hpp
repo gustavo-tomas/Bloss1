@@ -6,8 +6,6 @@
 
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
-#include "renderer/buffers.hpp"
-#include "renderer/model.hpp"
 
 namespace bls
 {
@@ -58,6 +56,7 @@ namespace bls
     };
 
     // @TODO: find a better solution (get rid of model entirely?)
+    class Model;
     class ModelComponent : public Component
     {
         public:

@@ -6,7 +6,7 @@
 
 #include "core/game.hpp"
 #include "ecs/ecs.hpp"
-#include "renderer/buffers.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {

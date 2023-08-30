@@ -1,4 +1,5 @@
-#include "ecs/systems.hpp"
+#include "ecs/ecs.hpp"
+#include "renderer/model.hpp"
 #include "managers/shader_manager.hpp"
 #include "core/game.hpp"
 
