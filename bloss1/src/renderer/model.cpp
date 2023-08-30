@@ -538,11 +538,11 @@ namespace bls
         std::cout << "animator destroyed successfully\n";
     }
 
-    void Animator::update(f32 deltaTime)
+    void Animator::update(f32 dt)
     {
         if (current_animation)
         {
-            current_time += current_animation->get_ticks_per_second() * deltaTime;
+            current_time += current_animation->get_ticks_per_second() * dt;
             current_time = fmod(current_time, current_animation->get_duration());
             calculate_bone_transform(&current_animation->get_root_node(), mat4(1.0f));
         }
@@ -579,6 +579,84 @@ namespace bls
 
         for (i32 i = 0; i < node->children_count; i++)
             calculate_bone_transform(&node->children[i], global_transformation);
+    }
+
+    void Animator::blend_animations(Animation* base_animation, Animation* layered_animation, f32 blend_factor, f32 dt)
+    {
+        // Speed multipliers to correctly transition from one animation to another
+        f32 a = 1.0f;
+        f32 b = base_animation->get_duration() / layered_animation->get_duration();
+        const f32 anim_speed_multiplier_up = mix(a, b, blend_factor);
+
+        a = layered_animation->get_duration() / base_animation->get_duration();
+        b = 1.0f;
+        const f32 anim_speed_multiplier_down = mix(a, b, blend_factor);
+
+        // Current time of each animation, "scaled" by the above speed multiplier variables
+        static f32 current_time_base = 0.0f;
+        current_time_base += base_animation->get_ticks_per_second() * dt * anim_speed_multiplier_up;
+        current_time_base = fmod(current_time_base, base_animation->get_duration());
+
+        static f32 current_time_layered = 0.0f;
+        current_time_layered += layered_animation->get_ticks_per_second() * dt * anim_speed_multiplier_down;
+        current_time_layered = fmod(current_time_layered, layered_animation->get_duration());
+
+        calculate_blended_bone_transform(base_animation, &base_animation->get_root_node(),
+                                         layered_animation, &layered_animation->get_root_node(),
+                                         current_time_base, current_time_layered,
+                                         mat4(1.0f),
+                                         blend_factor);
+    }
+
+    void Animator::calculate_blended_bone_transform(
+        Animation* base_animation, const AssNodeData* base_node,
+        Animation* layered_animation, const AssNodeData* layered_node,
+        const f32 current_time_base, const f32 current_time_layered,
+        const mat4& parent_transform,
+        const f32 blend_factor)
+    {
+        const str& node_name = base_node->name;
+
+        mat4 node_transform = base_node->transformation;
+        auto bone = base_animation->find_bone(node_name);
+        if (bone)
+        {
+            bone->update(current_time_base);
+            node_transform = bone->get_local_transform();
+        }
+
+        mat4 layered_node_transform = layered_node->transformation;
+        bone = layered_animation->find_bone(node_name);
+        if (bone)
+        {
+            bone->update(current_time_layered);
+            layered_node_transform = bone->get_local_transform();
+        }
+
+        // Blend two matrices
+        const quat rot_0 = quat_cast(node_transform);
+        const quat rot_1 = quat_cast(layered_node_transform);
+        const quat final_rot = slerp(rot_0, rot_1, blend_factor);
+        mat4 blended_mat = mat4_cast(final_rot);
+        blended_mat[3] = mix(node_transform[3], layered_node_transform[3], blend_factor);
+
+        mat4 global_transform = parent_transform * blended_mat;
+
+        const auto& bone_info_map = base_animation->get_bone_id_map();
+        if (bone_info_map.count(node_name))
+        {
+            i32 index = bone_info_map.at(node_name).id;
+            auto offset = bone_info_map.at(node_name).offset;
+
+            final_bone_matrices[index] = global_transform * offset;
+        }
+
+        for (u64 i = 0; i < base_node->children.size(); i++)
+            calculate_blended_bone_transform(base_animation, &base_node->children[i],
+                                             layered_animation, &layered_node->children[i],
+                                             current_time_base, current_time_layered,
+                                             global_transform,
+                                             blend_factor);
     }
 
     std::vector<mat4> Animator::get_final_bone_matrices()

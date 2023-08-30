@@ -158,9 +158,15 @@ namespace bls
             Animator(Animation* animation);
             ~Animator();
 
-            void update(f32 delta_time);
+            void update(f32 dt);
             void play(Animation* animation);
+            void blend_animations(Animation* base_animation, Animation* layered_animation, f32 blend_factor, f32 dt);
             void calculate_bone_transform(const AssNodeData* node, mat4 parent_transform);
+            void calculate_blended_bone_transform(Animation* base_animation, const AssNodeData* base_node,
+                                                  Animation* layered_animation, const AssNodeData* layered_node,
+                                                  const f32 current_time_base, const f32 current_time_layered,
+                                                  const mat4& parent_transform,
+                                                  const f32 blend_factor);
             std::vector<mat4> get_final_bone_matrices();
 
         private:

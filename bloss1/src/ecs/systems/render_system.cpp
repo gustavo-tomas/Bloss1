@@ -21,7 +21,19 @@ namespace bls
             auto animator = model->model->animator.get();
             if (animator)
             {
-                animator->update(dt);
+                // @TODO: test - Blend animations
+                if (ecs.names[id] == "abomination")
+                {
+                    auto& animations = model->model->animations;
+                    auto twist_anim = animations["Armature|Twist"].get();
+                    auto rotate_anim = animations["Armature|ArmatureAction.005"].get();
+                    f32 blend_factor = 0.5f;
+
+                    animator->blend_animations(rotate_anim, twist_anim, blend_factor, dt);
+                }
+
+                else
+                    animator->update(dt);
 
                 // Update bone matrices
                 auto bone_matrices = animator->get_final_bone_matrices();
