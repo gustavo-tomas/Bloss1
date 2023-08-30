@@ -127,11 +127,11 @@ namespace bls
 
     // Animation
     // -----------------------------------------------------------------------------------------------------------------
-    class Animation
+    class SkeletalAnimation
     {
         public:
-            Animation(const aiNode* root, const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count);
-            ~Animation();
+            SkeletalAnimation(const aiNode* root, const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count);
+            ~SkeletalAnimation();
 
             Bone* find_bone(const str& name);
             f32 get_ticks_per_second();
@@ -155,15 +155,15 @@ namespace bls
     class Animator
     {
         public:
-            Animator(Animation* animation);
+            Animator(SkeletalAnimation* animation);
             ~Animator();
 
             void update(f32 dt);
-            void play(Animation* animation);
-            void blend_animations(Animation* base_animation, Animation* layered_animation, f32 blend_factor, f32 dt);
+            void play(SkeletalAnimation* animation);
+            void blend_animations(SkeletalAnimation* base_animation, SkeletalAnimation* layered_animation, f32 blend_factor, f32 dt);
             void calculate_bone_transform(const AssNodeData* node, mat4 parent_transform);
-            void calculate_blended_bone_transform(Animation* base_animation, const AssNodeData* base_node,
-                                                  Animation* layered_animation, const AssNodeData* layered_node,
+            void calculate_blended_bone_transform(SkeletalAnimation* base_animation, const AssNodeData* base_node,
+                                                  SkeletalAnimation* layered_animation, const AssNodeData* layered_node,
                                                   const f32 current_time_base, const f32 current_time_layered,
                                                   const mat4& parent_transform,
                                                   const f32 blend_factor);
@@ -171,7 +171,7 @@ namespace bls
 
         private:
             std::vector<mat4> final_bone_matrices;
-            Animation* current_animation;
+            SkeletalAnimation* current_animation;
             f32 current_time;
     };
 
@@ -188,7 +188,7 @@ namespace bls
             str path;
             std::vector<Mesh*> meshes;
             std::map<str, BoneInfo> bone_info_map;
-            std::map<str, std::unique_ptr<Animation>> animations;
+            std::map<str, std::unique_ptr<SkeletalAnimation>> animations;
             std::unique_ptr<Animator> animator;
             i32 bone_counter;
 

@@ -37,7 +37,7 @@ namespace bls
             for (u32 i = 0; i < scene->mNumAnimations; i++)
             {
                 str name = scene->mAnimations[i]->mName.C_Str();
-                animations[name] = std::make_unique<Animation>(scene->mRootNode, scene->mAnimations[i], bone_info_map, bone_counter);
+                animations[name] = std::make_unique<SkeletalAnimation>(scene->mRootNode, scene->mAnimations[i], bone_info_map, bone_counter);
 
                 if (animator.get() == nullptr)
                     animator = std::make_unique<Animator>(animations[name].get());
@@ -436,9 +436,9 @@ namespace bls
         return id;
     }
 
-    // Animation
+    // Skeletal animation
     // -----------------------------------------------------------------------------------------------------------------
-    Animation::Animation(const aiNode* root, const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count)
+    SkeletalAnimation::SkeletalAnimation(const aiNode* root, const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count)
     {
         duration = animation->mDuration;
         ticks_per_second = animation->mTicksPerSecond;
@@ -447,13 +447,13 @@ namespace bls
         read_missing_bones(animation, model_bone_info_map, model_bone_count);
     }
 
-    Animation::~Animation()
+    SkeletalAnimation::~SkeletalAnimation()
     {
         for (auto bone : bones) { delete bone; }
         std::cout << "animation destroyed successfully\n";
     }
 
-    Bone* Animation::find_bone(const str& name)
+    Bone* SkeletalAnimation::find_bone(const str& name)
     {
         auto it = find_if(bones.begin(), bones.end(), [&](Bone * bone)
         {
@@ -465,7 +465,7 @@ namespace bls
         return *it;
     }
 
-    void Animation::read_missing_bones(const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count)
+    void SkeletalAnimation::read_missing_bones(const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count)
     {
         // Reading channels (bones engaged in an animation and their keyframes)
         for (u32 i = 0; i < animation->mNumChannels; i++)
@@ -484,7 +484,7 @@ namespace bls
         bone_info_map = model_bone_info_map;
     }
 
-    void Animation::read_hierarchy_data(AssNodeData& dest, const aiNode* root)
+    void SkeletalAnimation::read_hierarchy_data(AssNodeData& dest, const aiNode* root)
     {
         assert(root);
 
@@ -500,29 +500,29 @@ namespace bls
         }
     }
 
-    f32 Animation::get_ticks_per_second()
+    f32 SkeletalAnimation::get_ticks_per_second()
     {
         return ticks_per_second;
     }
 
-    f32 Animation::get_duration()
+    f32 SkeletalAnimation::get_duration()
     {
         return duration;
     }
 
-    AssNodeData& Animation::get_root_node()
+    AssNodeData& SkeletalAnimation::get_root_node()
     {
         return root_node;
     }
 
-    std::map<str, BoneInfo>& Animation::get_bone_id_map()
+    std::map<str, BoneInfo>& SkeletalAnimation::get_bone_id_map()
     {
         return bone_info_map;
     }
 
     // Animator
     // -----------------------------------------------------------------------------------------------------------------
-    Animator::Animator(Animation* animation)
+    Animator::Animator(SkeletalAnimation* animation)
     {
         current_time = 0.0;
         current_animation = animation;
@@ -548,7 +548,7 @@ namespace bls
         }
     }
 
-    void Animator::play(Animation* animation)
+    void Animator::play(SkeletalAnimation* animation)
     {
         current_animation = animation;
         current_time = 0.0f;
@@ -581,7 +581,7 @@ namespace bls
             calculate_bone_transform(&node->children[i], global_transformation);
     }
 
-    void Animator::blend_animations(Animation* base_animation, Animation* layered_animation, f32 blend_factor, f32 dt)
+    void Animator::blend_animations(SkeletalAnimation* base_animation, SkeletalAnimation* layered_animation, f32 blend_factor, f32 dt)
     {
         // Speed multipliers to correctly transition from one animation to another
         f32 a = 1.0f;
@@ -609,8 +609,8 @@ namespace bls
     }
 
     void Animator::calculate_blended_bone_transform(
-        Animation* base_animation, const AssNodeData* base_node,
-        Animation* layered_animation, const AssNodeData* layered_node,
+        SkeletalAnimation* base_animation, const AssNodeData* base_node,
+        SkeletalAnimation* layered_animation, const AssNodeData* layered_node,
         const f32 current_time_base, const f32 current_time_layered,
         const mat4& parent_transform,
         const f32 blend_factor)
