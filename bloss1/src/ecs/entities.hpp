@@ -52,6 +52,7 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f, true);
+        ecs.timers[id] = std::make_unique<Timer>();
 
         std::vector<KeyFrame> key_frames;
         key_frames.push_back({ transform, 3.0f });

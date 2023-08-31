@@ -6,7 +6,6 @@
 
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
-#include "core/timer.hpp"
 
 namespace bls
 {
@@ -116,6 +115,15 @@ namespace bls
             f32 radius;
     };
 
+    class Timer : public Component
+    {
+        public:
+            Timer()
+                : time(0.0f) { }
+
+            f32 time;
+    };
+
     // Key frame for animating transforms
     struct KeyFrame
     {
@@ -131,6 +139,5 @@ namespace bls
 
             std::vector<KeyFrame> key_frames;
             u32 curr_frame_idx;
-            Timer timer;
     };
 };
