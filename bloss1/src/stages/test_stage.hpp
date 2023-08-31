@@ -58,10 +58,8 @@ namespace bls
             Skybox* skybox;
 
             // @TODO: temporary
-            std::shared_ptr<Texture> position_texture, normal_texture, albedo_texture, arm_texture, tbn_texture, depth_texture;
+            std::unordered_map<str, std::shared_ptr<Texture>> textures;
             std::shared_ptr<Font> lena_font, inder_font;
-
-            u32 dir_light_id;
 
             bool running;
     };

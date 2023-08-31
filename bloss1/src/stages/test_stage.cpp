@@ -47,10 +47,9 @@ namespace bls
         controller = new CameraController(ecs->transforms[0]->position, ecs->transforms[0]->rotation, offset, *ecs->physics_objects[0].get());
 
         // Add directional lights
-        dir_light_id = directional_light(*ecs,
-                                         Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                                         DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f))
-                                        );
+        directional_light(*ecs,
+                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
+                          DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
 
         // Add point lights
         point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
@@ -72,42 +71,17 @@ namespace bls
         // Create framebuffer textures
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
 
-        // Position
-        position_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
-                                           TextureParameter::Repeat, TextureParameter::Repeat,
-                                           TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(position_texture.get());
+        // Create and attach textures
+        // @TODO: this is hardcoded
+        std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
+        for (const auto& name : texture_names)
+        {
+            textures[name] = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
+                                             TextureParameter::Repeat, TextureParameter::Repeat,
+                                             TextureParameter::Nearest, TextureParameter::Nearest);
 
-        // Normal
-        normal_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
-                                         TextureParameter::Repeat, TextureParameter::Repeat,
-                                         TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(normal_texture.get());
-
-        // Albedo
-        albedo_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8,
-                                         TextureParameter::Repeat, TextureParameter::Repeat,
-                                         TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(albedo_texture.get());
-
-        // ARM
-        arm_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA8,
-                                      TextureParameter::Repeat, TextureParameter::Repeat,
-                                      TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(arm_texture.get());
-
-        // TBN normal
-        tbn_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGBA32F,
-                                      TextureParameter::Repeat, TextureParameter::Repeat,
-                                      TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(tbn_texture.get());
-
-        // Depth
-        depth_texture = Texture::create(window.get_width(), window.get_height(), ImageFormat::RGB32F,
-                                        TextureParameter::Repeat, TextureParameter::Repeat,
-                                        TextureParameter::Nearest, TextureParameter::Nearest);
-        g_buffer->attach_texture(depth_texture.get());
-
+            g_buffer->attach_texture(textures[name].get());
+        }
         g_buffer->draw();
 
         // Create and attach depth buffer
@@ -205,13 +179,14 @@ namespace bls
             light_counter++;
         }
 
-        // @TODO: this is hardcoded
-        std::vector<str> textures = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
-        auto attachments = g_buffer->get_attachments();
-        for (u32 i = 0; i < attachments.size(); i++)
+        // Set texture attachments
+        auto& attachments = g_buffer->get_attachments();
+        u32 tex_position = attachments.size() - 1;
+        for (const auto& [name, texture] : textures)
         {
-            pbr_shader->set_uniform1("textures." + textures[i], i);
-            attachments[i]->bind(i);
+            pbr_shader->set_uniform1("textures." + name, tex_position);
+            attachments[tex_position]->bind(tex_position);
+            tex_position--; // Traverse from back to front
         }
 
         // Bind IBL maps
