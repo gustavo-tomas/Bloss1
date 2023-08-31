@@ -1,6 +1,9 @@
 #include "ecs/ecs.hpp"
 #include "renderer/model.hpp"
 #include "renderer/shader.hpp"
+#include "renderer/primitives/box.hpp"
+#include "renderer/primitives/line.hpp"
+#include "renderer/primitives/sphere.hpp"
 #include "core/game.hpp"
 
 namespace bls
@@ -108,5 +111,70 @@ namespace bls
                 mesh->vao->unbind();
             }
         }
+
+        // Render debug lines
+        // render_colliders(ecs, projection, view);
+    }
+
+    void render_colliders(ECS& ecs, const mat4& projection, const mat4& view)
+    {
+        // Set debug mode
+        auto& renderer = Game::get().get_renderer();
+        renderer.set_debug_mode(true);
+
+        auto color_shader = Shader::create("color", "", "");
+        color_shader->bind();
+
+        color_shader->set_uniform4("projection", projection);
+        color_shader->set_uniform4("view", view);
+        color_shader->set_uniform4("model", mat4(1.0f));
+        color_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
+
+        // Create axes lines for debugging              // Start    // End
+        std::vector<std::unique_ptr<Line>> axes;
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
+
+        // Render axes lines
+        for (u64 i = 0; i < axes.size(); i++)
+        {
+            vec3 color;
+
+            if (i == 0) color = { 1.0f, 0.0f, 0.0f }; // x axis is red
+            if (i == 1) color = { 0.0f, 1.0f, 0.0f }; // y axis is green
+            if (i == 2) color = { 0.0f, 0.0f, 1.0f }; // z axis is blue
+
+            color_shader->set_uniform3("color", color);
+            axes[i]->render();
+        }
+
+        // Render colliders
+        for (const auto& [id, collider] : ecs.colliders)
+        {
+            color_shader->set_uniform3("color", collider->color);
+            if (collider->type == Collider::ColliderType::Sphere)
+            {
+                auto collider_sphere = std::make_unique<Sphere>(renderer,
+                                       ecs.transforms[id]->position,
+                                       static_cast<SphereCollider*>(collider.get())->radius);
+
+                collider_sphere->render();
+            }
+
+            else if (collider->type == Collider::ColliderType::Box)
+            {
+                auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position,
+                                    static_cast<BoxCollider*>(collider.get())->width,
+                                    static_cast<BoxCollider*>(collider.get())->height,
+                                    static_cast<BoxCollider*>(collider.get())->depth);
+
+                collider_box->render();
+            }
+        }
+
+        // Unset debug mode
+        color_shader->unbind();
+        renderer.set_debug_mode(false);
     }
 };

@@ -14,9 +14,6 @@
 #include "renderer/font.hpp"
 #include "renderer/video_player.hpp"
 #include "renderer/primitives/quad.hpp"
-#include "renderer/primitives/box.hpp"
-#include "renderer/primitives/line.hpp"
-#include "renderer/primitives/sphere.hpp"
 #include "camera/controller.hpp"
 #include "audio/audio_engine.hpp"
 
@@ -34,8 +31,6 @@ namespace bls
             bool is_running() override;
 
         private:
-            void render_colliders(const mat4& projection, const mat4& view);
-
             std::unique_ptr<ECS> ecs;
 
             Renderer& renderer;
@@ -43,9 +38,6 @@ namespace bls
             AudioEngine& audio_engine;
 
             std::unique_ptr<Quad> quad;
-            std::unique_ptr<Box> collider_box;
-            std::unique_ptr<Sphere> collider_sphere;
-            std::vector<std::unique_ptr<Line>> axes;
 
             CameraController* controller;
             std::unique_ptr<VideoPlayer> video_player;
