@@ -28,8 +28,8 @@ namespace bls
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
-        ecs->add_system(physics_system);
         ecs->add_system(animation_system);
+        ecs->add_system(physics_system);
         ecs->add_system(render_system);
 
         // Add some entities to the world
