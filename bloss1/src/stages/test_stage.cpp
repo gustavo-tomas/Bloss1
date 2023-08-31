@@ -60,18 +60,18 @@ namespace bls
         // Create shaders
 
         // Geometry buffer shader
-        g_buffer_shader = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
+        shaders["g_buffer"] = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
 
         // PBR shader
-        pbr_shader = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
+        shaders["pbr"] = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
 
         // Debug shader
-        line_shader = Shader::create("line", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
+        shaders["color"] = Shader::create("color", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
 
-        // Create framebuffer textures
+        // Create g_buffer framebuffer
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
 
-        // Create and attach textures
+        // Create and attach framebuffer textures
         // @TODO: this is hardcoded
         std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
         for (const auto& name : texture_names)
@@ -134,6 +134,10 @@ namespace bls
         auto view = controller->get_camera().get_view_matrix();
         auto position = controller->get_camera().get_position();
 
+        // Shaders
+        auto g_buffer_shader = shaders["g_buffer"].get();
+        auto pbr_shader = shaders["pbr"].get();
+
         // Reset the viewport
         renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
         renderer.clear();
@@ -190,7 +194,7 @@ namespace bls
         }
 
         // Bind IBL maps
-        skybox->bind(*pbr_shader.get(), 10);
+        skybox->bind(*pbr_shader, 10);
 
         // Render light quad
         quad->render();
@@ -219,12 +223,13 @@ namespace bls
     {
         renderer.set_debug_mode(true);
 
-        line_shader->bind();
+        auto color_shader = shaders["color"].get();
+        color_shader->bind();
 
-        line_shader->set_uniform4("projection", projection);
-        line_shader->set_uniform4("view", view);
-        line_shader->set_uniform4("model", mat4(1.0f));
-        line_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
+        color_shader->set_uniform4("projection", projection);
+        color_shader->set_uniform4("view", view);
+        color_shader->set_uniform4("model", mat4(1.0f));
+        color_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
 
         // Render axes lines
         for (u64 i = 0; i < axes.size(); i++)
@@ -237,14 +242,14 @@ namespace bls
             else if (i == 2)
                 color = { 0.0f, 0.0f, 1.0f };
 
-            line_shader->set_uniform3("color", color);
+            color_shader->set_uniform3("color", color);
             axes[i]->render();
         }
 
         // Render colliders
         for (const auto& [id, collider] : ecs->colliders)
         {
-            line_shader->set_uniform3("color", collider->color);
+            color_shader->set_uniform3("color", collider->color);
             switch (collider->type)
             {
                 case Collider::ColliderType::Sphere:
@@ -269,7 +274,7 @@ namespace bls
             }
         }
 
-        line_shader->unbind();
+        color_shader->unbind();
         renderer.set_debug_mode(false);
     }
 

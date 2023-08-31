@@ -49,9 +49,7 @@ namespace bls
 
             CameraController* controller;
             std::unique_ptr<VideoPlayer> video_player;
-            std::shared_ptr<Shader> pbr_shader;
-            std::shared_ptr<Shader> g_buffer_shader;
-            std::shared_ptr<Shader> line_shader;
+            std::map<str, std::shared_ptr<Shader>> shaders;
             std::unique_ptr<FrameBuffer> g_buffer;
             std::unique_ptr<RenderBuffer> render_buffer;
 
