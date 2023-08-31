@@ -23,8 +23,8 @@ namespace bls
         std::unique_ptr<RenderBuffer> render_buffer;
         std::map<str, std::shared_ptr<Shader>> shaders;
 
+        std::map<str, std::shared_ptr<Font>> fonts;
         std::unordered_map<str, std::shared_ptr<Texture>> textures;
-        std::shared_ptr<Font> lena_font, inder_font;
 
         Skybox* skybox;
     };
@@ -87,8 +87,8 @@ namespace bls
         render_state.quad = std::make_unique<Quad>(renderer);
 
         // Create font
-        render_state.inder_font = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
-        render_state.lena_font  = Font::create("lena", "bloss1/assets/font/lena.ttf");
+        render_state.fonts["inder"] = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
+        render_state.fonts["lena"]  = Font::create("lena", "bloss1/assets/font/lena.ttf");
     }
 
     void render_system(ECS& ecs, f32 dt)
@@ -116,8 +116,7 @@ namespace bls
         auto& g_buffer = render_state.g_buffer;
         auto& skybox = render_state.skybox;
         auto& quad = render_state.quad;
-        auto& inder_font = render_state.inder_font;
-        auto& lena_font = render_state.lena_font;
+        auto& fonts = render_state.fonts;
 
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
@@ -286,8 +285,8 @@ namespace bls
         skybox->draw(view, projection);
 
         // Render text
-        inder_font->render("owowowowow", 20.0f, 20.0f, 0.5f, { 0.95f, 0.6f, 0.4f });
-        lena_font->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
+        fonts["inder"]->render("owowowowow", 20.0f, 20.0f, 0.5f, { 0.95f, 0.6f, 0.4f });
+        fonts["lena"]->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
 
         // Render debug lines
         render_colliders(ecs, projection, view);

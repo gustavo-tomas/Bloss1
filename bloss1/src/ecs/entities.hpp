@@ -30,6 +30,23 @@ namespace bls
         return id;
     }
 
+    u32 ball(ECS& ecs, const Transform& transform)
+    {
+        u32 id = ecs.get_id();
+
+        // auto model = Model::create("player", "bloss1/assets/models/box/planter_box_01_2k.gltf", false);
+        auto model = Model::create("ball", "bloss1/assets/models/sphere/rusted_sphere.gltf", false);
+
+        ecs.names[id] = "ball";
+        ecs.models[id] = std::make_unique<ModelComponent>(model.get());
+        ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
+        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
+        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
+
+        return id;
+    }
+
     u32 vampire(ECS& ecs, const Transform& transform)
     {
         u32 id = ecs.get_id();
