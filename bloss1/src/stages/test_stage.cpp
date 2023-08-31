@@ -13,7 +13,6 @@ namespace bls
 
     TestStage::~TestStage()
     {
-        delete controller;
         delete skybox;
     }
 
@@ -28,12 +27,14 @@ namespace bls
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
+        ecs->add_system(camera_controller_system);
+        ecs->add_system(camera_system);
         ecs->add_system(animation_system);
         ecs->add_system(physics_system);
         ecs->add_system(render_system);
 
         // Add some entities to the world
-        for (u32 i = 0; i < 5; i++)
+        for (u32 i = 0; i < 1; i++)
             player(*ecs, Transform(vec3(i * 10.0f, 30.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
         vampire(*ecs, Transform(vec3(-20.0f, 40.0f, 0.0f), vec3(0.0f), vec3(0.001f, 0.001f, 0.001f)));
@@ -41,10 +42,6 @@ namespace bls
 
         // Floor is created last
         floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
-
-        // Create a camera and controller
-        vec3 offset = vec3(15.0f, 7.0f, 50.0f);
-        controller = new CameraController(ecs->transforms[0]->position, ecs->transforms[0]->rotation, offset, *ecs->physics_objects[0].get());
 
         // Add directional lights
         directional_light(*ecs,
@@ -116,18 +113,14 @@ namespace bls
 
     void TestStage::update(f32 dt)
     {
-        // Update camera controller
-        controller->update(dt);
-        controller->get_camera().update(dt);
-
         // Window properties
         auto width = window.get_width();
         auto height = window.get_height();
 
         // Camera properties
-        auto projection = controller->get_camera().get_projection_matrix(width, height);
-        auto view = controller->get_camera().get_view_matrix();
-        auto position = controller->get_camera().get_position();
+        auto projection = ecs->cameras[0]->projection_matrix;
+        auto view = ecs->cameras[0]->view_matrix;
+        auto position = ecs->cameras[0]->position;
 
         // Shaders
         auto g_buffer_shader = shaders["g_buffer"].get();

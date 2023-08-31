@@ -24,6 +24,9 @@ namespace bls
         ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
         // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
 
+        ecs.cameras[id] = std::make_unique<Camera>(vec3(15.0f, 7.0f, 50.0f));
+        ecs.camera_controllers[id] = std::make_unique<CameraController>();
+
         return id;
     }
 

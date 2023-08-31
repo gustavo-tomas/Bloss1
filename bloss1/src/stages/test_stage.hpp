@@ -14,7 +14,6 @@
 #include "renderer/font.hpp"
 #include "renderer/video_player.hpp"
 #include "renderer/primitives/quad.hpp"
-#include "camera/controller.hpp"
 #include "audio/audio_engine.hpp"
 
 namespace bls
@@ -39,7 +38,6 @@ namespace bls
 
             std::unique_ptr<Quad> quad;
 
-            CameraController* controller;
             std::unique_ptr<VideoPlayer> video_player;
             std::map<str, std::shared_ptr<Shader>> shaders;
             std::unique_ptr<FrameBuffer> g_buffer;
