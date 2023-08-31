@@ -1,4 +1,5 @@
-#include "ecs/systems.hpp"
+#include "ecs/ecs.hpp"
+#include "renderer/model.hpp"
 #include "managers/shader_manager.hpp"
 #include "core/game.hpp"
 
@@ -13,6 +14,34 @@ namespace bls
         auto& renderer = Game::get().get_renderer();
         for (const auto& [id, model] : ecs.models)
         {
+            // Reset bone matrices
+            for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
+                g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", mat4(1.0f));
+
+            // Update animators
+            auto animator = model->model->animator.get();
+            if (animator)
+            {
+                // @TODO: test - Blend animations
+                if (ecs.names[id] == "abomination")
+                {
+                    auto& animations = model->model->animations;
+                    auto twist_anim = animations["Armature|Twist"].get();
+                    auto rotate_anim = animations["Armature|ArmatureAction.005"].get();
+                    f32 blend_factor = 0.5f;
+
+                    animator->blend_animations(rotate_anim, twist_anim, blend_factor, dt);
+                }
+
+                else
+                    animator->update(dt);
+
+                // Update bone matrices
+                auto bone_matrices = animator->get_final_bone_matrices();
+                for (u32 i = 0; i < bone_matrices.size(); i++)
+                    g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
+            }
+
             // Remember: scale -> rotate -> translate
             auto transform = ecs.transforms[id].get();
             auto model_matrix = mat4(1.0f);
@@ -23,7 +52,7 @@ namespace bls
             // @TODO: i dont know what im doing but it works
 
             // Player model matrix
-            if (id == 0)
+            if (ecs.names[id] == "player")
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));

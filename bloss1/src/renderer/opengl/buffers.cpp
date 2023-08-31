@@ -205,7 +205,12 @@ namespace bls
 
     void OpenGLVertexArray::add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer)
     {
-        glVertexAttribPointer(index, size, convert_to_opengl_data(type), normalized, stride, pointer);
+        if (type == ShaderDataType::Float)
+            glVertexAttribPointer(index, size, convert_to_opengl_data(type), normalized, stride, pointer);
+
+        else if (type == ShaderDataType::Int)
+            glVertexAttribIPointer(index, size, convert_to_opengl_data(type), stride, pointer);
+
         glEnableVertexAttribArray(index);
     }
 };

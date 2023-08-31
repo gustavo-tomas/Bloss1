@@ -6,8 +6,6 @@
 
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
-#include "renderer/buffers.hpp"
-#include "renderer/model.hpp"
 
 namespace bls
 {
@@ -58,6 +56,7 @@ namespace bls
     };
 
     // @TODO: find a better solution (get rid of model entirely?)
+    class Model;
     class ModelComponent : public Component
     {
         public:
@@ -114,5 +113,31 @@ namespace bls
                 : Collider(ColliderType::Sphere, immovable), radius(radius) { }
 
             f32 radius;
+    };
+
+    class Timer : public Component
+    {
+        public:
+            Timer()
+                : time(0.0f) { }
+
+            f32 time;
+    };
+
+    // Key frame for animating transforms
+    struct KeyFrame
+    {
+        Transform transform;
+        f32 duration;
+    };
+
+    class TransformAnimation : public Component
+    {
+        public:
+            TransformAnimation(std::vector<KeyFrame> key_frames)
+                : key_frames(key_frames), curr_frame_idx(0) { }
+
+            std::vector<KeyFrame> key_frames;
+            u32 curr_frame_idx;
     };
 };

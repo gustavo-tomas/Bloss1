@@ -1,7 +1,9 @@
 #include "ecs/systems.hpp"
 #include "ecs/systems/physics_system.hpp"
 
-// @TODO: finish and cleanup
+#define GRAVITY 9.8f
+
+// @TODO: use continuous collision detection
 namespace bls
 {
     void physics_system(ECS& ecs, f32 dt)
@@ -17,7 +19,7 @@ namespace bls
             if (!colliders[id]->immovable)
             {
                 // Apply forces
-                object->force += vec3(0.0f, object->mass * -9.8f, 0.0f); // @TODO: set a constant for gravity
+                object->force += vec3(0.0f, object->mass * -GRAVITY, 0.0f);
                 object->velocity += (object->force / object->mass) * dt;
 
                 // Apply deceleration
@@ -26,22 +28,6 @@ namespace bls
                 object->velocity.z = apply_deceleration(object->velocity.z, 20.0f, object->mass, dt);
 
                 transforms[id]->position += object->velocity * dt;
-            }
-
-            // @TODO: use continuous collision detection
-            // Prevent objects from clipping the floor
-            f32 vertical_side = 0.0f;
-            if (colliders[id]->type == Collider::ColliderType::Sphere)
-                vertical_side = static_cast<SphereCollider*>(colliders[id].get())->radius;
-
-            else if (colliders[id]->type == Collider::ColliderType::Box)
-                vertical_side = static_cast<BoxCollider*>(colliders[id].get())->height / 2.0f;
-
-            const f32 TOL = 0.025f;
-            if (transforms[id]->position.y - vertical_side <= 0.0f + TOL)
-            {
-                transforms[id]->position.y = vertical_side;
-                object->velocity.y = 0.0f;
             }
 
             // Reset forces
@@ -114,22 +100,27 @@ namespace bls
             max_aabb.y = trans_a->position.y + col_a->height;
             max_aabb.z = trans_a->position.z + col_a->depth;
 
-            // AABB closest point to the sphere
-            vec3 closest_point_aabb = vec3(0.0f);
-            closest_point_aabb.x = clamp(trans_b->position.x, min_aabb.x, max_aabb.x);
-            closest_point_aabb.y = clamp(trans_b->position.y, min_aabb.y, max_aabb.y);
-            closest_point_aabb.z = clamp(trans_b->position.z, min_aabb.z, max_aabb.z);
+            // 1) find point 'pbox' on box the closest to the sphere centre.
+            vec3 closest_point_aabb;
 
-            // Sphere closest point to AABB
-            vec3 vector_to_closest = normalize(closest_point_aabb - trans_b->position);
-            vec3 closest_point_sphere = trans_b->position + vector_to_closest * col_b->radius;
+            // For each coordinate axis, if the point coordinate value is
+            // outside box, clamp it to the box, else keep it as is
+            for (u32 i = 0; i < 3; i++)
+                closest_point_aabb[i] = clamp(trans_b->position[i], min_aabb[i], max_aabb[i]);
 
-            f32 dist_aabb_to_sphere = distance(trans_b->position, closest_point_aabb);
+            // 2) if 'pbox' is outside the sphere no collision.
+            f32 dist_aabb_to_sphere = distance(closest_point_aabb, trans_b->position);
             if (dist_aabb_to_sphere < col_b->radius)
             {
-                collision.point_a = closest_point_aabb;
-                collision.point_b = closest_point_sphere;
-                collision.has_collision = true;
+                // 3) find point 'pshpere' on sphere surface the closest to point 'pbox'.
+                vec3 closest_point_sphere = trans_b->position + normalize(closest_point_aabb - trans_b->position) * col_b->radius;
+
+                if (closest_point_sphere != closest_point_aabb)
+                {
+                    collision.point_a = closest_point_sphere;
+                    collision.point_b = closest_point_aabb;
+                    collision.has_collision = true;
+                }
             }
 
             return collision;
@@ -192,12 +183,68 @@ namespace bls
                                  min_aabb_a.y <= max_aabb_b.y && max_aabb_a.y >= min_aabb_b.y &&
                                  min_aabb_a.z <= max_aabb_b.z && max_aabb_a.z >= min_aabb_b.z);
 
-            // @TODO: finish collision response
             if (intersecting)
             {
-                // collision.point_a = ;
-                // collision.point_b = ;
-                // collision.has_collision = true;
+                vec3 overlap;
+                overlap.x = max(0.0f, min(max_aabb_a.x, max_aabb_b.x) - max(min_aabb_a.x, min_aabb_b.x));
+                overlap.y = max(0.0f, min(max_aabb_a.y, max_aabb_b.y) - max(min_aabb_a.y, min_aabb_b.y));
+                overlap.z = max(0.0f, min(max_aabb_a.z, max_aabb_b.z) - max(min_aabb_a.z, min_aabb_b.z));
+
+                vec3 penetration_depth = vec3(0.0f);
+                if (overlap.x < overlap.y && overlap.x < overlap.z)
+                {
+                    if (min_aabb_a.x < min_aabb_b.x)
+                    {
+                        max_aabb_a.x -= overlap.x;
+                        min_aabb_b.x += overlap.x;
+                        penetration_depth.x = -overlap.x;
+                    }
+                    else
+                    {
+                        min_aabb_a.x += overlap.x;
+                        max_aabb_b.x -= overlap.x;
+                        penetration_depth.x = overlap.x;
+                    }
+                }
+
+                else if (overlap.y < overlap.z)
+                {
+                    if (min_aabb_a.y < min_aabb_b.y)
+                    {
+                        max_aabb_a.y -= overlap.y;
+                        min_aabb_b.y += overlap.y;
+                        penetration_depth.y = -overlap.y;
+                    }
+                    else
+                    {
+                        min_aabb_a.y += overlap.y;
+                        max_aabb_b.y -= overlap.y;
+                        penetration_depth.y = overlap.y;
+                    }
+                }
+
+                else
+                {
+                    if (min_aabb_a.z < min_aabb_b.z)
+                    {
+                        max_aabb_a.z -= overlap.z;
+                        min_aabb_b.z += overlap.z;
+                        penetration_depth.z = -overlap.z;
+                    }
+                    else
+                    {
+                        min_aabb_a.z += overlap.z;
+                        max_aabb_b.z -= overlap.z;
+                        penetration_depth.z = +overlap.z;
+                    }
+                }
+
+                if (length(penetration_depth) > 0.0f)
+                {
+                    collision.point_a = penetration_depth;
+                    collision.point_b = vec3(0.0f);
+                    collision.has_collision = true;
+                }
             }
 
             return collision;
@@ -212,22 +259,30 @@ namespace bls
     // -----------------------------------------------------------------------------------------------------------------
     void solve_collision(ECS& ecs, u32 id_a, u32 id_b, Collision collision)
     {
+        vec3 delta = collision.point_a - collision.point_b;
+        f32 dist = length(delta);
+        vec3 normal = delta / dist;
+
         auto collider_a = ecs.colliders[id_a].get();
         auto collider_b = ecs.colliders[id_b].get();
 
-        auto trans_a = ecs.transforms[id_a].get();
-        auto trans_b = ecs.transforms[id_b].get();
-
-        vec3 normal = collision.point_a - collision.point_b;
-        f32 dist = glm::length(normal);
-
-        normal /= dist;
-
         if (!collider_a->immovable)
+        {
+            auto trans_a = ecs.transforms[id_a].get();
+            auto object_a = ecs.physics_objects[id_a].get();
+
             trans_a->position += normal * dist * 0.5f;
+            object_a->velocity += normal * dot(object_a->velocity, delta);
+        }
 
         if (!collider_b->immovable)
+        {
+            auto trans_b = ecs.transforms[id_b].get();
+            auto object_b = ecs.physics_objects[id_b].get();
+
             trans_b->position -= normal * dist * 0.5f;
+            object_b->velocity -= normal * dot(object_b->velocity, delta);
+        }
     }
 
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)

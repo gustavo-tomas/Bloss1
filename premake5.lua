@@ -43,7 +43,7 @@ project "bloss1"
         pic "On"
 
     filter "configurations:debug"
-        buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
+        buildoptions { "-Wall", "-Wextra", "-O0", "-fsanitize=address", "-fno-omit-frame-pointer" }
         linkoptions { "-fsanitize=address" }
 
         defines { "_DEBUG" }
