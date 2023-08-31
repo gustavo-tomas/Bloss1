@@ -1,14 +1,14 @@
 #include "ecs/ecs.hpp"
 #include "renderer/model.hpp"
-#include "managers/shader_manager.hpp"
+#include "renderer/shader.hpp"
 #include "core/game.hpp"
 
 namespace bls
 {
     void render_system(ECS& ecs, f32 dt)
     {
-        // Shaders
-        auto g_buffer_shader = ShaderManager::get().get_shader("g_buffer");
+        // Shaders - by now they should have been initialized
+        auto g_buffer_shader = Shader::create("g_buffer", "", "");
 
         // Render all entities
         auto& renderer = Game::get().get_renderer();
