@@ -9,7 +9,7 @@
 #include "core/event.hpp"
 #include "stages/stage.hpp"
 #include "renderer/renderer.hpp"
-#include "audio/audio_engine.hpp"
+#include "audio_engine.hpp"
 
 namespace bls
 {
