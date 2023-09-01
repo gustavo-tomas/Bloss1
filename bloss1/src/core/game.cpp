@@ -36,7 +36,7 @@ namespace bls
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
 
         // Register initial stage // oof
-        stages = std::unique_ptr<Stage>(new TestStage(*renderer.get(), *window.get(), *audio_engine.get()));
+        stages = std::unique_ptr<Stage>(new TestStage());
         stages->start();
 
         running = true;
