@@ -6,7 +6,7 @@
  */
 
 #include "math/vec.hpp"
-#include "glm/glm/gtx/string_cast.hpp"
+#include "glm/gtx/string_cast.hpp"
 
 namespace bls
 {

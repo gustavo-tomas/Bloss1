@@ -31,6 +31,8 @@ project "bloss1"
     { 
         "%{prj.name}/src",
         "vendor/glfw/include",
+        "vendor/assimp/include",
+        "vendor/glm",
         "vendor/",
         "/usr/include/freetype2"
     }

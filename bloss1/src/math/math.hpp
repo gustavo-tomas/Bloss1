@@ -10,9 +10,9 @@
 #include "math/vec.hpp"
 #include "math/to_str.hpp"
 
-#include "glm/glm/glm.hpp"
-#include "glm/glm/gtc/type_ptr.hpp"
-#include "glm/glm/gtx/quaternion.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtx/quaternion.hpp"
 
 namespace bls
 {
