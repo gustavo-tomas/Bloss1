@@ -6,7 +6,7 @@
 #include FT_FREETYPE_H
 
 #include <GL/glew.h> // Include glew before glfw
-#include <GLFW/glfw3.h>
+#include "glfw/include/GLFW/glfw3.h"
 
 namespace bls
 {

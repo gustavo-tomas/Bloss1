@@ -1,3 +1,6 @@
 [submodule "vendor/soloud"]
 	path = vendor/soloud
 	url = https://github.com/gustavo-tomas/soloud.git
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = https://github.com/gustavo-tomas/glfw.git

@@ -1,7 +1,7 @@
 #include "renderer/opengl/texture.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
-#include <GLFW/glfw3.h>
+#include "glfw/include/GLFW/glfw3.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
