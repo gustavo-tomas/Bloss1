@@ -4,9 +4,9 @@
 #include "glfw/include/GLFW/glfw3.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include "stb/stb_image.h"
 
-#include <filesystem> // @TODO: temporary (use a filesystem pls tyty)
+// @TODO: temporary (use a filesystem pls tyty)
 
 namespace bls
 {
