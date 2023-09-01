@@ -6,9 +6,9 @@
 # Linux
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if [[ -z $1 ]]; then
-        vendor/premake/premake5 gmake && make -j4
+        vendor/premake/premake5 gmake2 && make -j4
     else
-        vendor/premake/premake5 gmake && make config=$1 -j4
+        vendor/premake/premake5 gmake2 && make config=$1 -j4
     fi
 
 # Windows
