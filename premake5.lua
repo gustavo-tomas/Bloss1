@@ -27,7 +27,13 @@ project "bloss1"
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
 
     -- @TODO: Don't forget to add all dependencies to the vendor folder
-    includedirs { "%{prj.name}/src", "vendor/", "/usr/include/freetype2" }
+    includedirs 
+    { 
+        "%{prj.name}/src",
+        "vendor/glfw/include",
+        "vendor/",
+        "/usr/include/freetype2"
+    }
 
     linkoptions
     {
