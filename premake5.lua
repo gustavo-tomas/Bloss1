@@ -12,6 +12,7 @@ workspace "bloss1"
     -- Run vendor premakes here
     include "vendor/soloud"
     include "vendor/glfw"
+    include "vendor/assimp"
 
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
@@ -31,14 +32,13 @@ project "bloss1"
     linkoptions
     {
         "-lGL", "-lGLEW",
-        "-lassimp",
         "-lfreetype",
         "-lavcodec", "-lavformat", "-lavutil", "-lswscale",
         "-lasound" -- linux only
     }
 
     -- Links vendor libraries here
-    links { "soloud", "glfw" }
+    links { "soloud", "glfw", "assimp" }
 
     filter "system:linux"
         pic "On"

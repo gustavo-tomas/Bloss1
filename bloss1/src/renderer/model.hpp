@@ -10,8 +10,8 @@
 #include "renderer/assimp_utils.hpp"
 #include "math/math.hpp"
 
-#include <assimp/scene.h>
-#include <assimp/Importer.hpp>
+#include "assimp/include/assimp/scene.h"
+#include "assimp/include/assimp/Importer.hpp"
 
 #define MAX_BONE_PER_VERTEX 4
 #define MAX_BONE_MATRICES 100
