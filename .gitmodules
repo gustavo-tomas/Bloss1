@@ -1,3 +1,12 @@
 [submodule "vendor/soloud"]
 	path = vendor/soloud
 	url = https://github.com/gustavo-tomas/soloud.git
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = https://github.com/gustavo-tomas/glfw.git
+[submodule "vendor/glm"]
+	path = vendor/glm
+	url = https://github.com/gustavo-tomas/glm.git
+[submodule "vendor/assimp"]
+	path = vendor/assimp
+	url = https://github.com/gustavo-tomas/assimp.git

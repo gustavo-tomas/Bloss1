@@ -1,7 +1,7 @@
 #include "renderer/opengl/shader.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 #define MAX_SHADER_ID 100000007
 

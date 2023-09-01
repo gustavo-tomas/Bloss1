@@ -11,6 +11,8 @@ workspace "bloss1"
 
     -- Run vendor premakes here
     include "vendor/soloud"
+    include "vendor/glfw"
+    include "vendor/assimp"
 
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
@@ -25,19 +27,26 @@ project "bloss1"
     files { "%{prj.name}/src/**.hpp", "%{prj.name}/src/**.cpp" }
 
     -- @TODO: Don't forget to add all dependencies to the vendor folder
-    includedirs { "%{prj.name}/src", "vendor/", "/usr/include/freetype2" }
+    includedirs 
+    { 
+        "%{prj.name}/src",
+        "vendor/glfw/include",
+        "vendor/assimp/include",
+        "vendor/glm",
+        "vendor/",
+        "/usr/include/freetype2"
+    }
 
     linkoptions
     {
-        "-lglfw", "-lGL", "-lGLEW",
-        "-lassimp",
+        "-lGL", "-lGLEW",
         "-lfreetype",
         "-lavcodec", "-lavformat", "-lavutil", "-lswscale",
         "-lasound" -- linux only
     }
 
     -- Links vendor libraries here
-    links { "soloud" }
+    links { "soloud", "glfw", "assimp" }
 
     filter "system:linux"
         pic "On"

@@ -1,6 +1,5 @@
 #include "platform/glfw/extensions.hpp"
-
-#include <iostream>
+#include "core/core.hpp"
 
 void APIENTRY debug_callback(GLenum source, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*)
 {

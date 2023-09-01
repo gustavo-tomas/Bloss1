@@ -2,7 +2,7 @@
 
 #include "math/math.hpp"
 
-#include <assimp/Importer.hpp>
+#include "assimp/Importer.hpp"
 
 namespace bls
 {

@@ -1,7 +1,7 @@
 #include "renderer/model.hpp"
 #include "renderer/texture.hpp"
 
-#include <assimp/postprocess.h>
+#include "assimp/postprocess.h"
 
 namespace bls
 {
