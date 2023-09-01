@@ -15,7 +15,7 @@ run_gmake () {
 
 # Linux
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    run_gmake
+    run_gmake $1
 
 # Windows
 elif [[ "$OSTYPE" == "cygwin" ]]; then
@@ -25,7 +25,7 @@ elif [[ "$OSTYPE" == "msys" ]]; then
     echo "@TODO: Lightweight shell and GNU utilities compiled for Windows (part of MinGW)"
 
 elif [[ "$OSTYPE" == "tdm-gcc" ]]; then
-    run_gmake
+    run_gmake $1
 
 # MAC
 else
