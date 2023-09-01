@@ -7,13 +7,13 @@ Cute little data-driven (hopefully) c++ engine.
 ## Build
 
 ```
-$ scripts/build.sh
+$ scripts/build.sh release
 ```
 
 ## Run
 
 ```
-$ scripts/run.sh
+$ scripts/run.sh release
 ```
 
 ## Clean
