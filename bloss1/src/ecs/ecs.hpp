@@ -53,6 +53,22 @@ namespace bls
                 systems.push_back(system);
             }
 
+            // Erase all the components of an entity (@TODO: this is not very efficient)
+            void erase_entity(u32 id)
+            {
+                names.erase(id);
+                transforms.erase(id);
+                models.erase(id);
+                dir_lights.erase(id);
+                point_lights.erase(id);
+                physics_objects.erase(id);
+                colliders.erase(id);
+                transform_animations.erase(id);
+                timers.erase(id);
+                cameras.erase(id);
+                camera_controllers.erase(id);
+            }
+
             // Registered systems
             std::vector<System> systems;
 
