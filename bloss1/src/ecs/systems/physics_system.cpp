@@ -286,7 +286,7 @@ namespace bls
             auto object_a = ecs.physics_objects[id_a].get();
 
             trans_a->position += normal * dist * 0.5f;
-            object_a->velocity += normal * dot(object_a->velocity, delta);
+            object_a->velocity = object_a->velocity - (dot(object_a->velocity, normal) * normal);
         }
 
         if (!collider_b->immovable)
@@ -295,7 +295,7 @@ namespace bls
             auto object_b = ecs.physics_objects[id_b].get();
 
             trans_b->position -= normal * dist * 0.5f;
-            object_b->velocity -= normal * dot(object_b->velocity, delta);
+            object_b->velocity = object_b->velocity - (dot(object_b->velocity, normal) * normal);
         }
     }
 
