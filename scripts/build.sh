@@ -22,9 +22,6 @@ elif [[ "$OSTYPE" == "cygwin" ]]; then
     echo "@TODO: POSIX compatibility layer and Linux environment emulation for Windows"
 
 elif [[ "$OSTYPE" == "msys" ]]; then
-    echo "@TODO: Lightweight shell and GNU utilities compiled for Windows (part of MinGW)"
-
-elif [[ "$OSTYPE" == "tdm-gcc" ]]; then
     run_gmake $1
 
 # MAC
