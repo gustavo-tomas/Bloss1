@@ -48,7 +48,9 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(5.0f, 5.0f, 5.0f);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(
+                                5.0f, 5.0f, 5.0f,
+                                vec3(0.0f, 10.0f, 0.0f));
 
         return id;
     }
@@ -62,7 +64,7 @@ namespace bls
         ecs.names[id] = "abomination";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f, true);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f, vec3(0.0f), true);
         ecs.timers[id] = std::make_unique<Timer>();
 
         std::vector<KeyFrame> key_frames;
@@ -84,7 +86,10 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 10.0f, transform.scale.y * 1.0f, transform.scale.z * 10.0f, true);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(
+                                transform.scale.x * 10.0f, transform.scale.y * 1.0f, transform.scale.z * 10.0f,
+                                vec3(0.0f),
+                                true);
 
         return id;
     }

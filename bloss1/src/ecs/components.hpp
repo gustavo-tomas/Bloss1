@@ -96,7 +96,6 @@ namespace bls
             Model* model;
     };
 
-    // @TODO: for now, the object position is the same as the model's
     class PhysicsObject : public Component
     {
         public:
@@ -117,12 +116,13 @@ namespace bls
                 Box, Sphere
             };
 
-            Collider(ColliderType type, bool immovable)
-                : type(type), immovable(immovable) { }
+            Collider(ColliderType type, const vec3& offset, bool immovable)
+                : type(type), offset(offset), immovable(immovable) { }
 
             virtual ~Collider() { }
 
             ColliderType type;
+            vec3 offset; // Offset to the component position
             vec3 color;
             bool immovable;
     };
@@ -130,8 +130,8 @@ namespace bls
     class BoxCollider : public Collider
     {
         public:
-            BoxCollider(f32 width, f32 height, f32 depth, bool immovable = false)
-                : Collider(ColliderType::Box, immovable), width(width), height(height), depth(depth) { }
+            BoxCollider(f32 width, f32 height, f32 depth, const vec3& offset = vec3(0.0f), bool immovable = false)
+                : Collider(ColliderType::Box, offset, immovable), width(width), height(height), depth(depth) { }
 
             f32 width, height, depth;
     };
@@ -139,8 +139,8 @@ namespace bls
     class SphereCollider : public Collider
     {
         public:
-            SphereCollider(f32 radius, bool immovable = false)
-                : Collider(ColliderType::Sphere, immovable), radius(radius) { }
+            SphereCollider(f32 radius, const vec3& offset = vec3(0.0f), bool immovable = false)
+                : Collider(ColliderType::Sphere, offset, immovable), radius(radius) { }
 
             f32 radius;
     };
