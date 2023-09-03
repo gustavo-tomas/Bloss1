@@ -1,8 +1,8 @@
 #include "stages/test_stage.hpp"
+#include "core/game.hpp"
 #include "core/input.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
-#include "core/game.hpp"
 
 namespace bls
 {
@@ -50,18 +50,6 @@ namespace bls
         point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
         point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
         point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-
-        // Load audios
-        // auto& audio_engine = Game::get().get_audio_engine();
-        // audio_engine.load("test", "bloss1/assets/sounds/toc.wav", false);
-        // audio_engine.set_echo_filter("test", 0.2f, 0.15f);
-        // audio_engine.play("test");
-
-        // Create a video player
-        // video_player = std::make_unique<VideoPlayer>("bloss1/assets/videos/mh_pro_skate.mp4");
-        // video_player->play_video();
-
-        running = true;
     }
 
     void TestStage::update(f32 dt)
@@ -73,11 +61,6 @@ namespace bls
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
-            running = false;
-    }
-
-    bool TestStage::is_running()
-    {
-        return running;
+            Game::get().change_stage(nullptr);
     }
 };

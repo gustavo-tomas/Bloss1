@@ -15,7 +15,5 @@ namespace bls
 
             virtual void start() = 0;
             virtual void update(f32 dt) = 0;
-
-            virtual bool is_running() = 0;
     };
 };

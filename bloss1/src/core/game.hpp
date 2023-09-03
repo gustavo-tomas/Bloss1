@@ -22,7 +22,7 @@ namespace bls
             // The game loop
             void run();
 
-            void push_stage(Stage* stage);
+            void change_stage(Stage* new_stage);
             void on_event(Event& event);
 
             static Game& get(); // im sorry i can change
@@ -43,9 +43,9 @@ namespace bls
             std::unique_ptr<Window> window;
             std::unique_ptr<Renderer> renderer;
             std::unique_ptr<AudioEngine> audio_engine;
-            std::unique_ptr<Stage> stages; // For now just one stage
+            std::unique_ptr<Stage> stage;
 
             f64 target_spf;
-            bool running, minimized;
+            bool window_open, minimized;
     };
 };
