@@ -87,8 +87,8 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                transform.scale.x * 10.0f, transform.scale.y * 1.0f, transform.scale.z * 10.0f,
-                                vec3(0.0f),
+                                transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f,
+                                vec3(0.0f, -transform.scale.y * 20.0f, 0.0f),
                                 true);
 
         return id;

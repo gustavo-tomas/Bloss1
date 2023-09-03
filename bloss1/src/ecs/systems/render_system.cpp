@@ -332,7 +332,7 @@ namespace bls
             if (collider->type == Collider::ColliderType::Sphere)
             {
                 auto collider_sphere = std::make_unique<Sphere>(renderer,
-                                       ecs.transforms[id]->position,
+                                       ecs.transforms[id]->position + collider->offset,
                                        static_cast<SphereCollider*>(collider.get())->radius);
 
                 collider_sphere->render();
@@ -340,7 +340,7 @@ namespace bls
 
             else if (collider->type == Collider::ColliderType::Box)
             {
-                auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position,
+                auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position + collider->offset,
                                     static_cast<BoxCollider*>(collider.get())->width,
                                     static_cast<BoxCollider*>(collider.get())->height,
                                     static_cast<BoxCollider*>(collider.get())->depth);
