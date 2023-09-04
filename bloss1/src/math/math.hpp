@@ -68,6 +68,12 @@ namespace bls
     }
 
     template<typename T>
+    auto dot(T x, T y)
+    {
+        return glm::dot(x, y);
+    }
+
+    template<typename T>
     auto cross(T x, T y)
     {
         return glm::cross(x, y);
