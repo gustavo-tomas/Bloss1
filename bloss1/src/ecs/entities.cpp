@@ -50,7 +50,7 @@ namespace bls
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
                                 5.0f, 5.0f, 5.0f,
-                                vec3(0.0f, 10.0f, 0.0f));
+                                vec3(0.0f, 5.0f, 0.0f));
 
         return id;
     }

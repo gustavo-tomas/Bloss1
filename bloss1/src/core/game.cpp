@@ -1,5 +1,6 @@
 #include "core/game.hpp"
-#include "stages/menu_stage.hpp"
+// #include "stages/menu_stage.hpp"
+#include "stages/test_stage.hpp"
 
 namespace bls
 {
@@ -15,7 +16,6 @@ namespace bls
         }
 
         instance = this;
-        set_target_fps(0);
 
         // Create the window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
@@ -44,11 +44,13 @@ namespace bls
     void Game::run()
     {
         // Register initial stage
-        change_stage(new MenuStage());
+        change_stage(new TestStage());
 
         // Time variation
         f64 last_time = window->get_time(), current_time = 0, time_counter = 0, dt = 0;
         u32 frame_counter = 0;
+
+        set_target_fps(0);
 
         window_open = true;
         minimized = false;
