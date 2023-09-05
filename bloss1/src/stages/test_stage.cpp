@@ -43,13 +43,13 @@ namespace bls
         // Add directional lights
         directional_light(*ecs,
                           Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                          DirectionalLight(vec3(0.2f), vec3(1.0f), vec3(1.0f)));
+                          DirectionalLight(vec3(0.0f), vec3(0.5f, 0.5f, 0.5f)));
 
         // Add point lights
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
+        // point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        // point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
+        // point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
+        // point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
     }
 
     void TestStage::update(f32 dt)

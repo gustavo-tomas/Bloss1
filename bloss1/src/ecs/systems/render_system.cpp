@@ -81,8 +81,8 @@ namespace bls
 
         // Create a skybox
         // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        // render_state.skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10);
-        render_state.skybox = Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 1024, 32, 1024, 1024, 10);
+        render_state.skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10);
+        // render_state.skybox = Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10);
 
         // Create a quad for rendering
         render_state.quad = std::make_unique<Quad>(renderer);
@@ -249,14 +249,29 @@ namespace bls
 
         // Set lights uniforms
         u32 light_counter = 0;
+
+        // Point lights
         auto& point_lights = ecs.point_lights;
-        auto& light_transforms = ecs.transforms;
+        auto& transforms = ecs.transforms;
         for (auto& [id, light] : point_lights)
         {
-            auto transform = light_transforms[id].get();
+            auto transform = transforms[id].get();
 
             pbr_shader->set_uniform3("lights.pointLightPositions[" + to_str(light_counter) + "]", transform->position);
             pbr_shader->set_uniform3("lights.pointLightColors[" + to_str(light_counter) + "]", light->diffuse);
+
+            light_counter++;
+        }
+
+        // Directional lights
+        light_counter = 0;
+        auto& dir_lights = ecs.dir_lights;
+        for (auto& [id, light] : dir_lights)
+        {
+            auto transform = transforms[id].get();
+
+            pbr_shader->set_uniform3("lights.dirLightDirections[" + to_str(light_counter) + "]", transform->rotation);
+            pbr_shader->set_uniform3("lights.dirLightColors[" + to_str(light_counter) + "]", light->diffuse);
 
             light_counter++;
         }

@@ -36,8 +36,8 @@ struct Lights {
     vec3 pointLightPositions[numberOfLights];
 
     // Directional lights
-    vec3 directionalLightPositions[numberOfLights];
-    vec3 directionalLightColors[numberOfLights];
+    vec3 dirLightDirections[numberOfLights];
+    vec3 dirLightColors[numberOfLights];
 };
 
 uniform Lights lights;
@@ -91,7 +91,8 @@ void main() {
         float distance = length(lights.pointLightPositions[i] - FragPos);
         float attenuation = 1.0 / (distance * distance);
 
-        vec3 radiance = lights.pointLightColors[i] * attenuation;        
+        vec3 pointLightRadiance = lights.pointLightColors[i] * attenuation;
+        vec3 dirLightRadiance = lights.dirLightColors[i] * max(dot(N, -lights.dirLightDirections[i]), 0.0) * Albedo.rgb;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, Roughness);
@@ -111,7 +112,8 @@ void main() {
         float NdotL = max(dot(N, L), 0.0);
 
         // Add to Lo
-        Lo += (kD * Albedo.rgb / PI + specular) * radiance * NdotL;
+        Lo += (kD * Albedo.rgb / PI + specular) * pointLightRadiance * NdotL; // Point light influence
+        Lo += dirLightRadiance;                                               // Dir light influence
     }
 
     // Irradiance (ambient light)
