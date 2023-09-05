@@ -29,8 +29,18 @@ uniform Textures textures;
 
 // Lights
 const int numberOfLights = 16;
-uniform vec3 pointLightPositions[numberOfLights];
-uniform vec3 pointLightColors[numberOfLights];
+struct Lights {
+
+    // Point lights
+    vec3 pointLightColors[numberOfLights];
+    vec3 pointLightPositions[numberOfLights];
+
+    // Directional lights
+    vec3 directionalLightPositions[numberOfLights];
+    vec3 directionalLightColors[numberOfLights];
+};
+
+uniform Lights lights;
 
 uniform vec3 viewPos; // Camera position
 
@@ -75,13 +85,13 @@ void main() {
     for (int i = 0; i < numberOfLights; i++) {
 
         // Calculate per-light radiance
-        vec3 L = normalize(pointLightPositions[i] - FragPos);
+        vec3 L = normalize(lights.pointLightPositions[i] - FragPos);
         vec3 H = normalize(V + L);
 
-        float distance = length(pointLightPositions[i] - FragPos);
+        float distance = length(lights.pointLightPositions[i] - FragPos);
         float attenuation = 1.0 / (distance * distance);
 
-        vec3 radiance = pointLightColors[i] * attenuation;        
+        vec3 radiance = lights.pointLightColors[i] * attenuation;        
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, Roughness);
