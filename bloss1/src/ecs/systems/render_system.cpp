@@ -4,6 +4,7 @@
 #include "renderer/shader.hpp"
 #include "renderer/skybox.hpp"
 #include "renderer/font.hpp"
+#include "renderer/shadow_map.hpp"
 #include "renderer/primitives/box.hpp"
 #include "renderer/primitives/line.hpp"
 #include "renderer/primitives/quad.hpp"
@@ -11,6 +12,7 @@
 
 namespace bls
 {
+    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer);
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
 
     // @TODO: oooooooooooffffff
@@ -27,11 +29,12 @@ namespace bls
         std::unordered_map<str, std::shared_ptr<Texture>> textures;
 
         Skybox* skybox;
+        std::unique_ptr<ShadowMap> shadow_map;
     };
 
     RenderState render_state;
 
-    void initialize()
+    void initialize(ECS& ecs)
     {
         render_state = { };
 
@@ -90,13 +93,22 @@ namespace bls
         // Create font
         render_state.fonts["inder"] = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
         render_state.fonts["lena"]  = Font::create("lena", "bloss1/assets/font/lena.ttf");
+
+        // Create shadow map
+        for (const auto& [id, dir_light] : ecs.dir_lights)
+        {
+            const auto& transform = ecs.transforms[id];
+            auto dir = transform->rotation;
+            dir.y *= -1.0f;
+            render_state.shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
+        }
     }
 
     void render_system(ECS& ecs, f32 dt)
     {
         if (!initialized)
         {
-            initialize();
+            initialize(ecs);
             initialized = true;
         }
 
@@ -118,6 +130,7 @@ namespace bls
         auto& skybox = render_state.skybox;
         auto& quad = render_state.quad;
         auto& fonts = render_state.fonts;
+        auto& shadow_map = render_state.shadow_map;
 
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
@@ -128,23 +141,9 @@ namespace bls
         renderer.clear();
         renderer.set_viewport(0, 0, width, height);
 
-        // Geometry pass: render scene data into gbuffer
-        // -------------------------------------------------------------------------------------------------------------
-        g_buffer->bind();
-        renderer.clear();
-
-        g_buffer_shader->bind();
-        g_buffer_shader->set_uniform4("projection", projection);
-        g_buffer_shader->set_uniform4("view", view);
-
-        // Render all entities
-        for (const auto& [id, model] : ecs.models)
+        // Update animators
+        for (auto& [id, model] : ecs.models)
         {
-            // Reset bone matrices
-            for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
-                g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", mat4(1.0f));
-
-            // Update animators
             auto animator = model->model->animator.get();
             if (animator)
             {
@@ -161,79 +160,31 @@ namespace bls
 
                 else
                     animator->update(dt);
-
-                // Update bone matrices
-                auto bone_matrices = animator->get_final_bone_matrices();
-                for (u32 i = 0; i < bone_matrices.size(); i++)
-                    g_buffer_shader->set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
-            }
-
-            // Remember: scale -> rotate -> translate
-            auto transform = ecs.transforms[id].get();
-            auto model_matrix = mat4(1.0f);
-
-            // Translate
-            model_matrix = translate(model_matrix, transform->position);
-
-            // @TODO: i dont know what im doing but it works
-
-            // Player model matrix
-            if (ecs.names[id] == "player")
-            {
-                // Rotate
-                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-                model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
-                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-            }
-
-            else
-            {
-                // Rotate
-                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-                model_matrix = rotate(model_matrix, radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
-                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-            }
-
-            // Scale
-            model_matrix = scale(model_matrix, transform->scale);
-
-            // Bind and update data to shader
-            g_buffer_shader->set_uniform4("model", model_matrix);
-
-            // Render the model
-            for (auto& mesh : model->model->meshes)
-            {
-                // Bind textures
-                for (u32 i = 0; i < mesh->textures.size(); i++)
-                {
-                    auto texture = mesh->textures[i];
-
-                    str type_name;
-                    auto type = texture->get_type();
-
-                    switch (type)
-                    {
-                        case TextureType::Diffuse:          type_name = "diffuse";   break;
-                        case TextureType::Specular:         type_name = "specular";  break;
-                        case TextureType::Normal:           type_name = "normal";    break;
-                        case TextureType::Metalness:        type_name = "metalness"; break;
-                        case TextureType::Roughness:        type_name = "roughness"; break;
-                        case TextureType::AmbientOcclusion: type_name = "ao";        break;
-
-                        default: std::cerr << "invalid texture type: '" << type << "'\n";
-                    }
-
-                    g_buffer_shader->set_uniform1("material." + type_name, i);
-                    texture->bind(i); // Offset the active samplers in the frag shader
-                }
-
-                mesh->vao->bind();
-                renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
-
-                // Reset
-                mesh->vao->unbind();
             }
         }
+
+        // @TODO: see if this can be done during geometry pass
+        // Render shadow map
+        shadow_map->bind();
+        render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
+        shadow_map->unbind();
+
+        // Reset the viewport
+        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
+        renderer.clear();
+        renderer.set_viewport(0, 0, width, height);
+
+        // Geometry pass: render scene data into gbuffer
+        // -------------------------------------------------------------------------------------------------------------
+        g_buffer->bind();
+        renderer.clear();
+
+        g_buffer_shader->bind();
+        g_buffer_shader->set_uniform4("projection", projection);
+        g_buffer_shader->set_uniform4("view", view);
+
+        // Render the scene
+        render_scene(ecs, *g_buffer_shader, renderer);
 
         g_buffer->unbind();
         g_buffer_shader->unbind();
@@ -246,6 +197,11 @@ namespace bls
 
         // Set camera position
         pbr_shader->set_uniform3("viewPos", position);
+
+        // Set light uniforms
+        pbr_shader->set_uniform3("lightDir", render_state.shadow_map->get_light_dir());
+        pbr_shader->set_uniform1("near", camera->near);
+        pbr_shader->set_uniform1("far", camera->far);
 
         // Set lights uniforms
         u32 light_counter = 0;
@@ -286,8 +242,9 @@ namespace bls
             tex_position--; // Traverse from back to front
         }
 
-        // Bind IBL maps
-        skybox->bind(*pbr_shader, 10);
+        // Bind maps
+        skybox->bind(*pbr_shader, 10);          // IBL maps
+        shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
 
         // Render light quad
         quad->render();
@@ -306,6 +263,93 @@ namespace bls
 
         // Render debug lines
         render_colliders(ecs, projection, view);
+    }
+
+    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer)
+    {
+        // Render all entities
+        for (const auto& [id, model] : ecs.models)
+        {
+            // Reset bone matrices
+            for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
+                shader.set_uniform4("finalBonesMatrices[" + to_str(i) + "]", mat4(1.0f));
+
+            // Update animators
+            auto animator = model->model->animator.get();
+            if (animator)
+            {
+                // Update bone matrices
+                auto bone_matrices = animator->get_final_bone_matrices();
+                for (u32 i = 0; i < bone_matrices.size(); i++)
+                    shader.set_uniform4("finalBonesMatrices[" + to_str(i) + "]", bone_matrices[i]);
+            }
+
+            // Remember: scale -> rotate -> translate
+            auto transform = ecs.transforms[id].get();
+            auto model_matrix = mat4(1.0f);
+
+            // Translate
+            model_matrix = translate(model_matrix, transform->position);
+
+            // @TODO: i dont know what im doing but it works
+
+            // Player model matrix
+            if (ecs.names[id] == "player")
+            {
+                // Rotate
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            }
+
+            else
+            {
+                // Rotate
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.y), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+            }
+
+            // Scale
+            model_matrix = scale(model_matrix, transform->scale);
+
+            // Bind and update data to shader
+            shader.set_uniform4("model", model_matrix);
+
+            // Render the model
+            for (auto& mesh : model->model->meshes)
+            {
+                // Bind textures
+                for (u32 i = 0; i < mesh->textures.size(); i++)
+                {
+                    auto texture = mesh->textures[i];
+
+                    str type_name;
+                    auto type = texture->get_type();
+
+                    switch (type)
+                    {
+                        case TextureType::Diffuse:          type_name = "diffuse";   break;
+                        case TextureType::Specular:         type_name = "specular";  break;
+                        case TextureType::Normal:           type_name = "normal";    break;
+                        case TextureType::Metalness:        type_name = "metalness"; break;
+                        case TextureType::Roughness:        type_name = "roughness"; break;
+                        case TextureType::AmbientOcclusion: type_name = "ao";        break;
+
+                        default: std::cerr << "invalid texture type: '" << type << "'\n";
+                    }
+
+                    shader.set_uniform1("material." + type_name, i);
+                    texture->bind(i); // Offset the active samplers in the frag shader
+                }
+
+                mesh->vao->bind();
+                renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
+
+                // Reset
+                mesh->vao->unbind();
+            }
+        }
     }
 
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view)
