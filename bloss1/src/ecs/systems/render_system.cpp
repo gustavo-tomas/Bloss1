@@ -123,6 +123,8 @@ namespace bls
         auto position = camera->position;
         auto projection = camera->projection_matrix;
         auto view = camera->view_matrix;
+        auto near = camera->near;
+        auto far = camera->far;
 
         auto& shaders = render_state.shaders;
         auto& textures = render_state.textures;
@@ -198,10 +200,14 @@ namespace bls
         // Set camera position
         pbr_shader->set_uniform3("viewPos", position);
 
+        // Set fog uniforms
+        pbr_shader->set_uniform3("fogColor", vec3(0.5f));
+        pbr_shader->set_uniform2("fogMinMax", vec2(far / 3.0f, far));
+
         // Set light uniforms
         pbr_shader->set_uniform3("lightDir", render_state.shadow_map->get_light_dir());
-        pbr_shader->set_uniform1("near", camera->near);
-        pbr_shader->set_uniform1("far", camera->far);
+        pbr_shader->set_uniform1("near", near);
+        pbr_shader->set_uniform1("far", far);
 
         // Set lights uniforms
         u32 light_counter = 0;
