@@ -154,6 +154,19 @@ namespace bls
             f32 time;
     };
 
+    // @TODO: same problem as model
+    class Font;
+    class Text : public Component
+    {
+        public:
+            Text(Font* font, str text, const vec3& color)
+                : font(font), text(text), color(color) { }
+
+            Font* font;
+            str text;
+            vec3 color;
+    };
+
     // Key frame for animating transforms
     struct KeyFrame
     {

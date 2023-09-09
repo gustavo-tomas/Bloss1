@@ -50,6 +50,12 @@ namespace bls
         point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
         point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
         point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
+
+        // Add some text
+        text(*ecs,
+             Transform(vec3(20.0f), vec3(0.0f), vec3(0.5f)),
+             "Very high impact text",
+             vec3(0.4f, 0.6f, 0.8f));
     }
 
     void TestStage::update(f32 dt)

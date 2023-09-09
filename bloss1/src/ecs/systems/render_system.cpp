@@ -14,6 +14,7 @@ namespace bls
 {
     void render_scene(ECS& ecs, Shader& shader, Renderer& renderer);
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
+    void render_texts(ECS& ecs);
 
     // @TODO: oooooooooooffffff
     static bool initialized = false;
@@ -25,7 +26,6 @@ namespace bls
         std::unique_ptr<RenderBuffer> render_buffer;
         std::map<str, std::shared_ptr<Shader>> shaders;
 
-        std::map<str, std::shared_ptr<Font>> fonts;
         std::unordered_map<str, std::shared_ptr<Texture>> textures;
 
         Skybox* skybox;
@@ -90,10 +90,6 @@ namespace bls
         // Create a quad for rendering
         render_state.quad = std::make_unique<Quad>(renderer);
 
-        // Create font
-        render_state.fonts["inder"] = Font::create("inder_regular", "bloss1/assets/font/inder_regular.ttf");
-        render_state.fonts["lena"]  = Font::create("lena", "bloss1/assets/font/lena.ttf");
-
         // Create shadow map
         for (const auto& [id, dir_light] : ecs.dir_lights)
         {
@@ -131,7 +127,6 @@ namespace bls
         auto& g_buffer = render_state.g_buffer;
         auto& skybox = render_state.skybox;
         auto& quad = render_state.quad;
-        auto& fonts = render_state.fonts;
         auto& shadow_map = render_state.shadow_map;
 
         // Shaders - by now they should have been initialized
@@ -256,19 +251,18 @@ namespace bls
         quad->render();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
-        // -----------------------------------------------------------------------------------------------------------------
+        // -------------------------------------------------------------------------------------------------------------
         g_buffer->bind_and_blit(width, height);
         g_buffer->unbind();
 
         // Draw the skybox last
         skybox->draw(view, projection);
 
-        // Render text
-        fonts["inder"]->render("owowowowow", 20.0f, 20.0f, 0.5f, { 0.95f, 0.6f, 0.4f });
-        fonts["lena"]->render("lalala", 600.0f, 400.0f, 0.75f, { 0.4f, 0.6f, 0.8f });
-
         // Render debug lines
         render_colliders(ecs, projection, view);
+
+        // Render texts
+        render_texts(ecs);
     }
 
     void render_scene(ECS& ecs, Shader& shader, Renderer& renderer)
@@ -355,6 +349,17 @@ namespace bls
                 // Reset
                 mesh->vao->unbind();
             }
+        }
+    }
+
+    void render_texts(ECS& ecs)
+    {
+        auto& texts = ecs.texts;
+        auto& transforms = ecs.transforms;
+        for (const auto& [id, text] : texts)
+        {
+            auto transform = transforms[id].get();
+            text->font->render(text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
         }
     }
 

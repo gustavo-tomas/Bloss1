@@ -85,6 +85,7 @@ namespace bls
             std::map<u32, std::unique_ptr<Timer>> timers;
             std::map<u32, std::unique_ptr<Camera>> cameras;
             std::map<u32, std::unique_ptr<CameraController>> camera_controllers;
+            std::map<u32, std::unique_ptr<Text>> texts;
 
         private:
             // Entities IDs
