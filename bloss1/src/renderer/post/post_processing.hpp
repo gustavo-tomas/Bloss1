@@ -6,11 +6,6 @@
 
 namespace bls
 {
-    enum RenderPassType
-    {
-        Base, Fog
-    };
-
     class RenderPass
     {
         public:
