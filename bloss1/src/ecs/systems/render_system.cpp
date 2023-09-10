@@ -13,6 +13,8 @@
 
 namespace bls
 {
+    void initialize(ECS& ecs);
+
     void render_scene(ECS& ecs, Shader& shader, Renderer& renderer);
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
     void render_texts(ECS& ecs);
@@ -29,7 +31,7 @@ namespace bls
 
         std::unordered_map<str, std::shared_ptr<Texture>> textures;
 
-        Skybox* skybox;
+        std::unique_ptr<Skybox> skybox;
         std::unique_ptr<ShadowMap> shadow_map;
         std::unique_ptr<PostProcessingTexture> post_processing;
     };
@@ -86,7 +88,7 @@ namespace bls
 
         // Create a skybox
         // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        render_state.skybox = Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10);
+        render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10));
         // render_state.skybox = Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10);
 
         // Create a quad for rendering
