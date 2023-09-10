@@ -6,15 +6,15 @@
 
 namespace bls
 {
-    enum RenderPass
+    enum RenderPassType
     {
         Base, Fog
     };
 
-    class PostProcessingTexture
+    class RenderPass
     {
         public:
-            PostProcessingTexture(u32 width, u32 height)
+            RenderPass(u32 width, u32 height)
             {
                 this->width = width;
                 this->height = height;
@@ -34,7 +34,7 @@ namespace bls
                 quad = std::make_unique<Quad>(Game::get().get_renderer());
             }
 
-            virtual ~PostProcessingTexture()
+            virtual ~RenderPass()
             {
                 std::cout << "post processing texture destroyed successfully\n";
             }
@@ -71,10 +71,10 @@ namespace bls
             std::unique_ptr<RenderBuffer> rbo_depth;
     };
 
-    class BasePass : public PostProcessingTexture
+    class BasePass : public RenderPass
     {
         public:
-            BasePass(u32 width, u32 height) : PostProcessingTexture(width, height)
+            BasePass(u32 width, u32 height) : RenderPass(width, height)
             {
                 shader = Shader::create("base_pass", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/base.fs");
                 shader->bind();
@@ -82,12 +82,12 @@ namespace bls
             }
     };
 
-    class FogPass : public PostProcessingTexture
+    class FogPass : public RenderPass
     {
         public:
             FogPass(u32 width, u32 height,
                     const vec3& fog_color, const vec2& min_max, const vec3& camera_position, Texture* g_buffer_position)
-                : PostProcessingTexture(width, height),
+                : RenderPass(width, height),
                   fog_color(fog_color),
                   min_max(min_max),
                   camera_position(camera_position),
@@ -134,9 +134,9 @@ namespace bls
                 std::cout << "post processing system destroyed successfully\n";
             }
 
-            void add_render_pass(PostProcessingTexture* texture)
+            void add_render_pass(RenderPass* texture)
             {
-                render_passes.push_back(std::unique_ptr<PostProcessingTexture>(texture));
+                render_passes.push_back(std::unique_ptr<RenderPass>(texture));
             }
 
             void begin()
@@ -167,6 +167,6 @@ namespace bls
             }
 
         private:
-            std::vector<std::unique_ptr<PostProcessingTexture>> render_passes;
+            std::vector<std::unique_ptr<RenderPass>> render_passes;
     };
 };
