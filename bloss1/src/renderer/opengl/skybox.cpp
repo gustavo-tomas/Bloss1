@@ -227,7 +227,7 @@ namespace bls
         glDeleteTextures(1, &irradiance_map);
         glDeleteTextures(1, &brdf_texture);
 
-        std::cout << "cubemap destroyed successfully\n";
+        std::cout << "skybox destroyed successfully\n";
     }
 
     void OpenGLSkybox::bind(Shader& shader, u32 slot)
