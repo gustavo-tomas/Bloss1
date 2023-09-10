@@ -5,6 +5,7 @@
 #include "renderer/skybox.hpp"
 #include "renderer/font.hpp"
 #include "renderer/shadow_map.hpp"
+#include "renderer/post_processing.hpp"
 #include "renderer/primitives/box.hpp"
 #include "renderer/primitives/line.hpp"
 #include "renderer/primitives/quad.hpp"
@@ -30,6 +31,7 @@ namespace bls
 
         Skybox* skybox;
         std::unique_ptr<ShadowMap> shadow_map;
+        std::unique_ptr<PostProcessingTexture> post_processing;
     };
 
     RenderState render_state;
@@ -98,6 +100,9 @@ namespace bls
             dir.y *= -1.0f;
             render_state.shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
         }
+
+        // Create texture for post processing
+        render_state.post_processing = std::make_unique<PostProcessingTexture>(width, height);
     }
 
     void render_system(ECS& ecs, f32 dt)
@@ -128,6 +133,7 @@ namespace bls
         auto& skybox = render_state.skybox;
         auto& quad = render_state.quad;
         auto& shadow_map = render_state.shadow_map;
+        auto& post_processing = render_state.post_processing;
 
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
@@ -247,8 +253,15 @@ namespace bls
         skybox->bind(*pbr_shader, 10);          // IBL maps
         shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
 
+        // Bind texture for post processing
+        post_processing->bind();
+
         // Render light quad
         quad->render();
+
+        // Render post processing scene
+        post_processing->unbind();
+        post_processing->render();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
         // -------------------------------------------------------------------------------------------------------------
