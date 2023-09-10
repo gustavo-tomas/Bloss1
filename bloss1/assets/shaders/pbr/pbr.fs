@@ -48,10 +48,6 @@ uniform float near;
 uniform float far;
 uniform vec3 lightDir; // Light direction for shadow mapping
 
-// Fog
-uniform vec3 fogColor; // Color for fog calculation
-uniform vec2 fogMinMax; // Range of the fog relative to the camera
-
 // Shadow mapping
 uniform float cascadePlaneDistances[16];
 uniform int cascadeCount;   // number of frusta - 1
@@ -68,7 +64,6 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 FresnelSchlick(float cosTheta, vec3 F0);
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 float DirectShadowCalculation(vec3 fragPosWorldSpace, vec3 normalizedNormal, float Depth);
-float CalculateFog(vec3 fragPos);
 
 void main() {
 
@@ -161,11 +156,8 @@ void main() {
     // Gamma correction
     color = pow(color, vec3(1.0 / 2.2));
 
-    // Fog influence
-    float fogFactor = CalculateFog(FragPos);
-
     // Final color
-    fragColor = mix(vec4(fogColor, 1.0), vec4(color, 1.0), fogFactor);
+    fragColor = vec4(color, 1.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -267,13 +259,4 @@ float DirectShadowCalculation(vec3 fragPosWorldSpace, vec3 normalizedNormal, flo
     shadow /= 9.0;
 
     return shadow;
-}
-
-float CalculateFog(vec3 fragPos) {
-    // Fog increases as distance to camera increases
-    float dist = length(fragPos - viewPos);
-    float fogFactor = (fogMinMax.y - dist) / (fogMinMax.y - fogMinMax.x);
-    fogFactor = clamp(fogFactor, 0.0, 1.0);
-
-    return fogFactor;
 }

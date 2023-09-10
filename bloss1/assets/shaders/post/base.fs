@@ -6,8 +6,8 @@ in VS_OUT {
     vec2 TexCoords;
 } fs_in;
 
-uniform sampler2D fbo_texture;
+uniform sampler2D screenTexture;
 
 void main() {
-    fragColor = texture(fbo_texture, fs_in.TexCoords);
+    fragColor = texture(screenTexture, fs_in.TexCoords);
 }

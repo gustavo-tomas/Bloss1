@@ -33,7 +33,7 @@ namespace bls
 
         std::unique_ptr<Skybox> skybox;
         std::unique_ptr<ShadowMap> shadow_map;
-        std::unique_ptr<PostProcessingTexture> post_processing;
+        std::unique_ptr<PostProcessingSystem> post_processing;
     };
 
     RenderState render_state;
@@ -103,8 +103,12 @@ namespace bls
             render_state.shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
         }
 
-        // Create texture for post processing
-        render_state.post_processing = std::make_unique<PostProcessingTexture>(width, height);
+        // Create post processing system
+        render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
+        render_state.post_processing->add_render_pass(new FogPass(width, height,
+                vec3(0.5f),
+                vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
+                ecs.cameras[0].get()->position, render_state.textures["position"].get()));
     }
 
     void render_system(ECS& ecs, f32 dt)
@@ -203,10 +207,6 @@ namespace bls
         // Set camera position
         pbr_shader->set_uniform3("viewPos", position);
 
-        // Set fog uniforms
-        pbr_shader->set_uniform3("fogColor", vec3(0.5f));
-        pbr_shader->set_uniform2("fogMinMax", vec2(far / 3.0f, far));
-
         // Set light uniforms
         pbr_shader->set_uniform3("lightDir", render_state.shadow_map->get_light_dir());
         pbr_shader->set_uniform1("near", near);
@@ -255,14 +255,12 @@ namespace bls
         skybox->bind(*pbr_shader, 10);          // IBL maps
         shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
 
-        // Bind texture for post processing
-        post_processing->bind();
+        // Begin post processing process
+        post_processing->begin();
+        quad->render();      // Render light quad
+        post_processing->end();
 
-        // Render light quad
-        quad->render();
-
-        // Render post processing scene
-        post_processing->unbind();
+        // Render all passes
         post_processing->render();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
