@@ -5,7 +5,7 @@
 #include "renderer/skybox.hpp"
 #include "renderer/font.hpp"
 #include "renderer/shadow_map.hpp"
-#include "renderer/post_processing.hpp"
+#include "renderer/post/post_processing.hpp"
 #include "renderer/primitives/box.hpp"
 #include "renderer/primitives/line.hpp"
 #include "renderer/primitives/quad.hpp"

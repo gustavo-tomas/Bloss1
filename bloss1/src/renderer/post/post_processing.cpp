@@ -1,4 +1,4 @@
-#include "renderer/post_processing.hpp"
+#include "renderer/post/post_processing.hpp"
 #include "core/game.hpp"
 
 namespace bls
