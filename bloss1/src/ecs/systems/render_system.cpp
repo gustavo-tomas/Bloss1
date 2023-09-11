@@ -105,6 +105,7 @@ namespace bls
 
         // Create post processing system
         render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
+        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0, 0.4, 0.325));
         render_state.post_processing->add_render_pass(new FogPass(width, height,
                 vec3(0.5f),
                 vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
@@ -272,7 +273,7 @@ namespace bls
         skybox->draw(view, projection);
 
         // Render debug lines
-        render_colliders(ecs, projection, view);
+        // render_colliders(ecs, projection, view);
 
         // Render texts
         render_texts(ecs);

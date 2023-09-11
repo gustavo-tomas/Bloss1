@@ -114,6 +114,40 @@ namespace bls
             Texture* g_buffer_position;
     };
 
+    class BloomPass : public RenderPass
+    {
+        public:
+            BloomPass(u32 width, u32 height,
+                      u32 samples, f32 spread, f32 threshold, f32 amount)
+                : RenderPass(width, height),
+                  samples(samples), spread(spread), threshold(threshold), amount(amount)
+            {
+                shader = Shader::create("bloom", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/bloom.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
+                shader->set_uniform2("widthHeight", vec2(width, height));
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform1("samples", samples);
+                shader->set_uniform1("spread", spread);
+                shader->set_uniform1("threshold", threshold);
+                shader->set_uniform1("amount", amount);
+
+                fbo_texture->bind(0);
+
+                quad->render();
+            }
+
+            u32 samples;
+            f32 spread;
+            f32 threshold;
+            f32 amount;
+    };
+
     class PostProcessingSystem
     {
         public:
