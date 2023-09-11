@@ -148,6 +148,30 @@ namespace bls
             f32 amount;
     };
 
+    class SharpenPass : public RenderPass
+    {
+        public:
+            SharpenPass(u32 width, u32 height, f32 amount)
+                : RenderPass(width, height), amount(amount)
+            {
+                shader = Shader::create("sharpen", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/sharpen.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
+                shader->set_uniform2("widthHeight", vec2(width, height));
+            }
+
+            void render()
+            {
+                shader->bind();
+                shader->set_uniform1("amount", amount);
+
+                fbo_texture->bind(0);
+                quad->render();
+            }
+
+            f32 amount;
+    };
+
     class PostProcessingSystem
     {
         public:
