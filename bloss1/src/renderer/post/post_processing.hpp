@@ -81,17 +81,17 @@ namespace bls
     {
         public:
             FogPass(u32 width, u32 height,
-                    const vec3& fog_color, const vec2& min_max, const vec3& camera_position, Texture* g_buffer_position)
+                    const vec3& fog_color, const vec2& min_max, const vec3& camera_position, Texture* position_texture)
                 : RenderPass(width, height),
                   fog_color(fog_color),
                   min_max(min_max),
                   camera_position(camera_position),
-                  g_buffer_position(g_buffer_position)
+                  position_texture(position_texture)
             {
                 shader = Shader::create("fog", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/fog.fs");
                 shader->bind();
                 shader->set_uniform1("textures.screenTexture", 0U);
-                shader->set_uniform1("textures.position", 1U);
+                shader->set_uniform1("textures.positionTexture", 1U);
             }
 
             void render()
@@ -103,7 +103,7 @@ namespace bls
                 shader->set_uniform3("viewPos", camera_position);
 
                 screen_texture->bind(0);
-                g_buffer_position->bind(1);
+                position_texture->bind(1);
 
                 quad->render();
             }
@@ -111,7 +111,7 @@ namespace bls
             vec3 fog_color;
             vec2 min_max;
             const vec3& camera_position;
-            Texture* g_buffer_position;
+            Texture* position_texture;
     };
 
     class BloomPass : public RenderPass
@@ -125,7 +125,6 @@ namespace bls
                 shader = Shader::create("bloom", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/bloom.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
-                shader->set_uniform2("widthHeight", vec2(width, height));
             }
 
             void render()
@@ -157,7 +156,6 @@ namespace bls
                 shader = Shader::create("sharpen", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/sharpen.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
-                shader->set_uniform2("widthHeight", vec2(width, height));
             }
 
             void render()
@@ -204,7 +202,6 @@ namespace bls
                 shader = Shader::create("pixelization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/pixelization.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
-                shader->set_uniform2("widthHeight", vec2(width, height));
             }
 
             void render()

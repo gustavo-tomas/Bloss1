@@ -9,9 +9,10 @@ in VS_OUT {
 uniform sampler2D screenTexture;
 
 uniform int pixelSize;
-uniform vec2 widthHeight;
 
 void main() {
+
+    vec2 texSize = textureSize(screenTexture, 0).xy;
 
     float x = int(gl_FragCoord.x) % pixelSize;
     float y = int(gl_FragCoord.y) % pixelSize;
@@ -22,5 +23,5 @@ void main() {
     x = gl_FragCoord.x + x;
     y = gl_FragCoord.y + y;
 
-    fragColor = texture(screenTexture, vec2(x, y) / widthHeight);
+    fragColor = texture(screenTexture, vec2(x, y) / texSize);
 }

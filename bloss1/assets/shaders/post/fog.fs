@@ -9,7 +9,7 @@ in VS_OUT {
 // Textures
 struct Textures {
     sampler2D screenTexture;
-    sampler2D position;
+    sampler2D positionTexture;
 };
 
 uniform Textures textures;
@@ -20,7 +20,7 @@ uniform vec2 fogMinMax; // Range of the fog relative to the camera
 
 void main() {
 
-    vec3 FragPos = texture(textures.position, fs_in.TexCoords).rgb;
+    vec3 FragPos = texture(textures.positionTexture, fs_in.TexCoords).rgb;
     vec4 color = texture(textures.screenTexture, fs_in.TexCoords);
 
     // Fog influence

@@ -13,8 +13,6 @@ uniform float spread;
 uniform float threshold;
 uniform float amount;
 
-uniform vec2 widthHeight;
-
 void main() {
 
     float value = 0.0;
@@ -23,9 +21,11 @@ void main() {
     vec4 result = vec4(0.0);
     vec4 screenColor = texture(screenTexture, fs_in.TexCoords);
 
+    vec2 texSize = textureSize(screenTexture, 0).xy;
+
     for (int i = -samples; i <= samples; i++) {
         for (int j = -samples; j <= samples; j++) {
-            vec4 color = texture(screenTexture, (gl_FragCoord.xy + (vec2(i, j) * spread)) / widthHeight);
+            vec4 color = texture(screenTexture, (gl_FragCoord.xy + (vec2(i, j) * spread)) / texSize);
 
             value = max(color.r, max(color.g, color.b));
             if (value < threshold) {
