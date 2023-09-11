@@ -16,11 +16,11 @@ namespace bls
 
                 // Create a fbo and a color attachment texture to render the scene
                 fbo = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
-                fbo_texture = Texture::create(width, height,
-                                              ImageFormat::RGB8,
-                                              TextureParameter::Repeat, TextureParameter::Repeat,
-                                              TextureParameter::Linear, TextureParameter::Linear);
-                fbo->attach_texture(fbo_texture.get());
+                screen_texture = Texture::create(width, height,
+                                                 ImageFormat::RGB8,
+                                                 TextureParameter::Repeat, TextureParameter::Repeat,
+                                                 TextureParameter::Linear, TextureParameter::Linear);
+                fbo->attach_texture(screen_texture.get());
                 rbo_depth = std::unique_ptr<RenderBuffer>(RenderBuffer::create(width, height, AttachmentType::Depth));
 
                 fbo->check();
@@ -52,7 +52,7 @@ namespace bls
             virtual void render()
             {
                 shader->bind();
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
                 quad->render();
             }
 
@@ -62,7 +62,7 @@ namespace bls
             std::shared_ptr<Shader> shader;
             std::unique_ptr<Quad> quad;
             std::unique_ptr<FrameBuffer> fbo;
-            std::shared_ptr<Texture> fbo_texture;
+            std::shared_ptr<Texture> screen_texture;
             std::unique_ptr<RenderBuffer> rbo_depth;
     };
 
@@ -102,7 +102,7 @@ namespace bls
                 shader->set_uniform3("fogColor", fog_color);
                 shader->set_uniform3("viewPos", camera_position);
 
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
                 g_buffer_position->bind(1);
 
                 quad->render();
@@ -137,7 +137,7 @@ namespace bls
                 shader->set_uniform1("threshold", threshold);
                 shader->set_uniform1("amount", amount);
 
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
 
                 quad->render();
             }
@@ -165,7 +165,7 @@ namespace bls
                 shader->bind();
                 shader->set_uniform1("amount", amount);
 
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
                 quad->render();
             }
 
@@ -188,7 +188,7 @@ namespace bls
                 shader->bind();
                 shader->set_uniform1("levels", levels);
 
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
                 quad->render();
             }
 
@@ -212,7 +212,7 @@ namespace bls
                 shader->bind();
                 shader->set_uniform1("pixelSize", pixel_size);
 
-                fbo_texture->bind(0);
+                screen_texture->bind(0);
                 quad->render();
             }
 
