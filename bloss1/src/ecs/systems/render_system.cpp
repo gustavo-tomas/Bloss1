@@ -105,12 +105,13 @@ namespace bls
 
         // Create post processing system
         render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
-        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
-        render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
         render_state.post_processing->add_render_pass(new FogPass(width, height,
                 vec3(0.5f),
                 vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
                 ecs.cameras[0].get()->position, render_state.textures["position"].get()));
+        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
+        // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
+        render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
     }
 
     void render_system(ECS& ecs, f32 dt)

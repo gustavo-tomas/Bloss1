@@ -172,6 +172,29 @@ namespace bls
             f32 amount;
     };
 
+    class PosterizationPass : public RenderPass
+    {
+        public:
+            PosterizationPass(u32 width, u32 height, f32 levels)
+                : RenderPass(width, height), levels(levels)
+            {
+                shader = Shader::create("posterization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/posterization.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+                shader->set_uniform1("levels", levels);
+
+                fbo_texture->bind(0);
+                quad->render();
+            }
+
+            f32 levels;
+    };
+
     class PostProcessingSystem
     {
         public:
