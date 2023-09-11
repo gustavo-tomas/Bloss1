@@ -112,6 +112,7 @@ namespace bls
         render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
         // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
         render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
+        render_state.post_processing->add_render_pass(new PixelizationPass(width, height, 4));
     }
 
     void render_system(ECS& ecs, f32 dt)

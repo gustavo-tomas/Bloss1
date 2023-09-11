@@ -195,6 +195,30 @@ namespace bls
             f32 levels;
     };
 
+    class PixelizationPass : public RenderPass
+    {
+        public:
+            PixelizationPass(u32 width, u32 height, u32 pixel_size)
+                : RenderPass(width, height), pixel_size(pixel_size)
+            {
+                shader = Shader::create("pixelization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/pixelization.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
+                shader->set_uniform2("widthHeight", vec2(width, height));
+            }
+
+            void render()
+            {
+                shader->bind();
+                shader->set_uniform1("pixelSize", pixel_size);
+
+                fbo_texture->bind(0);
+                quad->render();
+            }
+
+            u32 pixel_size;
+    };
+
     class PostProcessingSystem
     {
         public:
