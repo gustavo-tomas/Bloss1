@@ -1,6 +1,7 @@
 #include "ecs/entities.hpp"
 #include "core/game.hpp"
 #include "renderer/model.hpp"
+#include "renderer/font.hpp"
 
 namespace bls
 {
@@ -50,7 +51,7 @@ namespace bls
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
                                 5.0f, 5.0f, 5.0f,
-                                vec3(0.0f, 10.0f, 0.0f));
+                                vec3(0.0f, 5.0f, 0.0f));
 
         return id;
     }
@@ -87,8 +88,8 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                transform.scale.x * 10.0f, transform.scale.y * 1.0f, transform.scale.z * 10.0f,
-                                vec3(0.0f),
+                                transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f,
+                                vec3(0.0f, -transform.scale.y * 20.0f, 0.0f),
                                 true);
 
         return id;
@@ -120,6 +121,19 @@ namespace bls
         ecs.names[id] = "point_light";
         ecs.point_lights[id] = std::make_unique<PointLight>(light);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
+
+        return id;
+    }
+
+    u32 text(ECS& ecs, const Transform& transform, const str& text, const vec3& color)
+    {
+        u32 id = ecs.get_id();
+
+        auto font = Font::create("inder", "bloss1/assets/font/inder_regular.ttf");
+
+        ecs.names[id] = "text";
+        ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.texts[id] = std::make_unique<Text>(font.get(), text, color);
 
         return id;
     }

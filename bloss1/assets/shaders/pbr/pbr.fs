@@ -23,16 +23,38 @@ struct Textures {
     samplerCube irradianceMap;
     samplerCube prefilterMap;
     sampler2D brdfLut;
+    sampler2DArray shadowMap;
 };
 
 uniform Textures textures;
 
 // Lights
 const int numberOfLights = 16;
-uniform vec3 pointLightPositions[numberOfLights];
-uniform vec3 pointLightColors[numberOfLights];
+struct Lights {
+
+    // Point lights
+    vec3 pointLightColors[numberOfLights];
+    vec3 pointLightPositions[numberOfLights];
+
+    // Directional lights
+    vec3 dirLightDirections[numberOfLights];
+    vec3 dirLightColors[numberOfLights];
+};
+
+uniform Lights lights;
 
 uniform vec3 viewPos; // Camera position
+uniform float near;
+uniform float far;
+uniform vec3 lightDir; // Light direction for shadow mapping
+
+// Shadow mapping
+uniform float cascadePlaneDistances[16];
+uniform int cascadeCount;   // number of frusta - 1
+
+layout (std140, binding = 0) uniform LightSpaceMatrices {
+    mat4 lightSpaceMatrices[16];
+};
 
 const float PI = 3.14159265359;
 
@@ -41,6 +63,7 @@ float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 FresnelSchlick(float cosTheta, vec3 F0);
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
+float DirectShadowCalculation(vec3 fragPosWorldSpace, vec3 normalizedNormal, float Depth);
 
 void main() {
 
@@ -70,18 +93,22 @@ void main() {
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, Albedo.rgb, Metalness);
 
+    // Direct shadow
+    float directShadow = DirectShadowCalculation(FragPos, N, Depth);
+
     // Reflectance equation
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < numberOfLights; i++) {
 
         // Calculate per-light radiance
-        vec3 L = normalize(pointLightPositions[i] - FragPos);
+        vec3 L = normalize(lights.pointLightPositions[i] - FragPos);
         vec3 H = normalize(V + L);
 
-        float distance = length(pointLightPositions[i] - FragPos);
+        float distance = length(lights.pointLightPositions[i] - FragPos);
         float attenuation = 1.0 / (distance * distance);
 
-        vec3 radiance = pointLightColors[i] * attenuation;        
+        vec3 pointLightRadiance = lights.pointLightColors[i] * attenuation;
+        vec3 dirLightRadiance = lights.dirLightColors[i] * max(dot(N, -lights.dirLightDirections[i]), 0.0) * Albedo.rgb;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, Roughness);
@@ -101,7 +128,8 @@ void main() {
         float NdotL = max(dot(N, L), 0.0);
 
         // Add to Lo
-        Lo += (kD * Albedo.rgb / PI + specular) * radiance * NdotL;
+        Lo += (kD * Albedo.rgb / PI + specular) * pointLightRadiance * NdotL; // Point light influence
+        Lo += dirLightRadiance;                                               // Dir light influence
     }
 
     // Irradiance (ambient light)
@@ -120,7 +148,7 @@ void main() {
 
     vec3 ambient = (kD * diffuse + specular) * AO;
 
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + ((1.0 - directShadow) * Lo);
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));
@@ -170,4 +198,65 @@ vec3 FresnelSchlick(float cosTheta, vec3 F0) {
 
 vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+float LinearizeDepth(float depth) {
+    float z = depth * 2.0 - 1.0; // Convert to NDC [0,1] -> [-1,1]
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
+float DirectShadowCalculation(vec3 fragPosWorldSpace, vec3 normalizedNormal, float Depth) {
+    // Select cascade layer
+    float depthValue = abs(LinearizeDepth(Depth));
+
+    int layer = -1;
+    for (int i = 0; i < cascadeCount; i++) {
+        if (depthValue < cascadePlaneDistances[i]) {
+            layer = i;
+            break;
+        }
+    }
+
+    if (layer == -1) {
+        layer = cascadeCount;
+    }
+
+    vec4 fragPosLightSpace = lightSpaceMatrices[layer] * vec4(fragPosWorldSpace, 1.0);
+
+    // Perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+    // Transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+
+    // Get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+
+    // Keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if (currentDepth > 1.0) {
+        return 0.0;
+    }
+
+    // Calculate bias (based on depth map resolution and slope)
+    float bias = max(0.05 * (1.0 - dot(normalizedNormal, lightDir)), 0.005);
+    const float biasModifier = 0.5;
+
+    if (layer == cascadeCount) {
+        bias *= 1 / (far * biasModifier);
+    } else {
+        bias *= 1 / (cascadePlaneDistances[layer] * biasModifier);
+    }
+
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(textures.shadowMap, 0));
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            float pcfDepth = texture(textures.shadowMap, vec3(projCoords.xy + vec2(x, y) * texelSize, layer)).r;
+            shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 9.0;
+
+    return shadow;
 }

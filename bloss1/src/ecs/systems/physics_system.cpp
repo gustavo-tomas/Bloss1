@@ -16,8 +16,40 @@ namespace bls
     Collision test_collision(ECS& ecs, u32 id_a, u32 id_b);
     void solve_collision(ECS& ecs, u32 id_a, u32 id_b, Collision collision);
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt);
+    void update_physics(ECS& ecs, f32 dt);
 
+    f64 accumulator = 0.0;
     void physics_system(ECS& ecs, f32 dt)
+    {
+        // Clamp dt to a higher bound
+        dt = clamp(static_cast<f64>(dt), 0.0, 0.1);
+
+        auto& transforms = ecs.transforms;
+        auto& objects = ecs.physics_objects;
+        auto& colliders = ecs.colliders;
+
+        std::map<u32, Transform*> previous_transforms;
+
+        // Run physics integration in a fixed dt
+        accumulator += dt;
+        while (accumulator >= dt)
+        {
+            // Save previous state
+            for (const auto& [id, object] : objects)
+                previous_transforms[id] = transforms[id].get();
+
+            update_physics(ecs, dt);
+            accumulator -= dt;
+        }
+
+        // Interpolate previous and current state
+        const f64 alpha = accumulator / dt;
+        for (const auto& [id, object] : objects)
+            if (!colliders[id]->immovable)
+                transforms[id]->position = mix(transforms[id]->position, previous_transforms[id]->position, alpha);
+    }
+
+    void update_physics(ECS& ecs, f32 dt)
     {
         resolve_collisions(ecs);
 
@@ -79,8 +111,11 @@ namespace bls
         auto collider_a = ecs.colliders[id_a].get();
         auto collider_b = ecs.colliders[id_b].get();
 
-        auto trans_a = ecs.transforms[id_a].get();
-        auto trans_b = ecs.transforms[id_b].get();
+        auto trans_a = *ecs.transforms[id_a].get();
+        auto trans_b = *ecs.transforms[id_b].get();
+
+        trans_a.position += collider_a->offset;
+        trans_b.position += collider_b->offset;
 
         Collision collision = { };
 
@@ -101,15 +136,15 @@ namespace bls
 
             // Point where the box 'begins'
             vec3 min_aabb = vec3(0.0f);
-            min_aabb.x = trans_a->position.x - col_a->width;
-            min_aabb.y = trans_a->position.y - col_a->height;
-            min_aabb.z = trans_a->position.z - col_a->depth;
+            min_aabb.x = trans_a.position.x - col_a->width;
+            min_aabb.y = trans_a.position.y - col_a->height;
+            min_aabb.z = trans_a.position.z - col_a->depth;
 
             // Point where the box 'ends'
             vec3 max_aabb = vec3(0.0f);
-            max_aabb.x = trans_a->position.x + col_a->width;
-            max_aabb.y = trans_a->position.y + col_a->height;
-            max_aabb.z = trans_a->position.z + col_a->depth;
+            max_aabb.x = trans_a.position.x + col_a->width;
+            max_aabb.y = trans_a.position.y + col_a->height;
+            max_aabb.z = trans_a.position.z + col_a->depth;
 
             // 1) find point 'pbox' on box the closest to the sphere centre.
             vec3 closest_point_aabb;
@@ -117,14 +152,14 @@ namespace bls
             // For each coordinate axis, if the point coordinate value is
             // outside box, clamp it to the box, else keep it as is
             for (u32 i = 0; i < 3; i++)
-                closest_point_aabb[i] = clamp(trans_b->position[i], min_aabb[i], max_aabb[i]);
+                closest_point_aabb[i] = clamp(trans_b.position[i], min_aabb[i], max_aabb[i]);
 
             // 2) if 'pbox' is outside the sphere no collision.
-            f32 dist_aabb_to_sphere = distance(closest_point_aabb, trans_b->position);
+            f32 dist_aabb_to_sphere = distance(closest_point_aabb, trans_b.position);
             if (dist_aabb_to_sphere < col_b->radius)
             {
                 // 3) find point 'pshpere' on sphere surface the closest to point 'pbox'.
-                vec3 closest_point_sphere = trans_b->position + normalize(closest_point_aabb - trans_b->position) * col_b->radius;
+                vec3 closest_point_sphere = trans_b.position + normalize(closest_point_aabb - trans_b.position) * col_b->radius;
 
                 if (length(closest_point_sphere - closest_point_aabb) > 0.0f)
                 {
@@ -145,14 +180,14 @@ namespace bls
 
             // Insert tolerance to avoid equal points
             const f32 TOL = 0.002;
-            f32 dist = distance(trans_a->position, trans_b->position);
+            f32 dist = distance(trans_a.position, trans_b.position);
             if (dist < col_a->radius + col_b->radius - TOL)
             {
                 // SphereA closest point to SphereB
-                vec3 vector_to_center_b = normalize(trans_b->position - trans_a->position);
-                vec3 vector_to_center_a = normalize(trans_a->position - trans_b->position);
-                vec3 closest_point_sphere_a = trans_b->position + vector_to_center_a * col_b->radius;
-                vec3 closest_point_sphere_b = trans_a->position + vector_to_center_b * col_a->radius;
+                vec3 vector_to_center_b = normalize(trans_b.position - trans_a.position);
+                vec3 vector_to_center_a = normalize(trans_a.position - trans_b.position);
+                vec3 closest_point_sphere_a = trans_b.position + vector_to_center_a * col_b->radius;
+                vec3 closest_point_sphere_b = trans_a.position + vector_to_center_b * col_a->radius;
 
                 if (length(closest_point_sphere_a - closest_point_sphere_b) > 0.0f)
                 {
@@ -173,25 +208,25 @@ namespace bls
 
             // Point where the box 'begins'
             vec3 min_aabb_a = vec3(0.0f);
-            min_aabb_a.x = trans_a->position.x - col_a->width;
-            min_aabb_a.y = trans_a->position.y - col_a->height;
-            min_aabb_a.z = trans_a->position.z - col_a->depth;
+            min_aabb_a.x = trans_a.position.x - col_a->width;
+            min_aabb_a.y = trans_a.position.y - col_a->height;
+            min_aabb_a.z = trans_a.position.z - col_a->depth;
 
             vec3 min_aabb_b = vec3(0.0f);
-            min_aabb_b.x = trans_b->position.x - col_b->width;
-            min_aabb_b.y = trans_b->position.y - col_b->height;
-            min_aabb_b.z = trans_b->position.z - col_b->depth;
+            min_aabb_b.x = trans_b.position.x - col_b->width;
+            min_aabb_b.y = trans_b.position.y - col_b->height;
+            min_aabb_b.z = trans_b.position.z - col_b->depth;
 
             // Point where the box 'ends'
             vec3 max_aabb_a = vec3(0.0f);
-            max_aabb_a.x = trans_a->position.x + col_a->width;
-            max_aabb_a.y = trans_a->position.y + col_a->height;
-            max_aabb_a.z = trans_a->position.z + col_a->depth;
+            max_aabb_a.x = trans_a.position.x + col_a->width;
+            max_aabb_a.y = trans_a.position.y + col_a->height;
+            max_aabb_a.z = trans_a.position.z + col_a->depth;
 
             vec3 max_aabb_b = vec3(0.0f);
-            max_aabb_b.x = trans_b->position.x + col_b->width;
-            max_aabb_b.y = trans_b->position.y + col_b->height;
-            max_aabb_b.z = trans_b->position.z + col_b->depth;
+            max_aabb_b.x = trans_b.position.x + col_b->width;
+            max_aabb_b.y = trans_b.position.y + col_b->height;
+            max_aabb_b.z = trans_b.position.z + col_b->depth;
 
             bool intersecting = (min_aabb_a.x <= max_aabb_b.x && max_aabb_a.x >= min_aabb_b.x &&
                                  min_aabb_a.y <= max_aabb_b.y && max_aabb_a.y >= min_aabb_b.y &&

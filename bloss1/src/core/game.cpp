@@ -1,4 +1,5 @@
 #include "core/game.hpp"
+// #include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
 
 namespace bls
@@ -15,7 +16,6 @@ namespace bls
         }
 
         instance = this;
-        set_target_fps(0);
 
         // Create the window
         window = std::unique_ptr<Window>(Window::create(title, width, height));
@@ -34,13 +34,6 @@ namespace bls
         EventSystem::register_callback<WindowResizeEvent>(BIND_EVENT_FN(Game::on_window_resize));
         EventSystem::register_callback<KeyPressEvent>(BIND_EVENT_FN(Game::on_key_press));
         EventSystem::register_callback<MouseScrollEvent>(BIND_EVENT_FN(Game::on_mouse_scroll));
-
-        // Register initial stage // oof
-        stages = std::unique_ptr<Stage>(new TestStage());
-        stages->start();
-
-        running = true;
-        minimized = false;
     }
 
     Game::~Game()
@@ -50,12 +43,20 @@ namespace bls
 
     void Game::run()
     {
+        // Register initial stage
+        change_stage(new TestStage());
+
         // Time variation
         f64 last_time = window->get_time(), current_time = 0, time_counter = 0, dt = 0;
         u32 frame_counter = 0;
 
+        set_target_fps(0);
+
+        window_open = true;
+        minimized = false;
+
         // The game loop
-        while (running)
+        while (stage && window_open)
         {
             // Don't render if the application is minimized
             if (minimized)
@@ -63,9 +64,6 @@ namespace bls
                 window->update();
                 continue;
             }
-
-            if (!stages->is_running())
-                running = false;
 
             // Calculate dt
             current_time = window->get_time();
@@ -82,7 +80,7 @@ namespace bls
             }
 
             // Update running stage
-            stages->update(dt);
+            stage->update(dt);
 
             // Update window
             window->update();
@@ -94,9 +92,12 @@ namespace bls
         }
     }
 
-    void Game::push_stage(Stage* stage)
+    void Game::change_stage(Stage* new_stage)
     {
-        stages = std::unique_ptr<Stage>(stage);
+        stage.reset();
+        stage = std::unique_ptr<Stage>(new_stage);
+        if (stage)
+            stage->start();
     }
 
     void Game::on_event(Event& event)
@@ -154,7 +155,7 @@ namespace bls
 
     void Game::on_window_close(const WindowCloseEvent&)
     {
-        running = false;
+        window_open = false;
     }
 
     void Game::on_key_press(const KeyPressEvent& event)

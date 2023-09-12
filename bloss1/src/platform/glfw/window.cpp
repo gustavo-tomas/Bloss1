@@ -56,8 +56,8 @@ namespace bls
         else
             std::cout << "ARB Debug extension not supported\n";
 
-        // Ensure we can capture the escape key being pressed below
-        glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GL_TRUE);
+        // Disable sticky keys
+        glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GLFW_FALSE);
 
         // Hide the mouse and enable unlimited movement
         // glfwSetInputMode(native_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -69,56 +69,51 @@ namespace bls
         glfwSetWindowUserPointer(native_window, &window_data);
 
         // Window close callback
-        glfwSetWindowCloseCallback(
-            native_window, [](GLFWwindow * window)
-            {
-                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                WindowCloseEvent event = { };
-                window_data.event_callback(event);
-            });
+        glfwSetWindowCloseCallback(native_window, [](GLFWwindow * window)
+        {
+            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+            WindowCloseEvent event = { };
+            window_data.event_callback(event);
+        });
 
         // Resize callback
-        glfwSetFramebufferSizeCallback(
-            native_window, [](GLFWwindow * window, i32 width, i32 height)
-            {
-                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                window_data.width = width;
-                window_data.height = height;
+        glfwSetFramebufferSizeCallback(native_window, [](GLFWwindow * window, i32 width, i32 height)
+        {
+            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+            window_data.width = width;
+            window_data.height = height;
 
-                WindowResizeEvent event = { (u32) width, (u32) height };
-                window_data.event_callback(event);
-            });
+            WindowResizeEvent event = { (u32) width, (u32) height };
+            window_data.event_callback(event);
+        });
 
         // Key callback
-        glfwSetKeyCallback(
-            native_window, [](GLFWwindow * window, i32 key, i32, i32 action, i32)
+        glfwSetKeyCallback(native_window, [](GLFWwindow * window, i32 key, i32, i32 action, i32)
+        {
+            // Key press
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
             {
-                // Key press
-                if (action == GLFW_PRESS || action == GLFW_REPEAT)
-                {
-                    auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                    KeyPressEvent event = { (u32) key };
-                    window_data.event_callback(event);
-                }
-            });
+                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+                KeyPressEvent event = { (u32) key };
+                window_data.event_callback(event);
+            }
+        });
 
         // Mouse callback
-        glfwSetCursorPosCallback(
-            native_window, [](GLFWwindow * window, f64 x_position, f64 y_position)
-            {
-                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                MouseMoveEvent event = { x_position, y_position };
-                window_data.event_callback(event);
-            });
+        glfwSetCursorPosCallback(native_window, [](GLFWwindow * window, f64 x_position, f64 y_position)
+        {
+            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+            MouseMoveEvent event = { x_position, y_position };
+            window_data.event_callback(event);
+        });
 
         // Scroll callback
-        glfwSetScrollCallback(
-            native_window, [](GLFWwindow * window, f64 x_offset, f64 y_offset)
-            {
-                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                MouseScrollEvent event = { x_offset, y_offset };
-                window_data.event_callback(event);
-            });
+        glfwSetScrollCallback(native_window, [](GLFWwindow * window, f64 x_offset, f64 y_offset)
+        {
+            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
+            MouseScrollEvent event = { x_offset, y_offset };
+            window_data.event_callback(event);
+        });
     }
 
     GlfwWindow::~GlfwWindow()

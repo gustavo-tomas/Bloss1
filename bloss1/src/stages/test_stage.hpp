@@ -6,7 +6,6 @@
 
 #include "stages/stage.hpp"
 #include "ecs/ecs.hpp"
-#include "renderer/video_player.hpp"
 
 namespace bls
 {
@@ -19,12 +18,7 @@ namespace bls
             void start() override;
             void update(f32 dt) override;
 
-            bool is_running() override;
-
         private:
             std::unique_ptr<ECS> ecs;
-            std::unique_ptr<VideoPlayer> video_player;
-
-            bool running;
     };
 };
