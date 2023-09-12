@@ -33,4 +33,5 @@ $ scripts/clean.sh
 - [The book of shaders](https://thebookofshaders.com)
 - [video-app](https://github.com/bmewj/video-app)
 - [blending skeletal animations](https://stackoverflow.com/questions/69860756/how-do-i-correctly-blend-between-skeletal-animations-in-opengl-from-a-walk-anima)
-- [Various shader effects](https://github.com/lettier/3d-game-shaders-for-beginners)
+- [3D game shaders for beginners](https://github.com/lettier/3d-game-shaders-for-beginners)
+- [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
