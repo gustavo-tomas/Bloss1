@@ -10,6 +10,7 @@
 #include "stages/stage.hpp"
 #include "renderer/renderer.hpp"
 #include "audio_engine.hpp"
+#include "math/random.hpp"
 
 namespace bls
 {
@@ -43,6 +44,7 @@ namespace bls
             std::unique_ptr<Window> window;
             std::unique_ptr<Renderer> renderer;
             std::unique_ptr<AudioEngine> audio_engine;
+            std::unique_ptr<Random> random_engine;
             std::unique_ptr<Stage> stage;
 
             f64 target_spf;

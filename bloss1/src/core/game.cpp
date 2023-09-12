@@ -29,6 +29,9 @@ namespace bls
         // @TODO: might wanna create a wrapper just like the renderer
         audio_engine = std::make_unique<AudioEngine>();
 
+        // Create RNG engine
+        random_engine = std::make_unique<Random>();
+
         // Register callbacks
         EventSystem::register_callback<WindowCloseEvent>(BIND_EVENT_FN(Game::on_window_close));
         EventSystem::register_callback<WindowResizeEvent>(BIND_EVENT_FN(Game::on_window_resize));
