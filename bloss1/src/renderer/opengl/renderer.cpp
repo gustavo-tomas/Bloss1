@@ -71,6 +71,27 @@ namespace bls
         }
     }
 
+    void OpenGLRenderer::set_blending(bool active)
+    {
+        if (active)
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
+
+        else
+            glDisable(GL_BLEND);
+    }
+
+    void OpenGLRenderer::set_face_culling(bool active)
+    {
+        if (active)
+            glEnable(GL_CULL_FACE);
+
+        else
+            glDisable(GL_CULL_FACE);
+    }
+
     void OpenGLRenderer::clear_color(const vec4& color)
     {
         glClearColor(color.r, color.g, color.b, color.a);

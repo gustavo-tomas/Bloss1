@@ -17,6 +17,8 @@ namespace bls
 
             void set_viewport(u32 x, u32 y, u32 width, u32 height) override;
             void set_debug_mode(bool active) override;
+            void set_blending(bool active) override;
+            void set_face_culling(bool active) override;
 
             void clear_color(const vec4& color) override;
             void clear() override;
