@@ -150,6 +150,11 @@ namespace bls
         return *window;
     }
 
+    Random& Game::get_random_engine()
+    {
+        return *random_engine;
+    }
+
     void Game::set_target_fps(u32 fps)
     {
         fps = (fps == 0) ? 100'000 : fps;

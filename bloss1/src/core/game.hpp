@@ -30,6 +30,7 @@ namespace bls
             Window& get_window();
             Renderer& get_renderer();
             AudioEngine& get_audio_engine();
+            Random& get_random_engine();
 
             void set_target_fps(u32 fps);
 
