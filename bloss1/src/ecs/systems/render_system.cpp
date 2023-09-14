@@ -11,6 +11,9 @@
 #include "renderer/primitives/quad.hpp"
 #include "renderer/primitives/sphere.hpp"
 
+#include "core/input.hpp"
+#include "ecs/systems/particle_system.hpp"
+
 namespace bls
 {
     void initialize(ECS& ecs);
@@ -199,6 +202,9 @@ namespace bls
         // Render the scene
         render_scene(ecs, *g_buffer_shader, renderer);
 
+        // Render particles
+        particle_system(ecs, dt);
+
         g_buffer->unbind();
         g_buffer_shader->unbind();
 
@@ -271,6 +277,24 @@ namespace bls
         // -------------------------------------------------------------------------------------------------------------
         g_buffer->bind_and_blit(width, height);
         g_buffer->unbind();
+
+        // Create and emit particles
+        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
+        {
+            Particle particle = { };
+            particle.color_begin = { 0.9f, 0.9f, 0.3f, 1.0f };
+            particle.color_end = { 0.3f, 0.9f, 0.9f, 1.0f };
+            particle.scale_begin = vec3(0.5f);
+            particle.scale_variation = vec3(0.3f);
+            particle.scale_end = vec3(0.01f);
+            particle.life_time = 10.0f;
+            particle.velocity = vec3(0.0f);
+            particle.velocity_variation = { 3.0f, 1.0f, 0.0f };
+            particle.position = ecs.transforms[0].get()->position;
+
+            for (u32 i = 0; i < 5; i++)
+                emit_particle(particle);
+        }
 
         // Draw the skybox last
         skybox->draw(view, projection);
