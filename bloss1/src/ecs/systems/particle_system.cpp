@@ -3,6 +3,7 @@
 #include "core/game.hpp"
 #include "renderer/shader.hpp"
 #include "renderer/primitives/quad.hpp"
+#include "renderer/texture.hpp"
 
 namespace bls
 {
@@ -18,6 +19,7 @@ namespace bls
 
         std::shared_ptr<Shader> particle_shader;
         std::unique_ptr<Quad> quad;
+        std::shared_ptr<Texture> particle_texture;
     };
 
     ParticleState particle_state;
@@ -26,9 +28,10 @@ namespace bls
     {
         auto& renderer = Game::get().get_renderer();
 
-        particle_state.particle_shader = Shader::create("particle", "bloss1/assets/shaders/particles/particle.vs", "bloss1/assets/shaders/particles/particle.fs");
+        particle_state.particle_shader = Shader::create("particle", "bloss1/assets/shaders/particles/particle.vs", "bloss1/assets/shaders/particles/particle_texture.fs");
         particle_state.quad = std::make_unique<Quad>(renderer);
         particle_state.particle_pool.resize(1000);
+        particle_state.particle_texture = Texture::create("particle", "bloss1/assets/textures/particles/particle_black.png", TextureType::Diffuse);
     }
 
     void particle_system(ECS& ecs, f32 dt)
@@ -63,6 +66,7 @@ namespace bls
         }
 
         particle_state.particle_shader->bind();
+        particle_state.particle_shader->set_uniform1("particleTexture", 0U);
         particle_state.particle_shader->set_uniform4("projection", camera->projection_matrix);
         particle_state.particle_shader->set_uniform4("view", camera->view_matrix);
 
@@ -85,6 +89,7 @@ namespace bls
 
             particle_state.particle_shader->set_uniform4("model", model_matrix);
             particle_state.particle_shader->set_uniform4("color", color);
+            particle_state.particle_texture->bind(0);
             particle_state.quad->render();
         }
 
