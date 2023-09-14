@@ -35,3 +35,4 @@ $ scripts/clean.sh
 - [blending skeletal animations](https://stackoverflow.com/questions/69860756/how-do-i-correctly-blend-between-skeletal-animations-in-opengl-from-a-walk-anima)
 - [3D game shaders for beginners](https://github.com/lettier/3d-game-shaders-for-beginners)
 - [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
+- [Particle system](https://github.com/TheCherno/OneHourParticleSystem)
