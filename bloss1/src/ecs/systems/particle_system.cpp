@@ -2,8 +2,9 @@
 #include "ecs/ecs.hpp"
 #include "core/game.hpp"
 #include "renderer/shader.hpp"
-#include "renderer/primitives/quad.hpp"
 #include "renderer/texture.hpp"
+#include "renderer/model.hpp"
+#include "renderer/primitives/quad.hpp"
 
 namespace bls
 {
@@ -11,6 +12,7 @@ namespace bls
 
     // @TODO: aaaaaaaaaaaahhh
     static bool initialized = false;
+    static bool render2D = false;
 
     struct ParticleState
     {
@@ -20,6 +22,7 @@ namespace bls
         std::shared_ptr<Shader> particle_shader;
         std::unique_ptr<Quad> quad;
         std::shared_ptr<Texture> particle_texture;
+        std::shared_ptr<Model> model;
     };
 
     ParticleState particle_state;
@@ -32,6 +35,7 @@ namespace bls
         particle_state.quad = std::make_unique<Quad>(renderer);
         particle_state.particle_pool.resize(1000);
         particle_state.particle_texture = Texture::create("particle", "bloss1/assets/textures/particles/particle_black.png", TextureType::Diffuse);
+        particle_state.model = Model::create("particle", "bloss1/assets/models/particles/particle.obj", false);
     }
 
     void particle_system(ECS& ecs, f32 dt)
@@ -89,8 +93,24 @@ namespace bls
 
             particle_state.particle_shader->set_uniform4("model", model_matrix);
             particle_state.particle_shader->set_uniform4("color", color);
-            particle_state.particle_texture->bind(0);
-            particle_state.quad->render();
+
+            // 2D particle (texture)
+            if (render2D)
+            {
+                particle_state.particle_texture->bind(0);
+                particle_state.quad->render();
+            }
+
+            // 3D particle (model)
+            else
+            {
+                for (auto& mesh : particle_state.model->meshes)
+                {
+                    mesh->vao->bind();
+                    renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
+                    mesh->vao->unbind();
+                }
+            }
         }
 
         renderer.set_face_culling(true);

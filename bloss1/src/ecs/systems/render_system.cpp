@@ -266,12 +266,12 @@ namespace bls
         shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
 
         // Begin post processing process
-        post_processing->begin();
+        // post_processing->begin();
         quad->render();      // Render light quad
-        post_processing->end();
+        // post_processing->end();
 
         // Render all passes
-        post_processing->render();
+        // post_processing->render();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
         // -------------------------------------------------------------------------------------------------------------
