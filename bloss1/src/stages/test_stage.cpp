@@ -34,7 +34,7 @@ namespace bls
         for (u32 i = 0; i < 5; i++)
             ball(*ecs, Transform(vec3((i + 1) * 10.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
-        vampire(*ecs, Transform(vec3(-20.0f, 10.0f, -20.0f), vec3(0.0f), vec3(0.001f, 0.001f, 0.001f)));
+        vampire(*ecs, Transform(vec3(-20.0f, 10.0f, -20.0f), vec3(0.0f, 180.0f, 0.0f), vec3(0.001f, 0.001f, 0.001f)));
         abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
 
         // Floor is created last

@@ -43,7 +43,7 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        auto model = Model::create("vampire", "bloss1/assets/models/vampire/dancing_vampire.dae", true);
+        auto model = Model::create("vampire", "bloss1/assets/models/vampire/dancing_vampire.dae", false);
 
         ecs.names[id] = "vampire";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
