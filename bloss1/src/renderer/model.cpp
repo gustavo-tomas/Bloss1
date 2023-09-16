@@ -74,7 +74,7 @@ namespace bls
     {
         std::vector<Vertex> vertices;
         std::vector<u32> indices;
-        std::vector<Texture*> textures;
+        std::vector<std::shared_ptr<Texture>> textures;
 
         // Process vertex positions, normals and texture coordinates
         for (u32 i = 0; i < mesh->mNumVertices; i++)
@@ -130,6 +130,8 @@ namespace bls
 
         // Process material
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+        // Load textures (or default textures if none is found)
 
         // Diffuse
         auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE);
@@ -188,11 +190,11 @@ namespace bls
         return new Mesh(vao, vbo, ebo, vertices, indices, textures);
     }
 
-    std::vector<Texture*> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
+    std::vector<std::shared_ptr<Texture>> Model::load_material_textures(aiMaterial* mat, aiTextureType type)
     {
         str directory = path.substr(0, path.find_last_of('/'));
 
-        std::vector<Texture*> textures;
+        std::vector<std::shared_ptr<Texture>> textures;
         for (u32 i = 0; i < mat->GetTextureCount(type); i++)
         {
             aiString str;
@@ -213,7 +215,7 @@ namespace bls
 
             // @TODO: might wanna check if texture was already loaded for another mesh
             auto texture = Texture::create(str.C_Str(), directory + "/" + str.C_Str(), texture_type);
-            textures.push_back(texture.get());
+            textures.push_back(texture);
         }
 
         return textures;

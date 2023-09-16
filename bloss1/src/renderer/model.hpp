@@ -69,7 +69,7 @@ namespace bls
     {
         public:
             Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const std::vector<Texture*>& textures)
+                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const std::vector<std::shared_ptr<Texture>>& textures)
                 : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices), textures(textures)
             { }
 
@@ -86,7 +86,7 @@ namespace bls
 
             std::vector<Vertex> vertices;
             std::vector<u32> indices;
-            std::vector<Texture*> textures;
+            std::vector<std::shared_ptr<Texture>> textures;
     };
 
     // Bone
@@ -197,7 +197,7 @@ namespace bls
             // Helper methods
             void process_node(aiNode* node, const aiScene* scene);
             Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
-            std::vector<Texture*> load_material_textures(aiMaterial* mat, aiTextureType type);
+            std::vector<std::shared_ptr<Texture>> load_material_textures(aiMaterial* mat, aiTextureType type);
 
             auto& get_bone_info_map();
             i32& get_bone_count();
