@@ -52,15 +52,16 @@ project "bloss1"
         pic "On"
 
     filter "configurations:debug"
-        buildoptions { "-Wall", "-Wextra", "-O0", "-fsanitize=address", "-fno-omit-frame-pointer" }
+        buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
         linkoptions { "-fsanitize=address" }
 
         defines { "_DEBUG" }
         symbols "On" -- '-g'
+        optimize "Off" -- '-O0'
         runtime "Debug"
 
     filter "configurations:release"
-        buildoptions { "-O3" } -- Zoooom
         defines { "_RELEASE" }
         symbols "Off"
+        optimize "On" -- '-O2'
         runtime "Release"
