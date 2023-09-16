@@ -40,6 +40,7 @@ namespace bls
 
             virtual void set_data(void* pixels) = 0;
 
+            static std::shared_ptr<Texture> get_default(TextureType texture_type);
             static std::shared_ptr<Texture> create(u32 width, u32 height, ImageFormat format,
                                                    TextureParameter wrap_s, TextureParameter wrap_t,
                                                    TextureParameter min_filter, TextureParameter mag_filter);

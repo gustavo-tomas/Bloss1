@@ -135,23 +135,23 @@ namespace bls
         typedef struct TextureParams
         {
             aiTextureType ai_texture_type;
-            std::shared_ptr<Texture> default_texture;
+            TextureType texture_type;
         } TextureParams;
 
         // Roughness and AO should be loaded with metalness -> ARM textures
         std::vector<TextureParams> texture_params =
         {
-            { aiTextureType_DIFFUSE,   Texture::create("default_diffuse",   "bloss1/assets/textures/default_diffuse.png", TextureType::Diffuse) },
-            { aiTextureType_SPECULAR,  Texture::create("default_specular",  "bloss1/assets/textures/default_specular.png", TextureType::Specular) },
-            { aiTextureType_NORMALS,   Texture::create("default_normal",    "bloss1/assets/textures/default_normal.png", TextureType::Normal) },
-            { aiTextureType_METALNESS, Texture::create("default_metalness", "bloss1/assets/textures/default_arm.png", TextureType::Metalness) }
+            { aiTextureType_DIFFUSE, TextureType::Diffuse },
+            { aiTextureType_SPECULAR, TextureType::Specular },
+            { aiTextureType_NORMALS, TextureType::Normal  },
+            { aiTextureType_METALNESS, TextureType::Metalness }
         };
 
-        for (const auto& [ai_texture_type, default_texture] : texture_params)
+        for (const auto& [ai_texture_type, texture_type] : texture_params)
         {
             auto texture_maps = load_material_textures(material, ai_texture_type);
             if (texture_maps.empty())
-                textures.push_back(default_texture);
+                textures.push_back(Texture::get_default(texture_type));
             else
                 textures.insert(textures.end(), texture_maps.begin(), texture_maps.end());
         }

@@ -32,7 +32,7 @@ namespace bls
         std::unique_ptr<RenderBuffer> render_buffer;
         std::map<str, std::shared_ptr<Shader>> shaders;
 
-        std::unordered_map<str, std::shared_ptr<Texture>> textures;
+        std::vector<std::pair<str, std::shared_ptr<Texture>>> textures;
 
         std::unique_ptr<Skybox> skybox;
         std::unique_ptr<ShadowMap> shadow_map;
@@ -71,11 +71,12 @@ namespace bls
         std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
         for (const auto& name : texture_names)
         {
-            render_state.textures[name] = Texture::create(width, height, ImageFormat::RGBA32F,
-                                          TextureParameter::Repeat, TextureParameter::Repeat,
-                                          TextureParameter::Nearest, TextureParameter::Nearest);
+            auto texture = Texture::create(width, height, ImageFormat::RGBA32F,
+                                           TextureParameter::Repeat, TextureParameter::Repeat,
+                                           TextureParameter::Nearest, TextureParameter::Nearest);
 
-            render_state.g_buffer->attach_texture(render_state.textures[name].get());
+            render_state.textures.push_back({ name, texture });
+            render_state.g_buffer->attach_texture(texture.get());
         }
         render_state.g_buffer->draw();
 
@@ -112,7 +113,7 @@ namespace bls
         render_state.post_processing->add_render_pass(new FogPass(width, height,
                 vec3(0.5f),
                 vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
-                ecs.cameras[0].get()->position, render_state.textures["position"].get()));
+                ecs.cameras[0].get()->position, render_state.textures[0].second.get()));
         render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
         // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
         // render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
@@ -252,19 +253,18 @@ namespace bls
             light_counter++;
         }
 
-        // Set texture attachments
-        auto& attachments = g_buffer->get_attachments();
-        u32 tex_position = attachments.size() - 1;
+        // Set texture attachments ---
+        u32 tex_position = 0;
         for (const auto& [name, texture] : textures)
         {
             pbr_shader->set_uniform1("textures." + name, tex_position);
-            attachments[tex_position]->bind(tex_position);
-            tex_position--; // Traverse from back to front
+            texture->bind(tex_position);
+            tex_position++;
         }
 
         // Bind maps
-        skybox->bind(*pbr_shader, 10);          // IBL maps
-        shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
+        skybox->bind(*pbr_shader, 12);          // IBL maps
+        shadow_map->bind_maps(*pbr_shader, 15); // Shadow map
 
         // Begin post processing process
         post_processing->begin();

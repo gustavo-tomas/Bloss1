@@ -90,6 +90,43 @@ namespace bls
         #endif
     }
 
+    std::shared_ptr<Texture> Texture::get_default(TextureType texture_type)
+    {
+        str name = "";
+        switch (texture_type)
+        {
+            case TextureType::Diffuse:
+                name = "default_diffuse";
+                break;
+
+            case TextureType::Normal:
+                name = "default_normal";
+                break;
+
+            case TextureType::Specular:
+                name = "default_specular";
+                break;
+
+            case TextureType::Metalness:
+                name = "default_arm";
+                break;
+
+            case TextureType::Roughness:
+                name = "default_roughness";
+                break;
+
+            case TextureType::AmbientOcclusion:
+                name = "default_ao";
+                break;
+
+            default:
+                std::cerr << "invalid texture type for default texture\n";
+                break;
+        }
+
+        return Texture::create(name, "bloss1/assets/textures/" + name + ".png", texture_type);
+    }
+
     std::shared_ptr<Font> Font::create(const str& name, const str& path)
     {
         if (FontManager::get().exists(name))
