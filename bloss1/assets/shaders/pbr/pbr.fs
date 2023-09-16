@@ -72,6 +72,7 @@ void main() {
     vec3 Normal = texture(textures.normal, fs_in.TexCoords).rgb;
     vec4 Albedo = texture(textures.albedo, fs_in.TexCoords);
     vec3 ARM = texture(textures.arm, fs_in.TexCoords).rgb;
+    vec3 TBNNormal = texture(textures.tbnNormal, fs_in.TexCoords).rgb;
     float Depth = texture(textures.depth, fs_in.TexCoords).r;
 
     float AO = ARM.r;
