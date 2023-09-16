@@ -16,7 +16,7 @@ struct Textures {
     sampler2D normal;
     sampler2D albedo;
     sampler2D arm;
-    sampler2D tbnNormal;
+    sampler2D emissive;
     sampler2D depth;
 
     // IBL
@@ -72,7 +72,7 @@ void main() {
     vec3 Normal = texture(textures.normal, fs_in.TexCoords).rgb;
     vec4 Albedo = texture(textures.albedo, fs_in.TexCoords);
     vec3 ARM = texture(textures.arm, fs_in.TexCoords).rgb;
-    vec3 TBNNormal = texture(textures.tbnNormal, fs_in.TexCoords).rgb;
+    vec3 Emissive = texture(textures.emissive, fs_in.TexCoords).rgb;
     float Depth = texture(textures.depth, fs_in.TexCoords).r;
 
     float AO = ARM.r;
@@ -85,7 +85,7 @@ void main() {
     }
 
     // Normalized vectors
-    vec3 N = TBNNormal;                       // Normalized normal
+    vec3 N = Normal;                          // Normalized normal
     vec3 V = normalize(viewPos - FragPos); // Normalized view direction
     vec3 R = reflect(-V, N);             // Normalized reflection
 
@@ -148,7 +148,7 @@ void main() {
 
     vec3 ambient = (kD * diffuse + specular) * AO;
 
-    vec3 color = ambient + ((1.0 - directShadow) * Lo);
+    vec3 color = ambient + ((1.0 - directShadow) * Lo) + Emissive;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

@@ -10,7 +10,6 @@ layout (location = 6) in vec4 weights;
 
 out VS_OUT {
     vec2 TexCoords;
-    vec3 Normal;
     mat3 TBN;
     vec3 FragPos;
 
@@ -51,9 +50,6 @@ void main() {
     // Position
     vec4 fragPos = model * positionAfterWeights;
 
-    // Normal matrix
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-
     // TBN matrix
     vec3 T = normalize(vec3(model * vec4(tangent, 0.0)));
     vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));
@@ -62,7 +58,6 @@ void main() {
 
     vs_out.FragPos = fragPos.xyz;
     vs_out.TexCoords = texCoords;
-    vs_out.Normal = normalMatrix * normal;
     vs_out.TBN = tbnMatrix;
 
     // View matrices

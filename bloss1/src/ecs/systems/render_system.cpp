@@ -68,7 +68,7 @@ namespace bls
 
         // Create and attach framebuffer textures
         // @TODO: this is hardcoded
-        std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
+        std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "emissive", "depth" };
         for (const auto& name : texture_names)
         {
             auto texture = Texture::create(width, height, ImageFormat::RGBA32F,
@@ -377,6 +377,7 @@ namespace bls
                         case TextureType::Metalness:        type_name = "metalness"; break;
                         case TextureType::Roughness:        type_name = "roughness"; break;
                         case TextureType::AmbientOcclusion: type_name = "ao";        break;
+                        case TextureType::Emissive:         type_name = "emissive";  break;
 
                         default: std::cerr << "invalid texture type: '" << type << "'\n";
                     }

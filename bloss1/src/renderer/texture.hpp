@@ -10,7 +10,7 @@ namespace bls
 {
     enum TextureType
     {
-        None, Diffuse, Normal, Specular, Metalness, Roughness, AmbientOcclusion
+        None, Diffuse, Normal, Specular, Metalness, Roughness, AmbientOcclusion, Emissive
     };
 
     enum ImageFormat

@@ -119,6 +119,10 @@ namespace bls
                 name = "default_ao";
                 break;
 
+            case TextureType::Emissive:
+                name = "default_emissive";
+                break;
+
             default:
                 std::cerr << "invalid texture type for default texture\n";
                 break;

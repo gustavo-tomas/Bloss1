@@ -141,10 +141,11 @@ namespace bls
         // Roughness and AO should be loaded with metalness -> ARM textures
         std::vector<TextureParams> texture_params =
         {
-            { aiTextureType_DIFFUSE, TextureType::Diffuse },
-            { aiTextureType_SPECULAR, TextureType::Specular },
-            { aiTextureType_NORMALS, TextureType::Normal  },
-            { aiTextureType_METALNESS, TextureType::Metalness }
+            { aiTextureType_DIFFUSE,   TextureType::Diffuse },
+            { aiTextureType_SPECULAR,  TextureType::Specular },
+            { aiTextureType_NORMALS,   TextureType::Normal  },
+            { aiTextureType_METALNESS, TextureType::Metalness },
+            { aiTextureType_EMISSIVE,  TextureType::Emissive }
         };
 
         for (const auto& [ai_texture_type, texture_type] : texture_params)
@@ -206,9 +207,10 @@ namespace bls
                 case aiTextureType_SPECULAR:  texture_type = TextureType::Specular;  break;
                 case aiTextureType_NORMALS:   texture_type = TextureType::Normal;    break;
                 case aiTextureType_METALNESS: texture_type = TextureType::Metalness; break;
+                case aiTextureType_EMISSIVE:  texture_type = TextureType::Emissive;  break;
 
                 default:
-                    std::cerr << "invalid texture type: '" << type << "'\n";
+                    std::cerr << "invalid texture type for material: '" << type << "'\n";
                     break;
             }
 
