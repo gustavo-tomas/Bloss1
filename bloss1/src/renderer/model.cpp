@@ -132,30 +132,29 @@ namespace bls
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
         // Load textures (or default textures if none is found)
+        typedef struct TextureParams
+        {
+            aiTextureType ai_texture_type;
+            std::shared_ptr<Texture> default_texture;
+        } TextureParams;
 
-        // Diffuse
-        auto diffuse_maps = load_material_textures(material, aiTextureType_DIFFUSE);
-        textures.insert(textures.end(), diffuse_maps.begin(), diffuse_maps.end());
+        // Roughness and AO should be loaded with metalness -> ARM textures
+        std::vector<TextureParams> texture_params =
+        {
+            { aiTextureType_DIFFUSE,   Texture::create("default_diffuse",   "bloss1/assets/textures/default_diffuse.png", TextureType::Diffuse) },
+            { aiTextureType_SPECULAR,  Texture::create("default_specular",  "bloss1/assets/textures/default_specular.png", TextureType::Specular) },
+            { aiTextureType_NORMALS,   Texture::create("default_normal",    "bloss1/assets/textures/default_normal.png", TextureType::Normal) },
+            { aiTextureType_METALNESS, Texture::create("default_metalness", "bloss1/assets/textures/default_arm.png", TextureType::Metalness) }
+        };
 
-        // Specular
-        auto specular_maps = load_material_textures(material, aiTextureType_SPECULAR);
-        textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
-
-        // Normal
-        auto normal_maps = load_material_textures(material, aiTextureType_NORMALS);
-        textures.insert(textures.end(), normal_maps.begin(), normal_maps.end());
-
-        // Metalness
-        auto metalness_maps = load_material_textures(material, aiTextureType_METALNESS);
-        textures.insert(textures.end(), metalness_maps.begin(), metalness_maps.end());
-
-        // Roughness (already loaded in metal ARM textures)
-        // vector<Texture> roughnessMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, "texture_roughness");
-        // textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
-
-        // Ambient occlusion (AO)
-        // vector<Texture> aoMaps = LoadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "texture_ao");
-        // textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
+        for (const auto& [ai_texture_type, default_texture] : texture_params)
+        {
+            auto texture_maps = load_material_textures(material, ai_texture_type);
+            if (texture_maps.empty())
+                textures.push_back(default_texture);
+            else
+                textures.insert(textures.end(), texture_maps.begin(), texture_maps.end());
+        }
 
         // Bone weight
         extract_bone_weight_for_vertices(vertices, mesh);
