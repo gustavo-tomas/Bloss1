@@ -216,6 +216,25 @@ namespace bls
             u32 pixel_size;
     };
 
+    class FXAAPass : public RenderPass
+    {
+        public:
+            FXAAPass(u32 width, u32 height)
+                : RenderPass(width, height)
+            {
+                shader = Shader::create("fxaa", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/fxaa.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+                screen_texture->bind(0);
+                quad->render();
+            }
+    };
+
     class PostProcessingSystem
     {
         public:

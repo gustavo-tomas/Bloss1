@@ -108,14 +108,15 @@ namespace bls
 
         // Create post processing system
         render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
+        render_state.post_processing->add_render_pass(new FXAAPass(width, height));
         render_state.post_processing->add_render_pass(new FogPass(width, height,
                 vec3(0.5f),
                 vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
                 ecs.cameras[0].get()->position, render_state.textures["position"].get()));
         render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
         // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
-        render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
-        render_state.post_processing->add_render_pass(new PixelizationPass(width, height, 4));
+        // render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
+        // render_state.post_processing->add_render_pass(new PixelizationPass(width, height, 4));
     }
 
     void render_system(ECS& ecs, f32 dt)
@@ -266,12 +267,12 @@ namespace bls
         shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
 
         // Begin post processing process
-        // post_processing->begin();
+        post_processing->begin();
         quad->render();      // Render light quad
-        // post_processing->end();
+        post_processing->end();
 
         // Render all passes
-        // post_processing->render();
+        post_processing->render();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
         // -------------------------------------------------------------------------------------------------------------
