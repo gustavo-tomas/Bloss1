@@ -17,7 +17,7 @@ namespace bls
     struct ParticleState
     {
         std::vector<Particle> particle_pool;
-        u32 pool_index = 999;
+        u32 pool_index;
 
         std::shared_ptr<Shader> particle_shader;
         std::unique_ptr<Quad> quad;
@@ -33,7 +33,8 @@ namespace bls
 
         particle_state.particle_shader = Shader::create("particle", "bloss1/assets/shaders/particles/particle.vs", "bloss1/assets/shaders/particles/particle_texture.fs");
         particle_state.quad = std::make_unique<Quad>(renderer);
-        particle_state.particle_pool.resize(1000);
+        particle_state.pool_index = 999;
+        particle_state.particle_pool.resize(particle_state.pool_index + 1);
         particle_state.particle_texture = Texture::create("particle", "bloss1/assets/textures/particles/particle_black.png", TextureType::Diffuse);
         particle_state.model = Model::create("particle", "bloss1/assets/models/particles/particle.obj", false);
     }
