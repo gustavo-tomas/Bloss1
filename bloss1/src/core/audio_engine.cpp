@@ -22,7 +22,7 @@ namespace bls
         if (audios.count(name))
         {
             std::cerr << "audio '" << name << "' is already loaded\n";
-            exit(1);
+            return;
         }
 
         // Load a wav/ogg/mp3 file
