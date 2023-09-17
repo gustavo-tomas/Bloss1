@@ -27,6 +27,7 @@ namespace bls
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
         ecs->add_system(render_system);
+        ecs->add_system(sound_system);
 
         // Add some entities to the world
         player(*ecs, Transform(vec3(0.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
@@ -56,6 +57,9 @@ namespace bls
              Transform(vec3(20.0f), vec3(0.0f), vec3(0.5f)),
              "Very high impact text",
              vec3(0.4f, 0.6f, 0.8f));
+
+        // Add background music
+        background_music(*ecs, Transform(), Sound("doom", 0.05f, true), "bloss1/assets/sounds/doom.mp3");
     }
 
     void TestStage::update(f32 dt)

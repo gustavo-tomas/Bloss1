@@ -154,6 +154,17 @@ namespace bls
             f32 time;
     };
 
+    class Sound : public Component
+    {
+        public:
+            Sound(const str& name, f32 volume, bool play_now)
+                : name(name), volume(volume), play_now(play_now) { }
+
+            str name;
+            f32 volume;
+            bool play_now;
+    };
+
     // @TODO: same problem as model
     class Font;
     class Text : public Component

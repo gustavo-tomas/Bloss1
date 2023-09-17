@@ -20,6 +20,10 @@ namespace bls
 
         ecs.cameras[id] = std::make_unique<Camera>(vec3(15.0f, 7.0f, 50.0f));
         ecs.camera_controllers[id] = std::make_unique<CameraController>();
+        ecs.sounds[id]["player_fire"] = std::make_unique<Sound>("player_fire", 0.5f, false);
+
+        auto& audio_engine = Game::get().get_audio_engine();
+        audio_engine.load("player_fire", "bloss1/assets/sounds/gunshot.mp3");
 
         return id;
     }
@@ -134,6 +138,20 @@ namespace bls
         ecs.names[id] = "text";
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.texts[id] = std::make_unique<Text>(font.get(), text, color);
+
+        return id;
+    }
+
+    u32 background_music(ECS& ecs, const Transform& transform, const Sound& sound, const str& file)
+    {
+        u32 id = ecs.get_id();
+
+        auto& audio_engine = Game::get().get_audio_engine();
+        audio_engine.load(sound.name, file, true);
+
+        ecs.names[id] = "background_music";
+        ecs.transforms[id] = std::make_unique<Transform>(transform);
+        ecs.sounds[id][sound.name] = std::make_unique<Sound>(sound);
 
         return id;
     }

@@ -86,6 +86,7 @@ namespace bls
             std::map<u32, std::unique_ptr<Camera>> cameras;
             std::map<u32, std::unique_ptr<CameraController>> camera_controllers;
             std::map<u32, std::unique_ptr<Text>> texts;
+            std::map<u32, std::map<str, std::unique_ptr<Sound>>> sounds;
 
         private:
             // Entities IDs
