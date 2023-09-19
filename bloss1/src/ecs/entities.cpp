@@ -5,6 +5,11 @@
 
 namespace bls
 {
+    u32 empty_entity(ECS& ecs)
+    {
+        return ecs.get_id();
+    }
+
     u32 player(ECS& ecs, const Transform& transform)
     {
         u32 id = ecs.get_id();

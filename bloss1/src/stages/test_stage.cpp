@@ -3,6 +3,7 @@
 #include "core/input.hpp"
 #include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
+#include "ecs/scene_parser.hpp"
 
 namespace bls
 {
@@ -32,14 +33,11 @@ namespace bls
         // Add some entities to the world
         player(*ecs, Transform(vec3(0.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
-        for (u32 i = 0; i < 5; i++)
-            ball(*ecs, Transform(vec3((i + 1) * 10.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
+        // Load entities from file
+        auto scene_parser = SceneParser(*ecs.get());
+        scene_parser.parse_scene("bloss1/assets/scenes/test_stage.bloss");
 
-        vampire(*ecs, Transform(vec3(-20.0f, 10.0f, -20.0f), vec3(0.0f, 180.0f, 0.0f), vec3(0.001f, 0.001f, 0.001f)));
         abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
-
-        // Floor is created last
-        floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
 
         // Add directional lights
         directional_light(*ecs,
