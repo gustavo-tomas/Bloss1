@@ -1,6 +1,8 @@
 # Bloss1
 
-Cute little data-driven (hopefully) c++ engine.
+Final project for my Computer Science course - UnB
+
+C++ game engine.
 
 :)
 
