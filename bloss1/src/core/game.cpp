@@ -25,6 +25,9 @@ namespace bls
         renderer = std::unique_ptr<Renderer>(Renderer::create());
         renderer->initialize();
 
+        // Create the editor
+        editor = std::make_unique<Editor>(*window.get());
+
         // Create the audio engine
         // @TODO: might wanna create a wrapper just like the renderer
         audio_engine = std::make_unique<AudioEngine>();
@@ -84,6 +87,9 @@ namespace bls
 
             // Update running stage
             stage->update(dt);
+
+            // Update editor
+            editor->update(dt);
 
             // Update window
             window->update();

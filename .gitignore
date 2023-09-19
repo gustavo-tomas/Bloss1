@@ -39,3 +39,6 @@ bin/
 # Generated makefiles
 Makefile
 !premake5_windows.exe
+
+# Imgui files
+imgui.ini

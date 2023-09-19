@@ -133,7 +133,7 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        auto font = Font::create("inder", "bloss1/assets/font/inder_regular.ttf");
+        auto font = Font::create("inder", "bloss1/assets/fonts/inder_regular.ttf");
 
         ecs.names[id] = "text";
         ecs.transforms[id] = std::make_unique<Transform>(transform);
@@ -142,12 +142,12 @@ namespace bls
         return id;
     }
 
-    u32 background_music(ECS& ecs, const Transform& transform, const Sound& sound, const str& file)
+    u32 background_music(ECS& ecs, const Transform& transform, const Sound& sound, const str& file, bool looping)
     {
         u32 id = ecs.get_id();
 
         auto& audio_engine = Game::get().get_audio_engine();
-        audio_engine.load(sound.name, file, true);
+        audio_engine.load(sound.name, file, looping);
 
         ecs.names[id] = "background_music";
         ecs.transforms[id] = std::make_unique<Transform>(transform);

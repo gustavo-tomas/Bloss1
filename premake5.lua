@@ -13,6 +13,7 @@ workspace "bloss1"
     include "vendor/soloud"
     include "vendor/glfw"
     include "vendor/assimp"
+    include "vendor/imgui"
 
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
@@ -33,6 +34,7 @@ project "bloss1"
         "vendor/glfw/include",
         "vendor/assimp/include",
         "vendor/glm",
+        "vendor/imgui",
         "vendor/",
         "/usr/include/freetype2"
     }
@@ -46,7 +48,7 @@ project "bloss1"
     }
 
     -- Links vendor libraries here
-    links { "soloud", "glfw", "assimp" }
+    links { "soloud", "glfw", "assimp", "imgui" }
 
     filter "system:linux"
         pic "On"

@@ -59,7 +59,7 @@ namespace bls
              vec3(0.4f, 0.6f, 0.8f));
 
         // Add background music
-        background_music(*ecs, Transform(), Sound("doom", 0.05f, true), "bloss1/assets/sounds/doom.mp3");
+        background_music(*ecs, Transform(), Sound("test", 0.5f, true), "bloss1/assets/sounds/test.wav");
     }
 
     void TestStage::update(f32 dt)

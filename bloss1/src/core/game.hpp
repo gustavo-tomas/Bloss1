@@ -7,6 +7,7 @@
 #include "core/core.hpp"
 #include "core/window.hpp"
 #include "core/event.hpp"
+#include "core/editor.hpp"
 #include "stages/stage.hpp"
 #include "renderer/renderer.hpp"
 #include "audio_engine.hpp"
@@ -44,6 +45,7 @@ namespace bls
 
             std::unique_ptr<Window> window;
             std::unique_ptr<Renderer> renderer;
+            std::unique_ptr<Editor> editor;
             std::unique_ptr<AudioEngine> audio_engine;
             std::unique_ptr<Random> random_engine;
             std::unique_ptr<Stage> stage;
