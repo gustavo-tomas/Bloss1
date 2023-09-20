@@ -116,6 +116,25 @@ namespace bls
                 Box, Sphere
             };
 
+            static str get_collider_str(ColliderType type)
+            {
+                switch (type)
+                {
+                    case Sphere:
+                        return "sphere";
+                        break;
+
+                    case Box:
+                        return "box";
+                        break;
+
+                    default:
+                        std::cerr << "invalid collider type\n";
+                        return "";
+                        break;
+                }
+            }
+
             Collider(ColliderType type, const vec3& offset, bool immovable)
                 : type(type), offset(offset), immovable(immovable) { }
 
