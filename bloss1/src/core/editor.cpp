@@ -6,6 +6,8 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
+#include "renderer/model.hpp"
+
 namespace bls
 {
     Editor::Editor(Window& window) : window(window)
@@ -40,7 +42,7 @@ namespace bls
         std::cout << "editor destroyed successfully\n";
     }
 
-    void Editor::update(f32 dt)
+    void Editor::update(ECS& ecs, f32 dt)
     {
         // Create ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -75,6 +77,9 @@ namespace bls
         ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
 
+        // Entities
+        render_entities(ecs);
+
         pop_style_vars();
 
         // Render
@@ -88,6 +93,74 @@ namespace bls
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void Editor::render_entities(ECS& ecs)
+    {
+        // Scene entities
+        ImGui::Begin("Entities");
+
+        // @TODO: oooofff
+        for (const auto& [id, name] : ecs.names)
+        {
+            ImGui::Text("%d - %s", id, name.c_str());
+            ImGui::Separator();
+
+            if (ecs.transforms.count(id))
+            {
+                ImGui::Text("transform");
+                ImGui::Text("position: %s", to_str(ecs.transforms[id]->position).c_str());
+                ImGui::Text("rotation: %s", to_str(ecs.transforms[id]->rotation).c_str());
+                ImGui::Text("scale: %s", to_str(ecs.transforms[id]->scale).c_str());
+            }
+
+            if (ecs.models.count(id))
+            {
+                ImGui::Text("model");
+                ImGui::Text("path: %s", ecs.models[id]->model->path.c_str());
+
+                for (const auto& [animation_name, animation] : ecs.models[id]->model->animations)
+                    ImGui::Text("animation: %s", animation_name.c_str());
+            }
+
+            if (ecs.physics_objects.count(id))
+            {
+                ImGui::Text("physics object");
+                ImGui::Text("force: %s", to_str(ecs.physics_objects[id]->force).c_str());
+                ImGui::Text("velocity: %s", to_str(ecs.physics_objects[id]->velocity).c_str());
+                ImGui::Text("mass: %.3f", ecs.physics_objects[id]->mass);
+            }
+
+            if (ecs.colliders.count(id))
+            {
+                ImGui::Text("collider");
+                ImGui::Text("type: %s", Collider::get_collider_str(ecs.colliders[id]->type).c_str());
+
+                if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
+                {
+                    auto radius = static_cast<SphereCollider*>(ecs.colliders[id].get())->radius;
+                    ImGui::Text("radius: %.3f", radius);
+                }
+
+                else if (ecs.colliders[id]->type == Collider::ColliderType::Box)
+                {
+                    vec3 dimensions =
+                    {
+                        static_cast<BoxCollider*>(ecs.colliders[id].get())->width,
+                        static_cast<BoxCollider*>(ecs.colliders[id].get())->height,
+                        static_cast<BoxCollider*>(ecs.colliders[id].get())->depth
+                    };
+                    ImGui::Text("dimensions: %s", to_str(dimensions).c_str());
+                }
+
+                ImGui::Text("immovable: %d", ecs.colliders[id]->immovable);
+                ImGui::Text("offset: %s", to_str(ecs.colliders[id]->offset).c_str());
+            }
+
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        }
+
+        ImGui::End();
     }
 
     void Editor::push_style_vars()

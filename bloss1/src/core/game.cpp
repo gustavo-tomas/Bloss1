@@ -53,8 +53,7 @@ namespace bls
         change_stage(new TestStage());
 
         // Time variation
-        f64 last_time = window->get_time(), current_time = 0, time_counter = 0, dt = 0;
-        u32 frame_counter = 0;
+        f64 last_time = window->get_time(), current_time = 0, dt = 0;
 
         set_target_fps(0);
 
@@ -76,20 +75,14 @@ namespace bls
             dt = current_time - last_time;
             last_time = current_time;
 
-            // Print FPS
-            frame_counter++;
-            time_counter += dt;
-            if (time_counter >= 1.0)
-            {
-                printf("%.3lf ms/frame - %d fps\n", 1000.0 / (f64) frame_counter, frame_counter);
-                frame_counter = time_counter = 0;
-            }
-
             // Update running stage
             stage->update(dt);
 
+            if (!stage)
+                break;
+
             // Update editor
-            editor->update(dt);
+            editor->update(*stage->ecs, dt);
 
             // Update window
             window->update();
