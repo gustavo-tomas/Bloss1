@@ -103,45 +103,57 @@ namespace bls
         // @TODO: oooofff
         for (const auto& [id, name] : ecs.names)
         {
-            ImGui::Text("%d - %s", id, name.c_str());
+            if (!ImGui::CollapsingHeader(name.c_str()))
+                continue;
+
+            ImGui::Text("id: %d", id);
             ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
             if (ecs.transforms.count(id))
             {
                 ImGui::Text("transform");
-                ImGui::Text("position: %s", to_str(ecs.transforms[id]->position).c_str());
-                ImGui::Text("rotation: %s", to_str(ecs.transforms[id]->rotation).c_str());
-                ImGui::Text("scale: %s", to_str(ecs.transforms[id]->scale).c_str());
+                ImGui::Separator();
+                ImGui::InputFloat3("position", value_ptr(ecs.transforms[id]->position));
+                ImGui::InputFloat3("rotation", value_ptr(ecs.transforms[id]->rotation));
+                ImGui::InputFloat3("scale", value_ptr(ecs.transforms[id]->scale));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
 
             if (ecs.models.count(id))
             {
                 ImGui::Text("model");
+                ImGui::Separator();
                 ImGui::Text("path: %s", ecs.models[id]->model->path.c_str());
 
                 for (const auto& [animation_name, animation] : ecs.models[id]->model->animations)
                     ImGui::Text("animation: %s", animation_name.c_str());
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
 
             if (ecs.physics_objects.count(id))
             {
                 ImGui::Text("physics object");
-                ImGui::Text("force: %s", to_str(ecs.physics_objects[id]->force).c_str());
-                ImGui::Text("velocity: %s", to_str(ecs.physics_objects[id]->velocity).c_str());
-                ImGui::Text("mass: %.3f", ecs.physics_objects[id]->mass);
+                ImGui::Separator();
+                ImGui::InputFloat3("force", value_ptr(ecs.physics_objects[id]->force));
+                ImGui::InputFloat3("velocity", value_ptr(ecs.physics_objects[id]->velocity));
+                ImGui::InputFloat("mass", &ecs.physics_objects[id]->mass);
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
 
             if (ecs.colliders.count(id))
             {
                 ImGui::Text("collider");
+                ImGui::Separator();
                 ImGui::Text("type: %s", Collider::get_collider_str(ecs.colliders[id]->type).c_str());
 
                 if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
                 {
-                    auto radius = static_cast<SphereCollider*>(ecs.colliders[id].get())->radius;
-                    ImGui::Text("radius: %.3f", radius);
+                    auto* radius = &static_cast<SphereCollider*>(ecs.colliders[id].get())->radius;
+                    ImGui::InputFloat("radius", radius);
                 }
 
+                // @TODO: convert Box dimensions to vec3
                 else if (ecs.colliders[id]->type == Collider::ColliderType::Box)
                 {
                     vec3 dimensions =
@@ -150,14 +162,13 @@ namespace bls
                         static_cast<BoxCollider*>(ecs.colliders[id].get())->height,
                         static_cast<BoxCollider*>(ecs.colliders[id].get())->depth
                     };
-                    ImGui::Text("dimensions: %s", to_str(dimensions).c_str());
+                    ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 
-                ImGui::Text("immovable: %d", ecs.colliders[id]->immovable);
-                ImGui::Text("offset: %s", to_str(ecs.colliders[id]->offset).c_str());
+                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
+                ImGui::InputFloat3("offset", value_ptr(ecs.colliders[id]->offset));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
-
-            ImGui::Dummy(ImVec2(10.0f, 10.0f));
         }
 
         ImGui::End();
