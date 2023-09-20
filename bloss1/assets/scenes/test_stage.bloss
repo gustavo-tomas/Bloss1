@@ -27,7 +27,7 @@
     model: bloss1/assets/models/vampire/dancing_vampire.dae, 0;
     transform: (-20.0, 10.0, -20.0), (0.0, 180.0, 0.0), (0.001, 0.001, 0.001);
     physics_object: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 1.0;
-    collider: box, 5.0, 5.0, 5.0, (0.0, 5.0, 0.0), 0;
+    collider: box, (5.0, 5.0, 5.0), (0.0, 5.0, 0.0), 0;
 }
 
 [floor]
@@ -35,5 +35,5 @@
     model: bloss1/assets/models/floor/square_floor_fixed.gltf, 0;
     transform: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (10.0, 1.0, 10.0);
     physics_object: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 1.0;
-    collider: box, 100.0, 20.0, 100.0, (0.0, -20.0, 0.0), 1;
+    collider: box, (100.0, 20.0, 100.0), (0.0, -20.0, 0.0), 1;
 }
