@@ -38,7 +38,7 @@ namespace bls
                 line.erase(std::remove(line.begin(), line.end(), ']'), line.end());
 
                 id = empty_entity(ecs);
-                ecs.names[id] = entity_name;
+                ecs.names[id] = line;
 
                 entity_name = line;
                 entity_detected = true;
