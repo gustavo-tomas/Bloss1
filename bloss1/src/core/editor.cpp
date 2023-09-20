@@ -156,12 +156,7 @@ namespace bls
                 // @TODO: convert Box dimensions to vec3
                 else if (ecs.colliders[id]->type == Collider::ColliderType::Box)
                 {
-                    vec3 dimensions =
-                    {
-                        static_cast<BoxCollider*>(ecs.colliders[id].get())->width,
-                        static_cast<BoxCollider*>(ecs.colliders[id].get())->height,
-                        static_cast<BoxCollider*>(ecs.colliders[id].get())->depth
-                    };
+                    auto& dimensions = static_cast<BoxCollider*>(ecs.colliders[id].get())->dimensions;
                     ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 

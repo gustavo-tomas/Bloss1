@@ -301,7 +301,7 @@ namespace bls
         skybox->draw(view, projection);
 
         // Render debug lines
-        // render_colliders(ecs, projection, view);
+        render_colliders(ecs, projection, view);
 
         // Render texts
         render_texts(ecs);
@@ -455,9 +455,7 @@ namespace bls
             else if (collider->type == Collider::ColliderType::Box)
             {
                 auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position + collider->offset,
-                                    static_cast<BoxCollider*>(collider.get())->width,
-                                    static_cast<BoxCollider*>(collider.get())->height,
-                                    static_cast<BoxCollider*>(collider.get())->depth);
+                                    static_cast<BoxCollider*>(collider.get())->dimensions);
 
                 collider_box->render();
             }

@@ -12,24 +12,24 @@ namespace bls
     class Box
     {
         public:
-            Box(Renderer& renderer, const vec3& position = vec3(0.0f), f32 width = 1.0f, f32 height = 1.0f, f32 depth = 1.0f)
+            Box(Renderer& renderer, const vec3& position = vec3(0.0f), const vec3& dimensions = vec3(1.0f))
                 : renderer(renderer)
             {
                 vertices =
                 {
                     // Front face
-                    // Position                                                     // Normals         // Texture coordinates
-                    position.x + -width, position.y + -height, position.z + depth,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // (0)
-                    position.x +  width, position.y + -height, position.z + depth,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // (1)
-                    position.x +  width, position.y +  height, position.z + depth,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // (2)
-                    position.x + -width, position.y +  height, position.z + depth,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // (3)
+                    // Position                                                                         // Normals         // Texture coordinates
+                    position.x + -dimensions.x, position.y + -dimensions.y, position.z + dimensions.z,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f, // (0)
+                    position.x +  dimensions.x, position.y + -dimensions.y, position.z + dimensions.z,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f, // (1)
+                    position.x +  dimensions.x, position.y +  dimensions.y, position.z + dimensions.z,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f, // (2)
+                    position.x + -dimensions.x, position.y +  dimensions.y, position.z + dimensions.z,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, // (3)
 
                     // Back face
-                    // Position                                                      // Normals          // Texture coordinates
-                    position.x + -width, position.y + -height, position.z + -depth,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // (4)
-                    position.x +  width, position.y + -height, position.z + -depth,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // (5)
-                    position.x +  width, position.y +  height, position.z + -depth,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f, // (6)
-                    position.x + -width, position.y +  height, position.z + -depth,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f  // (7)
+                    // Position                                                                          // Normals          // Texture coordinates
+                    position.x + -dimensions.x, position.y + -dimensions.y, position.z + -dimensions.z,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f, // (4)
+                    position.x +  dimensions.x, position.y + -dimensions.y, position.z + -dimensions.z,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f, // (5)
+                    position.x +  dimensions.x, position.y +  dimensions.y, position.z + -dimensions.z,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f, // (6)
+                    position.x + -dimensions.x, position.y +  dimensions.y, position.z + -dimensions.z,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f  // (7)
                 };
 
                 // Setup cube VAO

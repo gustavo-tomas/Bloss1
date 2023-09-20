@@ -124,17 +124,12 @@ namespace bls
             else if (type == "box")
             {
                 str width, height, depth;
-
-                std::getline(iline, width,  ',');
-                std::getline(iline, height, ',');
-                std::getline(iline, depth,  ',');
+                vec3 dimensions = read_vec3(&iline, ',');
 
                 offset = read_vec3(&iline, ',');
                 std::getline(iline, immovable, ';');
 
-                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(
-                                               stof(width), stof(height), stof(depth),
-                                               offset, stoi(immovable));
+                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(dimensions, offset, stoi(immovable));
             }
 
             else

@@ -149,10 +149,10 @@ namespace bls
     class BoxCollider : public Collider
     {
         public:
-            BoxCollider(f32 width, f32 height, f32 depth, const vec3& offset = vec3(0.0f), bool immovable = false)
-                : Collider(ColliderType::Box, offset, immovable), width(width), height(height), depth(depth) { }
+            BoxCollider(const vec3& dimensions, const vec3& offset = vec3(0.0f), bool immovable = false)
+                : Collider(ColliderType::Box, offset, immovable), dimensions(dimensions) { }
 
-            f32 width, height, depth;
+            vec3 dimensions; // width, height, depth
     };
 
     class SphereCollider : public Collider
