@@ -17,8 +17,5 @@ namespace bls
 
             void start() override;
             void update(f32 dt) override;
-
-        private:
-            std::unique_ptr<ECS> ecs;
     };
 };
