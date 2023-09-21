@@ -16,6 +16,7 @@ namespace bls
             ~SceneParser();
 
             void parse_scene(const str& file);
+            void save_scene(const str& file);
 
         private:
             void parse_component(const str& line, u32 entity_id, const str& entity_name);

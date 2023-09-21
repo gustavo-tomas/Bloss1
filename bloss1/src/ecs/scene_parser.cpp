@@ -59,6 +59,65 @@ namespace bls
         scene.close();
     }
 
+    void SceneParser::save_scene(const str& file)
+    {
+        std::ofstream scene(file);
+
+        for (const auto& [id, name] : ecs.names)
+        {
+            scene << "[" << name << "]" << "\n";
+            scene << "{" << "\n";
+
+            if (ecs.models.count(id))
+            {
+                scene << "\tmodel: ";
+                scene << ecs.models[id]->model->path << ", ";
+                scene << ecs.models[id]->model->flip_uvs << ";" << "\n";
+            }
+
+            if (ecs.transforms.count(id))
+            {
+                scene << "\ttransform: ";
+                scene << to_str(ecs.transforms[id]->position).substr(4) << ", ";
+                scene << to_str(ecs.transforms[id]->rotation).substr(4) << ", ";
+                scene << to_str(ecs.transforms[id]->scale).substr(4)    << ";" << "\n";
+            }
+
+            if (ecs.physics_objects.count(id))
+            {
+                scene << "\tphysics_object: ";
+                scene << to_str(ecs.physics_objects[id]->velocity).substr(4) << ", ";
+                scene << to_str(ecs.physics_objects[id]->force).substr(4) << ", ";
+                scene << to_str(ecs.physics_objects[id]->mass) << ";" << "\n";
+            }
+
+            if (ecs.colliders.count(id))
+            {
+                auto type = ecs.colliders[id]->type;
+
+                scene << "\tcollider: ";
+                scene << Collider::get_collider_str(type) << ", ";
+
+                if (type == Collider::ColliderType::Sphere)
+                {
+                    auto collider = static_cast<SphereCollider*>(ecs.colliders[id].get());
+                    scene << to_str(collider->radius) << ", ";
+                }
+
+                else if (type == Collider::ColliderType::Box)
+                {
+                    auto collider = static_cast<BoxCollider*>(ecs.colliders[id].get());
+                    scene << to_str(collider->dimensions).substr(4) << ", ";
+                }
+
+                scene << to_str(ecs.colliders[id]->offset).substr(4) << ", ";
+                scene << to_str(ecs.colliders[id]->immovable) << ";" << "\n";
+            }
+
+            scene << "}" << "\n\n";
+        }
+    }
+
     void SceneParser::parse_component(const str& line, u32 entity_id, const str& entity_name)
     {
         // Parse component

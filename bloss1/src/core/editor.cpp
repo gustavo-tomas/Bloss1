@@ -63,7 +63,15 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0)) { }
+                if (ImGui::MenuItem("Save current scene", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
+                {
+
+                }
+
+                if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
+                {
+
+                }
 
                 ImGui::Separator();
                 ImGui::EndMenu();
