@@ -1,6 +1,7 @@
 #include "ecs/scene_parser.hpp"
 #include "ecs/entities.hpp"
 #include "renderer/model.hpp"
+#include "renderer/font.hpp"
 
 namespace bls
 {
@@ -17,9 +18,27 @@ namespace bls
         while (std::getline(scene, line))
         {
             // Remove unecessary chars
-            line.erase(std::remove_if(line.begin(), line.end(), ::isspace), line.end());
             line.erase(std::remove(line.begin(), line.end(), '('), line.end());
             line.erase(std::remove(line.begin(), line.end(), ')'), line.end());
+
+            // @TODO: oooofff
+            bool insideQuotes = false;
+            str processed_line = "";
+            for (const char c : line)
+            {
+                if (c == '~')
+                {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+
+                if (!insideQuotes && std::isspace(c))
+                    continue;
+
+                processed_line += c;
+            }
+
+            line = processed_line;
 
             // Parse entity
             if (line[0] == '[')
@@ -151,6 +170,17 @@ namespace bls
 
                 scene << to_str(controller.speed) << ", ";
                 scene << to_str(controller.sensitivity) << ";" << "\n";
+            }
+
+            if (ecs.texts.count(id))
+            {
+                auto& text = *ecs.texts[id];
+
+                scene << "\ttext: ";
+
+                scene << text.font_file << ", ";
+                scene << "~" << text.text << "~" << ", ";
+                write_vec3(&scene, text.color, ";\n");
             }
 
             scene << "}" << "\n\n";
@@ -290,6 +320,19 @@ namespace bls
             std::getline(iline, sensitivity, ';');
 
             ecs.camera_controllers[entity_id] = std::make_unique<CameraController>(CameraController(stof(speed), stof(sensitivity)));
+        }
+
+        else if (component_name == "text")
+        {
+            str font_file, text;
+            vec3 color;
+
+            std::getline(iline, font_file, ',');
+            std::getline(iline, text, ',');
+            color = read_vec3(&iline, ',');
+
+            auto font = Font::create(entity_name, font_file);
+            ecs.texts[entity_id] = std::make_unique<Text>(Text(font.get(), font_file, text, color));
         }
     }
 

@@ -142,7 +142,7 @@ namespace bls
 
         ecs.names[id] = "text";
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.texts[id] = std::make_unique<Text>(font.get(), text, color);
+        ecs.texts[id] = std::make_unique<Text>(font.get(), "bloss1/assets/fonts/inder_regular.ttf", text, color);
 
         return id;
     }

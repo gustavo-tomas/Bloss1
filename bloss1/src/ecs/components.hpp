@@ -189,10 +189,11 @@ namespace bls
     class Text : public Component
     {
         public:
-            Text(Font* font, str text, const vec3& color)
-                : font(font), text(text), color(color) { }
+            Text(Font* font, const str& font_file, const str& text, const vec3& color)
+                : font(font), font_file(font_file), text(text), color(color) { }
 
             Font* font;
+            str font_file;
             str text;
             vec3 color;
     };

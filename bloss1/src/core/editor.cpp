@@ -222,6 +222,26 @@ namespace bls
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
+
+            if (ecs.texts.count(id))
+            {
+                auto font_file = ecs.texts[id]->font_file;
+                auto& text = ecs.texts[id]->text;
+
+                std::vector<char> text_c(text.c_str(), text.c_str() + text.size() + 1);
+                char buffer[512];
+                strcpy(buffer, text_c.data());
+
+                ImGui::Text("text");
+                ImGui::Separator();
+                ImGui::Text(("font: " + font_file).c_str());
+                ImGui::InputText("text", buffer, 512);
+                ImGui::InputFloat3("color", value_ptr(ecs.texts[id]->color));
+
+                text = buffer;
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();
