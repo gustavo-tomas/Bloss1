@@ -111,7 +111,7 @@ namespace bls
         // @TODO: oooofff
         for (const auto& [id, name] : ecs.names)
         {
-            if (!ImGui::CollapsingHeader(name.c_str()))
+            if (!ImGui::CollapsingHeader((name + to_str(id)).c_str()))
                 continue;
 
             ImGui::Text("id: %d", id);
@@ -170,6 +170,31 @@ namespace bls
 
                 ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
                 ImGui::InputFloat3("offset", value_ptr(ecs.colliders[id]->offset));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.dir_lights.count(id))
+            {
+                ImGui::Text("dir light");
+                ImGui::Separator();
+                ImGui::InputFloat3("ambient",  value_ptr(ecs.dir_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse",  value_ptr(ecs.dir_lights[id]->diffuse));
+                ImGui::InputFloat3("specular", value_ptr(ecs.dir_lights[id]->specular));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.point_lights.count(id))
+            {
+                ImGui::Text("point light");
+                ImGui::Separator();
+                ImGui::InputFloat3("ambient",  value_ptr(ecs.point_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse",  value_ptr(ecs.point_lights[id]->diffuse));
+                ImGui::InputFloat3("specular", value_ptr(ecs.point_lights[id]->specular));
+
+                ImGui::InputFloat("constant",  &ecs.point_lights[id]->constant);
+                ImGui::InputFloat("linear",    &ecs.point_lights[id]->linear);
+                ImGui::InputFloat("quadratic", &ecs.point_lights[id]->quadratic);
+
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
         }
