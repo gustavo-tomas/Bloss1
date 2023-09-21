@@ -4,17 +4,7 @@
 
 namespace bls
 {
-    SceneParser::SceneParser(ECS& ecs) : ecs(ecs)
-    {
-
-    }
-
-    SceneParser::~SceneParser()
-    {
-        std::cout << "scene parser destroyed successfully\n";
-    }
-
-    void SceneParser::parse_scene(const str& file)
+    void SceneParser::parse_scene(ECS& ecs, const str& file)
     {
         std::fstream scene(file);
 
@@ -53,13 +43,13 @@ namespace bls
             }
 
             if (entity_detected)
-                parse_component(line, id, entity_name);
+                parse_component(ecs, line, id, entity_name);
         }
 
         scene.close();
     }
 
-    void SceneParser::save_scene(const str& file)
+    void SceneParser::save_scene(ECS& ecs, const str& file)
     {
         std::ofstream scene(file);
 
@@ -118,7 +108,7 @@ namespace bls
         }
     }
 
-    void SceneParser::parse_component(const str& line, u32 entity_id, const str& entity_name)
+    void SceneParser::parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name)
     {
         // Parse component
         str component_name;

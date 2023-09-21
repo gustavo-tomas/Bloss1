@@ -12,16 +12,11 @@ namespace bls
     class SceneParser
     {
         public:
-            SceneParser(ECS& ecs);
-            ~SceneParser();
-
-            void parse_scene(const str& file);
-            void save_scene(const str& file);
+            static void parse_scene(ECS& ecs, const str& file);
+            static void save_scene(ECS& ecs, const str& file);
 
         private:
-            void parse_component(const str& line, u32 entity_id, const str& entity_name);
-            vec3 read_vec3(std::istringstream* iline, char delimiter);
-
-            ECS& ecs;
+            static void parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name);
+            static vec3 read_vec3(std::istringstream* iline, char delimiter);
     };
 };

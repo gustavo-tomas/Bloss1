@@ -34,8 +34,7 @@ namespace bls
         player(*ecs, Transform(vec3(0.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
 
         // Load entities from file
-        auto scene_parser = SceneParser(*ecs.get());
-        scene_parser.parse_scene("bloss1/assets/scenes/test_stage.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
 
         abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
 
