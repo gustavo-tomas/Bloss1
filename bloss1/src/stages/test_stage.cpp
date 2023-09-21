@@ -38,17 +38,6 @@ namespace bls
 
         abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
 
-        // Add directional lights
-        directional_light(*ecs,
-                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                          DirectionalLight(vec3(0.0f), vec3(0.005f, 0.005f, 0.005f)));
-
-        // Add point lights
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-
         // Add some text
         text(*ecs,
              Transform(vec3(20.0f), vec3(0.0f), vec3(0.5f)),

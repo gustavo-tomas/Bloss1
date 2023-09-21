@@ -105,6 +105,29 @@ namespace bls
                 scene << to_str(ecs.colliders[id]->immovable) << ";" << "\n";
             }
 
+            if (ecs.dir_lights.count(id))
+            {
+                auto& dir_light = *ecs.dir_lights[id];
+
+                scene << "\tdir_light: ";
+                scene << to_str(dir_light.ambient).substr(4) << ", ";
+                scene << to_str(dir_light.diffuse).substr(4) << ", ";
+                scene << to_str(dir_light.specular).substr(4) << ";" << "\n";
+            }
+
+            if (ecs.point_lights.count(id))
+            {
+                auto& point_light = *ecs.point_lights[id];
+
+                scene << "\tpoint_light: ";
+                scene << to_str(point_light.ambient).substr(4) << ", ";
+                scene << to_str(point_light.diffuse).substr(4) << ", ";
+                scene << to_str(point_light.specular).substr(4) << ", ";
+                scene << to_str(point_light.constant) << ", ";
+                scene << to_str(point_light.linear) << ", ";
+                scene << to_str(point_light.quadratic) << ";" << "\n";
+            }
+
             scene << "}" << "\n\n";
         }
 
@@ -187,6 +210,34 @@ namespace bls
 
             else
                 std::cerr << "invalid collider type\n";
+        }
+
+        else if (component_name == "dir_light")
+        {
+            vec3 ambient, diffuse, specular;
+
+            ambient = read_vec3(&iline, ',');
+            diffuse = read_vec3(&iline, ',');
+            specular = read_vec3(&iline, ',');
+
+            ecs.dir_lights[entity_id] = std::make_unique<DirectionalLight>(DirectionalLight(ambient, diffuse, specular));
+        }
+
+        else if (component_name == "point_light")
+        {
+            vec3 ambient, diffuse, specular;
+            str constant, linear, quadratic;
+
+            ambient = read_vec3(&iline, ',');
+            diffuse = read_vec3(&iline, ',');
+            specular = read_vec3(&iline, ',');
+
+            std::getline(iline, constant, ',');
+            std::getline(iline, linear, ',');
+            std::getline(iline, quadratic, ';');
+
+            ecs.point_lights[entity_id] = std::make_unique<PointLight>(PointLight(ambient, diffuse, specular,
+                                          stof(constant), stof(linear), stof(quadratic)));
         }
     }
 
