@@ -129,6 +129,30 @@ namespace bls
                 scene << to_str(point_light.quadratic) << ";" << "\n";
             }
 
+            if (ecs.cameras.count(id))
+            {
+                auto& camera = *ecs.cameras[id];
+
+                scene << "\tcamera: ";
+                write_vec3(&scene, camera.target_offset, ", ");
+                write_vec3(&scene, camera.world_up, ", ");
+
+                scene << to_str(camera.zoom) << ", ";
+                scene << to_str(camera.near) << ", ";
+                scene << to_str(camera.far) << ", ";
+                scene << to_str(camera.lerp_factor) << ";" << "\n";
+            }
+
+            if (ecs.camera_controllers.count(id))
+            {
+                auto& controller = *ecs.camera_controllers[id];
+
+                scene << "\tcamera_controller: ";
+
+                scene << to_str(controller.speed) << ", ";
+                scene << to_str(controller.sensitivity) << ";" << "\n";
+            }
+
             scene << "}" << "\n\n";
         }
 
@@ -239,6 +263,33 @@ namespace bls
 
             ecs.point_lights[entity_id] = std::make_unique<PointLight>(PointLight(ambient, diffuse, specular,
                                           stof(constant), stof(linear), stof(quadratic)));
+        }
+
+        else if (component_name == "camera")
+        {
+            vec3 offset, world_up;
+            str zoom, near, far, lerp_factor;
+
+            offset = read_vec3(&iline, ',');
+            world_up = read_vec3(&iline, ',');
+
+            std::getline(iline, zoom, ',');
+            std::getline(iline, near, ',');
+            std::getline(iline, far, ',');
+            std::getline(iline, lerp_factor, ';');
+
+            ecs.cameras[entity_id] = std::make_unique<Camera>(Camera(offset, world_up,
+                                     stof(zoom), stof(near), stof(far), stof(lerp_factor)));
+        }
+
+        else if (component_name == "camera_controller")
+        {
+            str speed, sensitivity;
+
+            std::getline(iline, speed, ',');
+            std::getline(iline, sensitivity, ';');
+
+            ecs.camera_controllers[entity_id] = std::make_unique<CameraController>(CameraController(stof(speed), stof(sensitivity)));
         }
     }
 

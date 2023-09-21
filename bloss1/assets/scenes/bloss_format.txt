@@ -13,6 +13,8 @@ physics_object: velocity, force, mass;
 collider: type, dimensions, offset, immovable;
 dir_light: ambient, diffuse, specular;
 point_light: ambient, diffuse, specular, constant, linear, quadratic;
+camera: offset, world_up, zoom, near, far, lerp_factor;
+camera_controller: speed, sensitivity;
 
 // Example:
 [ball]
