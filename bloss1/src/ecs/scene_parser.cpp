@@ -199,6 +199,13 @@ namespace bls
                 }
             }
 
+            if (ecs.timers.count(id))
+            {
+                auto& timer = ecs.timers[id];
+                scene << "\ttimer: ";
+                scene << to_str(timer->time) << ";" << "\n";
+            }
+
             scene << "}" << "\n\n";
         }
 
@@ -363,6 +370,13 @@ namespace bls
 
             Game::get().get_audio_engine().load(sound_name, sound_file, stoi(looping));
             ecs.sounds[entity_id][sound_name] = std::make_unique<Sound>(Sound(sound_file, sound_name, stof(volume), stoi(play_now), stoi(looping)));
+        }
+
+        else if (component_name == "timer")
+        {
+            str time;
+            std::getline(iline, time, ';');
+            ecs.timers[entity_id] = std::make_unique<Timer>(Timer(stof(time)));
         }
     }
 

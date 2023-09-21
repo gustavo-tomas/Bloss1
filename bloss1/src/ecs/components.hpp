@@ -167,8 +167,8 @@ namespace bls
     class Timer : public Component
     {
         public:
-            Timer()
-                : time(0.0f) { }
+            Timer(f32 time = 0.0f)
+                : time(time) { }
 
             f32 time;
     };

@@ -17,6 +17,7 @@ camera: offset, world_up, zoom, near, far, lerp_factor;
 camera_controller: speed, sensitivity;
 text: font, ~text~, color;
 sound: file, name, volume, play_now, looping;
+timer: time;
 
 // Example:
 [ball]

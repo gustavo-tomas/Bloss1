@@ -258,6 +258,17 @@ namespace bls
                     ImGui::Dummy(ImVec2(10.0f, 10.0f));
                 }
             }
+
+            if (ecs.timers.count(id))
+            {
+                auto& time = ecs.timers[id]->time;
+
+                ImGui::Text("timer");
+                ImGui::Separator();
+                ImGui::InputFloat("time", &time);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();
