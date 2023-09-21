@@ -11,6 +11,8 @@ model: file, flip_uvs;
 transform: position, rotation, scale;
 physics_object: velocity, force, mass;
 collider: type, dimensions, offset, immovable;
+dir_light: ambient, diffuse, specular;
+point_light: ambient, diffuse, specular, constant, linear, quadratic;
 
 // Example:
 [ball]
