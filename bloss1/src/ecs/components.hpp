@@ -176,12 +176,14 @@ namespace bls
     class Sound : public Component
     {
         public:
-            Sound(const str& name, f32 volume, bool play_now)
-                : name(name), volume(volume), play_now(play_now) { }
+            Sound(const str& file, const str& name, f32 volume, bool play_now, bool looping)
+                : file(file), name(name), volume(volume), play_now(play_now), looping(looping) { }
 
+            str file;
             str name;
             f32 volume;
             bool play_now;
+            bool looping;
     };
 
     // @TODO: same problem as model

@@ -34,9 +34,6 @@ namespace bls
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
 
         abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
-
-        // Add background music
-        background_music(*ecs, Transform(), Sound("test", 0.5f, true), "bloss1/assets/sounds/test.wav");
     }
 
     void TestStage::update(f32 dt)

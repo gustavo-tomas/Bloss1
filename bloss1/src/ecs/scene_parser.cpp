@@ -2,6 +2,7 @@
 #include "ecs/entities.hpp"
 #include "renderer/model.hpp"
 #include "renderer/font.hpp"
+#include "core/game.hpp"
 
 namespace bls
 {
@@ -183,6 +184,21 @@ namespace bls
                 write_vec3(&scene, text.color, ";\n");
             }
 
+            if (ecs.sounds.count(id))
+            {
+                for (const auto& [name, sound] : ecs.sounds[id])
+                {
+                    scene << "\tsound: ";
+
+                    scene << sound->file << ", ";
+                    scene << sound->name << ", ";
+
+                    scene << to_str(sound->volume) << ", ";
+                    scene << to_str(sound->play_now) << ", ";
+                    scene << to_str(sound->looping) << ";" << "\n";
+                }
+            }
+
             scene << "}" << "\n\n";
         }
 
@@ -333,6 +349,20 @@ namespace bls
 
             auto font = Font::create(entity_name, font_file);
             ecs.texts[entity_id] = std::make_unique<Text>(Text(font.get(), font_file, text, color));
+        }
+
+        else if (component_name == "sound")
+        {
+            str sound_file, sound_name, volume, play_now, looping;
+
+            std::getline(iline, sound_file, ',');
+            std::getline(iline, sound_name, ',');
+            std::getline(iline, volume, ',');
+            std::getline(iline, play_now, ',');
+            std::getline(iline, looping, ';');
+
+            Game::get().get_audio_engine().load(sound_name, sound_file, stoi(looping));
+            ecs.sounds[entity_id][sound_name] = std::make_unique<Sound>(Sound(sound_file, sound_name, stof(volume), stoi(play_now), stoi(looping)));
         }
     }
 

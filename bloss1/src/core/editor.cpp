@@ -111,7 +111,7 @@ namespace bls
         // @TODO: oooofff
         for (const auto& [id, name] : ecs.names)
         {
-            if (!ImGui::CollapsingHeader((name + to_str(id)).c_str()))
+            if (!ImGui::CollapsingHeader((name + "_" + to_str(id)).c_str()))
                 continue;
 
             ImGui::Text("id: %d", id);
@@ -241,6 +241,22 @@ namespace bls
                 text = buffer;
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.sounds.count(id))
+            {
+                for (auto& [sound_name, sound] : ecs.sounds[id])
+                {
+                    ImGui::Text("sound");
+                    ImGui::Separator();
+                    ImGui::Text(("name: " + sound_name).c_str());
+                    ImGui::Text(("file: " + sound->file).c_str());
+                    ImGui::Text(("looping: " + to_str(sound->looping)).c_str());
+                    ImGui::InputFloat("volume ", &sound->volume);
+                    ImGui::Checkbox("play now ", &sound->play_now);
+
+                    ImGui::Dummy(ImVec2(10.0f, 10.0f));
+                }
             }
         }
 

@@ -25,10 +25,10 @@ namespace bls
 
         ecs.cameras[id] = std::make_unique<Camera>(vec3(15.0f, 7.0f, 50.0f));
         ecs.camera_controllers[id] = std::make_unique<CameraController>();
-        ecs.sounds[id]["player_fire"] = std::make_unique<Sound>("player_fire", 0.5f, false);
+        // ecs.sounds[id]["player_fire"] = std::make_unique<Sound>("player_fire", 0.5f, false);
 
-        auto& audio_engine = Game::get().get_audio_engine();
-        audio_engine.load("player_fire", "bloss1/assets/sounds/gunshot.mp3");
+        // auto& audio_engine = Game::get().get_audio_engine();
+        // audio_engine.load("player_fire", "bloss1/assets/sounds/gunshot.mp3");
 
         return id;
     }

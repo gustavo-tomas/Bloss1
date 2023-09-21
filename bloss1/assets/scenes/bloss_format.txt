@@ -16,10 +16,13 @@ point_light: ambient, diffuse, specular, constant, linear, quadratic;
 camera: offset, world_up, zoom, near, far, lerp_factor;
 camera_controller: speed, sensitivity;
 text: font, ~text~, color;
+sound: file, name, volume, play_now, looping;
 
 // Example:
 [ball]
-    model: bloss1/assets/models/sphere/rusted_sphere.gltf, false;
+{
+    model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;
     transform: (10.0, 10.0, 0.0), (0.0, 90.0, 0.0), (5.0, 5.0, 5.0);
     physics_object: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 1.0;
-    collider: sphere, 5.0, (0.0, 0.0, 0.0), false;
+    collider: sphere, 5.0, (0.0, 0.0, 0.0), 0;
+}
