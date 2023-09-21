@@ -69,16 +69,16 @@ namespace bls
             if (ecs.transforms.count(id))
             {
                 scene << "\ttransform: ";
-                scene << to_str(ecs.transforms[id]->position).substr(4) << ", ";
-                scene << to_str(ecs.transforms[id]->rotation).substr(4) << ", ";
-                scene << to_str(ecs.transforms[id]->scale).substr(4)    << ";" << "\n";
+                write_vec3(&scene, ecs.transforms[id]->position, ", ");
+                write_vec3(&scene, ecs.transforms[id]->rotation, ", ");
+                write_vec3(&scene, ecs.transforms[id]->scale, ";\n");
             }
 
             if (ecs.physics_objects.count(id))
             {
                 scene << "\tphysics_object: ";
-                scene << to_str(ecs.physics_objects[id]->velocity).substr(4) << ", ";
-                scene << to_str(ecs.physics_objects[id]->force).substr(4) << ", ";
+                write_vec3(&scene, ecs.physics_objects[id]->velocity, ", ");
+                write_vec3(&scene, ecs.physics_objects[id]->force, ", ");
                 scene << to_str(ecs.physics_objects[id]->mass) << ";" << "\n";
             }
 
@@ -98,10 +98,10 @@ namespace bls
                 else if (type == Collider::ColliderType::Box)
                 {
                     auto collider = static_cast<BoxCollider*>(ecs.colliders[id].get());
-                    scene << to_str(collider->dimensions).substr(4) << ", ";
+                    write_vec3(&scene, collider->dimensions, ", ");
                 }
 
-                scene << to_str(ecs.colliders[id]->offset).substr(4) << ", ";
+                write_vec3(&scene, ecs.colliders[id]->offset, ", ");
                 scene << to_str(ecs.colliders[id]->immovable) << ";" << "\n";
             }
 
@@ -110,9 +110,9 @@ namespace bls
                 auto& dir_light = *ecs.dir_lights[id];
 
                 scene << "\tdir_light: ";
-                scene << to_str(dir_light.ambient).substr(4) << ", ";
-                scene << to_str(dir_light.diffuse).substr(4) << ", ";
-                scene << to_str(dir_light.specular).substr(4) << ";" << "\n";
+                write_vec3(&scene, dir_light.ambient, ", ");
+                write_vec3(&scene, dir_light.diffuse, ", ");
+                write_vec3(&scene, dir_light.specular, ";\n");
             }
 
             if (ecs.point_lights.count(id))
@@ -120,9 +120,10 @@ namespace bls
                 auto& point_light = *ecs.point_lights[id];
 
                 scene << "\tpoint_light: ";
-                scene << to_str(point_light.ambient).substr(4) << ", ";
-                scene << to_str(point_light.diffuse).substr(4) << ", ";
-                scene << to_str(point_light.specular).substr(4) << ", ";
+                write_vec3(&scene, point_light.ambient, ", ");
+                write_vec3(&scene, point_light.diffuse, ", ");
+                write_vec3(&scene, point_light.specular, ", ");
+
                 scene << to_str(point_light.constant) << ", ";
                 scene << to_str(point_light.linear) << ", ";
                 scene << to_str(point_light.quadratic) << ";" << "\n";
@@ -254,5 +255,10 @@ namespace bls
         }
 
         return vec;
+    }
+
+    void SceneParser::write_vec3(std::ofstream* scene, const vec3& vec, const str& end_str)
+    {
+        *scene << to_str(vec).substr(4) << end_str;
     }
 };

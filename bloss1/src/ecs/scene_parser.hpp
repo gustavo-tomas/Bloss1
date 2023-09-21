@@ -18,5 +18,6 @@ namespace bls
         private:
             static void parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name);
             static vec3 read_vec3(std::istringstream* iline, char delimiter);
+            static void write_vec3(std::ofstream* scene, const vec3& vec, const str& end_str);
     };
 };
