@@ -7,10 +7,11 @@
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 #include "renderer/model.hpp"
+#include "ecs/scene_parser.hpp"
 
 namespace bls
 {
-    Editor::Editor(Window& window) : window(window)
+    Editor::Editor(Window& window) : window(window), file("bloss1/assets/scenes/test_stage2.bloss")
     {
         // Context creation
         IMGUI_CHECKVERSION();
@@ -63,10 +64,9 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                if (ImGui::MenuItem("Save current scene", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
-                {
-
-                }
+                ImGui::InputTextWithHint("##", "file", file, 64); ImGui::SameLine();
+                if (ImGui::SmallButton("save"))
+                    SceneParser::save_scene(ecs, file);
 
                 if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
                 {
