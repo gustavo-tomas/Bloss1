@@ -1,3 +1,13 @@
+[player]
+{
+    model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;
+    transform: (0.0, 10.0, 0.0), (0.0, 90.0, 0.0), (5.0, 5.0, 5.0);
+    physics_object: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 1.0;
+    collider: sphere, 5.0, (0.0, 0.0, 0.0), 0;
+    camera: (15.0, 7.0, 50.0), (0.0, 1.0, 0.0), 45.0, 1.0, 1000.0, 7.5;
+    camera_controller: 80.0, 0.03;
+}
+
 [ball]
 {
     model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;

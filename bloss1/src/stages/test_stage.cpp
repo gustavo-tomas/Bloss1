@@ -30,9 +30,6 @@ namespace bls
         ecs->add_system(render_system);
         ecs->add_system(sound_system);
 
-        // Add some entities to the world
-        player(*ecs, Transform(vec3(0.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
-
         // Load entities from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
 

@@ -197,6 +197,31 @@ namespace bls
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
+
+            if (ecs.cameras.count(id))
+            {
+                ImGui::Text("camera");
+                ImGui::Separator();
+                ImGui::InputFloat3("target offset", value_ptr(ecs.cameras[id]->target_offset));
+                ImGui::InputFloat3("world up", value_ptr(ecs.cameras[id]->world_up));
+
+                ImGui::InputFloat("zoom", &ecs.cameras[id]->target_zoom);
+                ImGui::InputFloat("near", &ecs.cameras[id]->near);
+                ImGui::InputFloat("far",  &ecs.cameras[id]->far);
+                ImGui::InputFloat("lerp factor", &ecs.cameras[id]->lerp_factor);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.camera_controllers.count(id))
+            {
+                ImGui::Text("camera controller");
+                ImGui::Separator();
+                ImGui::InputFloat("sensitivity", &ecs.camera_controllers[id]->sensitivity);
+                ImGui::InputFloat("speed", &ecs.camera_controllers[id]->speed);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();
