@@ -19,6 +19,6 @@ namespace bls
             void pop_style_vars();
 
             Window& window;
-            char file[65];
+            char save_file[65];
     };
 };

@@ -11,7 +11,7 @@
 
 namespace bls
 {
-    Editor::Editor(Window& window) : window(window), file("bloss1/assets/scenes/test_stage2.bloss")
+    Editor::Editor(Window& window) : window(window), save_file("bloss1/assets/scenes/test_stage2.bloss")
     {
         // Context creation
         IMGUI_CHECKVERSION();
@@ -64,9 +64,9 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                ImGui::InputTextWithHint("##", "file", file, 64); ImGui::SameLine();
+                ImGui::InputTextWithHint("##", "file", save_file, 64); ImGui::SameLine();
                 if (ImGui::SmallButton("save"))
-                    SceneParser::save_scene(ecs, file);
+                    SceneParser::save_scene(ecs, save_file);
 
                 if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
                 {
