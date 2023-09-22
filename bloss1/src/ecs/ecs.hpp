@@ -23,8 +23,11 @@ namespace bls
     class ECS
     {
         public:
-            ECS()
-                : id_counter(0) { }
+            ECS(unsigned int max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
+            {
+                for (auto id = 0; id <= max_entity_id; id++)
+                    available_ids.insert(id);
+            }
 
             ~ECS()
             {
@@ -39,12 +42,16 @@ namespace bls
             // Return a new id (create a new entity)
             u32 get_id()
             {
-                if (id_counter >= MAX_ENTITY_ID)
+                if (available_ids.empty())
                 {
-                    std::cerr << "id_counter reached maximum id\n";
+                    std::cerr << "no available ids left\n";
                     exit(1);
                 }
-                return id_counter++;
+
+                int id = *available_ids.begin();
+                available_ids.erase(id);
+
+                return id;
             }
 
             // Register a system
@@ -56,6 +63,12 @@ namespace bls
             // Erase all the components of an entity (@TODO: this is not very efficient)
             void erase_entity(u32 id)
             {
+                if (id > max_entity_id)
+                {
+                    std::cerr << "tried to delete invalid id: " << id << "\n";
+                    exit(1);
+                }
+
                 names.erase(id);
                 transforms.erase(id);
                 models.erase(id);
@@ -67,6 +80,8 @@ namespace bls
                 timers.erase(id);
                 cameras.erase(id);
                 camera_controllers.erase(id);
+
+                available_ids.insert(id);
             }
 
             // Registered systems
@@ -90,6 +105,7 @@ namespace bls
 
         private:
             // Entities IDs
-            u32 id_counter;
+            unsigned int max_entity_id;
+            std::set<unsigned int> available_ids;
     };
 };
