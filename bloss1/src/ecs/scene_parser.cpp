@@ -203,7 +203,24 @@ namespace bls
             {
                 auto& timer = ecs.timers[id];
                 scene << "\ttimer: ";
-                scene << to_str(timer->time) << ";" << "\n";
+                scene << to_str(0.0) << ";" << "\n";
+            }
+
+            if (ecs.transform_animations.count(id))
+            {
+                auto& key_frames = ecs.transform_animations[id]->key_frames;
+                scene << "\ttransform_animation: ";
+                scene << to_str(key_frames.size()) << ", ";
+
+                for (auto& key_frame : key_frames)
+                {
+                    write_vec3(&scene, key_frame.transform.position, ", ");
+                    write_vec3(&scene, key_frame.transform.rotation, ", ");
+                    write_vec3(&scene, key_frame.transform.scale, ", ");
+
+                    scene << to_str(key_frame.duration) << "; ";
+                }
+                scene << "\n";
             }
 
             scene << "}" << "\n\n";
@@ -377,6 +394,28 @@ namespace bls
             str time;
             std::getline(iline, time, ';');
             ecs.timers[entity_id] = std::make_unique<Timer>(Timer(stof(time)));
+        }
+
+        else if (component_name == "transform_animation")
+        {
+            vec3 position, rotation, scale;
+            str size, duration;
+
+            std::getline(iline, size, ',');
+            std::vector<KeyFrame> key_frames(stoi(size));
+
+            for (u16 i = 0; i < stoi(size); i++)
+            {
+                position = read_vec3(&iline, ',');
+                rotation = read_vec3(&iline, ',');
+                scale = read_vec3(&iline, ',');
+                std::getline(iline, duration, ';');
+
+                Transform transform = { position, rotation, scale };
+                key_frames[i] = { transform, stof(duration) };
+            }
+
+            ecs.transform_animations[entity_id] = std::make_unique<TransformAnimation>(key_frames);
         }
     }
 

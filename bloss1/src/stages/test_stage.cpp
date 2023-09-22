@@ -32,8 +32,6 @@ namespace bls
 
         // Load entities from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
-
-        abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
     }
 
     void TestStage::update(f32 dt)

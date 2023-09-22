@@ -18,6 +18,7 @@ camera_controller: speed, sensitivity;
 text: font, ~text~, color;
 sound: file, name, volume, play_now, looping;
 timer: time;
+transform_animation: number_of_transforms, transform1, duration1; transform2, duration2; ... ;
 
 // Example:
 [ball]

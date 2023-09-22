@@ -269,6 +269,27 @@ namespace bls
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
+
+            if (ecs.transform_animations.count(id))
+            {
+                auto& key_frames = ecs.transform_animations[id]->key_frames;
+
+                ImGui::Text("transform_animation");
+                ImGui::Separator();
+                for (u32 i = 0; i < key_frames.size(); i++)
+                {
+                    auto& key_frame = key_frames[i];
+
+                    ImGui::Text(("frame: " + to_str(i)).c_str());
+                    ImGui::InputFloat3(("position_" + to_str(i)).c_str(), value_ptr(key_frame.transform.position));
+                    ImGui::InputFloat3(("rotation_" + to_str(i)).c_str(), value_ptr(key_frame.transform.rotation));
+                    ImGui::InputFloat3(("scale_" + to_str(i)).c_str(), value_ptr(key_frame.transform.scale));
+                    ImGui::InputFloat(("duration_" + to_str(i)).c_str(), &key_frame.duration);
+                    ImGui::Dummy(ImVec2(5.0f, 5.0f));
+                }
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();
