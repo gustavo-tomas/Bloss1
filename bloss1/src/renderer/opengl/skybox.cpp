@@ -84,7 +84,7 @@ namespace bls
         }
 
         if (!captureFBO->check())
-            exit(1);
+            throw std::runtime_error("failed to generate framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -125,7 +125,7 @@ namespace bls
         }
 
         if (!captureFBO->check())
-            exit(1);
+            throw std::runtime_error("failed to generate framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -177,7 +177,7 @@ namespace bls
         }
 
         if (!captureFBO->check())
-            exit(1);
+            throw std::runtime_error("failed to generate framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -204,7 +204,7 @@ namespace bls
         quad->render();
 
         if (!captureFBO->check())
-            exit(1);
+            throw std::runtime_error("failed to generate framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

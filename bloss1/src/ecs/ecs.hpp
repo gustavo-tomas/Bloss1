@@ -25,7 +25,7 @@ namespace bls
         public:
             ECS(unsigned int max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
             {
-                for (auto id = 0; id <= max_entity_id; id++)
+                for (unsigned int id = 0; id <= max_entity_id; id++)
                     available_ids.insert(id);
             }
 
@@ -43,10 +43,7 @@ namespace bls
             u32 get_id()
             {
                 if (available_ids.empty())
-                {
-                    std::cerr << "no available ids left\n";
-                    exit(1);
-                }
+                    std::runtime_error("no available ids left");
 
                 int id = *available_ids.begin();
                 available_ids.erase(id);
@@ -64,10 +61,7 @@ namespace bls
             void erase_entity(u32 id)
             {
                 if (id > max_entity_id)
-                {
-                    std::cerr << "tried to delete invalid id: " << id << "\n";
-                    exit(1);
-                }
+                    throw std::runtime_error("tried to delete invalid id: " + to_str(id));
 
                 names.erase(id);
                 transforms.erase(id);

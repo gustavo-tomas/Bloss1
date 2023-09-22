@@ -90,7 +90,7 @@ namespace bls
             for (auto c : error_message) { error += c; }
             std::cout << "error when linking shader: " << vertex_path << "\n";
             std::cout << "error when linking program: \n" << error << "\n";
-            exit(1);
+            throw std::runtime_error("failed to link program");
         }
 
         glDetachShader(id, vertex_shader_id);

@@ -1,4 +1,5 @@
 #include "renderer/opengl/texture.hpp"
+#include "math/math.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
 #include "GLFW/glfw3.h"
@@ -18,7 +19,7 @@ namespace bls
             case ImageFormat::RGBA8: return GL_RGBA8;
             case ImageFormat::RGB32F: return GL_RGB32F;
             case ImageFormat::RGBA32F: return GL_RGBA32F;
-            default: std::cerr << "invalid image format: '" << format << "'\n"; exit(1);
+            default: throw std::runtime_error("invalid image format: '" + to_str(format) + "'");
         }
 
         return 0;
@@ -32,7 +33,7 @@ namespace bls
             case TextureParameter::ClampToEdge: return GL_CLAMP_TO_EDGE;
             case TextureParameter::Nearest: return GL_NEAREST;
             case TextureParameter::Linear: return GL_LINEAR;
-            default: std::cerr << "invalid texture parameter: '" << parameter << "'\n"; exit(1);
+            default: throw std::runtime_error("invalid texture parameter: '" + to_str(parameter) + "'");
         }
 
         return 0;
@@ -88,9 +89,8 @@ namespace bls
 
             else
             {
-                std::cerr << "failed to load texture: '" << path << "'\n";
                 stbi_image_free(data);
-                exit(1);
+                throw std::runtime_error("failed to load texture: '" + path + "'");
             }
         }
 
@@ -117,10 +117,7 @@ namespace bls
                 }
 
                 else
-                {
-                    std::cerr << "unsupported number of channels: '" << num_components << "'\n";
-                    exit(1);
-                }
+                    throw std::runtime_error("unsupported number of channels: '" + to_str(num_components) + "'");
 
                 // Create texture
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
@@ -138,8 +135,6 @@ namespace bls
 
             else
             {
-                std::cerr << "failed to load texture: '" << path << "'\n";
-
                 const char* failure_reason = stbi_failure_reason();
                 if (failure_reason)
                 {
@@ -148,7 +143,7 @@ namespace bls
                 }
 
                 stbi_image_free(data);
-                exit(1);
+                throw std::runtime_error("failed to load texture: '" + path + "'");
             }
         }
 

@@ -67,10 +67,7 @@ namespace bls
 
         int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE)
-        {
-            std::cout << "Error: ligthFBO Framebuffer is not complete!";
-            exit(1);
-        }
+            throw std::runtime_error("lightFBO framebuffer is not complete");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

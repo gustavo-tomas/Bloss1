@@ -36,18 +36,12 @@ namespace bls
         // Initialize free type
         FT_Library ft;
         if (FT_Init_FreeType(&ft))
-        {
-            std::cerr << "failed to initialize FreeType\n";
-            exit(1);
-        }
+            throw std::runtime_error("failed to initialize FreeType");
 
         // Load font as face
         FT_Face face;
         if (FT_New_Face(ft, path.c_str(), 0, &face))
-        {
-            std::cerr << "failed to load font: '" << path << "'\n";
-            exit(1);
-        }
+            throw std::runtime_error("failed to load font: '" + path + "'");
 
         // Set glyph size
         FT_Set_Pixel_Sizes(face, 0, 80);

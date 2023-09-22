@@ -13,10 +13,7 @@ namespace bls
         // Initialize GLFW
         glewExperimental = true;
         if (!glfwInit())
-        {
-            std::cerr << "failed to initialize GLFW\n";
-            exit(1);
-        }
+            throw std::runtime_error("failed to initialize GLFW");
 
         // GLFW window hints
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -29,19 +26,15 @@ namespace bls
         native_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
         if (!native_window)
         {
-            std::cerr << "failed to create GLFW native_window\n";
             glfwTerminate();
-            exit(1);
+            throw std::runtime_error("failed to create GLFW native_window");
         }
 
         // Initialize GLEW
         glfwMakeContextCurrent(native_window);
         glewExperimental = true;
         if (glewInit() != GLEW_OK)
-        {
-            std::cerr << "failed to initialize GLEW\n";
-            exit(1);
-        }
+            throw std::runtime_error("failed to initialize GLEW");
 
         // Get native_window dimensions
         glfwGetWindowSize(native_window, (i32*) &width, (i32*) &height);

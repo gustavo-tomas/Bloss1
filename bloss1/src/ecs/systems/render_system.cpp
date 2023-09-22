@@ -86,7 +86,7 @@ namespace bls
 
         // Check if framebuffer is complete
         if (!render_state.g_buffer->check())
-            exit(1);
+            throw std::runtime_error("framebuffer is not complete");
 
         render_state.g_buffer->unbind();
 

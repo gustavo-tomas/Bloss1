@@ -13,10 +13,7 @@ namespace bls
             return models[name];
 
         else
-        {
-            std::cerr << "model '" << name << "' doesn't exist\n";
-            exit(1);
-        }
+            throw std::runtime_error("model '" + name + "' doesn't exist");
     }
 
     bool ModelManager::exists(const str& name)

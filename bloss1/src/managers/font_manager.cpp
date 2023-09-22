@@ -13,10 +13,7 @@ namespace bls
             return fonts[name];
 
         else
-        {
-            std::cerr << "font '" << name << "' doesn't exist\n";
-            exit(1);
-        }
+            throw std::runtime_error("font '" + name + "' doesn't exist");
     }
 
     bool FontManager::exists(const str& name)

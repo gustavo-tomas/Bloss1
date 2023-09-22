@@ -12,7 +12,7 @@ namespace bls
             case ShaderDataType::Float: return GL_FLOAT;
             case ShaderDataType::Int:   return GL_INT;
             case ShaderDataType::Bool:  return GL_BOOL;
-            default: std::cerr << "unknown shader data type\n"; exit(1);
+            default: throw std::runtime_error("unknown shader data type");
         }
 
         return 0;

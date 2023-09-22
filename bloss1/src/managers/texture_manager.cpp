@@ -14,10 +14,7 @@ namespace bls
             return textures[name];
 
         else
-        {
-            std::cerr << "texture '" << name << "' doesn't exist\n";
-            exit(1);
-        }
+            throw std::runtime_error("texture '" + name + "' doesn't exist");
     }
 
     bool TextureManager::exists(const str& name)

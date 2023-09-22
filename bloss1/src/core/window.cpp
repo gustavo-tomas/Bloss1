@@ -11,8 +11,7 @@ namespace bls
         #ifdef _GLFW
         return new GlfwWindow(title, width, height);
         #else
-        std::cerr << "no valid window defined\n";
-        exit(1);
+        throw std::runtime_error("no valid window defined");
         #endif
     }
 

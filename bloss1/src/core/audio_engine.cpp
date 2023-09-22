@@ -30,10 +30,8 @@ namespace bls
 
         auto res = wav->load(path.c_str());
         if (res != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
-        {
-            std::cerr << "failed to load audio: '" << path << "'\n";
-            exit(1);
-        }
+            std::runtime_error("failed to load audio: '" + path + "'");
+
         wav->setLooping(looping);
 
         audios[name] = std::unique_ptr<SoLoud::Wav>(wav);

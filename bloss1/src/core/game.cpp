@@ -10,10 +10,7 @@ namespace bls
     {
         // Create game instance
         if (instance != nullptr)
-        {
-            std::cerr << "there can be only one instance of game\n";
-            exit(1);
-        }
+            throw std::runtime_error("there can be only one instance of game");
 
         instance = this;
 
@@ -126,10 +123,7 @@ namespace bls
     Game& Game::get()
     {
         if (instance == nullptr)
-        {
-            std::cerr << "game instance is nullptr\n";
-            exit(1);
-        }
+            throw std::runtime_error("game instance is nullptr");
 
         return *instance;
     }

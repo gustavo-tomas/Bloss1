@@ -14,10 +14,7 @@ namespace bls
             return shaders[name];
 
         else
-        {
-            std::cerr << "shader '" << name << "' doesn't exist\n";
-            exit(1);
-        }
+            throw std::runtime_error("shader '" + name + "' doesn't exist");
     }
 
     bool ShaderManager::exists(const str& name)

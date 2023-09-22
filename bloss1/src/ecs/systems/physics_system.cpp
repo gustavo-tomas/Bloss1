@@ -280,8 +280,7 @@ namespace bls
         }
 
         // Invalid colliders
-        std::cerr << "invalid colliders\n";
-        exit(1);
+        throw std::runtime_error("invalid collider types");
     }
 
     // Collision solver
