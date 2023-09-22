@@ -5,6 +5,11 @@
 
 namespace bls
 {
+    u32 empty_entity(ECS& ecs)
+    {
+        return ecs.get_id();
+    }
+
     u32 player(ECS& ecs, const Transform& transform)
     {
         u32 id = ecs.get_id();
@@ -20,10 +25,10 @@ namespace bls
 
         ecs.cameras[id] = std::make_unique<Camera>(vec3(15.0f, 7.0f, 50.0f));
         ecs.camera_controllers[id] = std::make_unique<CameraController>();
-        ecs.sounds[id]["player_fire"] = std::make_unique<Sound>("player_fire", 0.5f, false);
+        // ecs.sounds[id]["player_fire"] = std::make_unique<Sound>("player_fire", 0.5f, false);
 
-        auto& audio_engine = Game::get().get_audio_engine();
-        audio_engine.load("player_fire", "bloss1/assets/sounds/gunshot.mp3");
+        // auto& audio_engine = Game::get().get_audio_engine();
+        // audio_engine.load("player_fire", "bloss1/assets/sounds/gunshot.mp3");
 
         return id;
     }
@@ -54,7 +59,7 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                5.0f, 5.0f, 5.0f,
+                                vec3(5.0f, 5.0f, 5.0f),
                                 vec3(0.0f, 5.0f, 0.0f));
 
         return id;
@@ -69,7 +74,7 @@ namespace bls
         ecs.names[id] = "abomination";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.colliders[id] = std::make_unique<BoxCollider>(3.0f, 3.0f, 3.0f, vec3(0.0f), true);
+        ecs.colliders[id] = std::make_unique<BoxCollider>(vec3(3.0f, 3.0f, 3.0f), vec3(0.0f), true);
         ecs.timers[id] = std::make_unique<Timer>();
 
         std::vector<KeyFrame> key_frames;
@@ -92,7 +97,7 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f,
+                                vec3(transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f),
                                 vec3(0.0f, -transform.scale.y * 20.0f, 0.0f),
                                 true);
 
@@ -137,7 +142,7 @@ namespace bls
 
         ecs.names[id] = "text";
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.texts[id] = std::make_unique<Text>(font.get(), text, color);
+        ecs.texts[id] = std::make_unique<Text>(font.get(), "bloss1/assets/fonts/inder_regular.ttf", text, color);
 
         return id;
     }

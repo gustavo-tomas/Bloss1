@@ -6,9 +6,12 @@
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
 
+#include "renderer/model.hpp"
+#include "ecs/scene_parser.hpp"
+
 namespace bls
 {
-    Editor::Editor(Window& window) : window(window)
+    Editor::Editor(Window& window) : window(window), save_file("bloss1/assets/scenes/test_stage2.bloss")
     {
         // Context creation
         IMGUI_CHECKVERSION();
@@ -40,7 +43,7 @@ namespace bls
         std::cout << "editor destroyed successfully\n";
     }
 
-    void Editor::update(f32 dt)
+    void Editor::update(ECS& ecs, f32 dt)
     {
         // Create ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -61,7 +64,14 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0)) { }
+                ImGui::InputTextWithHint("##", "file", save_file, 64); ImGui::SameLine();
+                if (ImGui::SmallButton("save"))
+                    SceneParser::save_scene(ecs, save_file);
+
+                if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
+                {
+
+                }
 
                 ImGui::Separator();
                 ImGui::EndMenu();
@@ -74,6 +84,9 @@ namespace bls
         ImGui::Begin("Status");
         ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::End();
+
+        // Entities
+        render_entities(ecs);
 
         pop_style_vars();
 
@@ -88,6 +101,198 @@ namespace bls
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void Editor::render_entities(ECS& ecs)
+    {
+        // Scene entities
+        ImGui::Begin("Entities");
+
+        // @TODO: oooofff
+        for (const auto& [id, name] : ecs.names)
+        {
+            if (!ImGui::CollapsingHeader((name + "_" + to_str(id)).c_str()))
+                continue;
+
+            ImGui::Text("id: %d", id);
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            if (ecs.transforms.count(id))
+            {
+                ImGui::Text("transform");
+                ImGui::Separator();
+                ImGui::InputFloat3("position", value_ptr(ecs.transforms[id]->position));
+                ImGui::InputFloat3("rotation", value_ptr(ecs.transforms[id]->rotation));
+                ImGui::InputFloat3("scale", value_ptr(ecs.transforms[id]->scale));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.models.count(id))
+            {
+                ImGui::Text("model");
+                ImGui::Separator();
+                ImGui::Text("path: %s", ecs.models[id]->model->path.c_str());
+
+                for (const auto& [animation_name, animation] : ecs.models[id]->model->animations)
+                    ImGui::Text("animation: %s", animation_name.c_str());
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.physics_objects.count(id))
+            {
+                ImGui::Text("physics object");
+                ImGui::Separator();
+                ImGui::InputFloat3("force", value_ptr(ecs.physics_objects[id]->force));
+                ImGui::InputFloat3("velocity", value_ptr(ecs.physics_objects[id]->velocity));
+                ImGui::InputFloat("mass", &ecs.physics_objects[id]->mass);
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.colliders.count(id))
+            {
+                ImGui::Text("collider");
+                ImGui::Separator();
+                ImGui::Text("type: %s", Collider::get_collider_str(ecs.colliders[id]->type).c_str());
+
+                if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
+                {
+                    auto* radius = &static_cast<SphereCollider*>(ecs.colliders[id].get())->radius;
+                    ImGui::InputFloat("radius", radius);
+                }
+
+                // @TODO: convert Box dimensions to vec3
+                else if (ecs.colliders[id]->type == Collider::ColliderType::Box)
+                {
+                    auto& dimensions = static_cast<BoxCollider*>(ecs.colliders[id].get())->dimensions;
+                    ImGui::InputFloat3("dimensions", value_ptr(dimensions));
+                }
+
+                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
+                ImGui::InputFloat3("offset", value_ptr(ecs.colliders[id]->offset));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.dir_lights.count(id))
+            {
+                ImGui::Text("dir light");
+                ImGui::Separator();
+                ImGui::InputFloat3("ambient",  value_ptr(ecs.dir_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse",  value_ptr(ecs.dir_lights[id]->diffuse));
+                ImGui::InputFloat3("specular", value_ptr(ecs.dir_lights[id]->specular));
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.point_lights.count(id))
+            {
+                ImGui::Text("point light");
+                ImGui::Separator();
+                ImGui::InputFloat3("ambient",  value_ptr(ecs.point_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse",  value_ptr(ecs.point_lights[id]->diffuse));
+                ImGui::InputFloat3("specular", value_ptr(ecs.point_lights[id]->specular));
+
+                ImGui::InputFloat("constant",  &ecs.point_lights[id]->constant);
+                ImGui::InputFloat("linear",    &ecs.point_lights[id]->linear);
+                ImGui::InputFloat("quadratic", &ecs.point_lights[id]->quadratic);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.cameras.count(id))
+            {
+                ImGui::Text("camera");
+                ImGui::Separator();
+                ImGui::InputFloat3("target offset", value_ptr(ecs.cameras[id]->target_offset));
+                ImGui::InputFloat3("world up", value_ptr(ecs.cameras[id]->world_up));
+
+                ImGui::InputFloat("zoom", &ecs.cameras[id]->target_zoom);
+                ImGui::InputFloat("near", &ecs.cameras[id]->near);
+                ImGui::InputFloat("far",  &ecs.cameras[id]->far);
+                ImGui::InputFloat("lerp factor", &ecs.cameras[id]->lerp_factor);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.camera_controllers.count(id))
+            {
+                ImGui::Text("camera controller");
+                ImGui::Separator();
+                ImGui::InputFloat("sensitivity", &ecs.camera_controllers[id]->sensitivity);
+                ImGui::InputFloat("speed", &ecs.camera_controllers[id]->speed);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.texts.count(id))
+            {
+                auto font_file = ecs.texts[id]->font_file;
+                auto& text = ecs.texts[id]->text;
+
+                std::vector<char> text_c(text.c_str(), text.c_str() + text.size() + 1);
+                char buffer[512];
+                strcpy(buffer, text_c.data());
+
+                ImGui::Text("text");
+                ImGui::Separator();
+                ImGui::Text(("font: " + font_file).c_str());
+                ImGui::InputText("text", buffer, 512);
+                ImGui::InputFloat3("color", value_ptr(ecs.texts[id]->color));
+
+                text = buffer;
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.sounds.count(id))
+            {
+                for (auto& [sound_name, sound] : ecs.sounds[id])
+                {
+                    ImGui::Text("sound");
+                    ImGui::Separator();
+                    ImGui::Text(("name: " + sound_name).c_str());
+                    ImGui::Text(("file: " + sound->file).c_str());
+                    ImGui::Text(("looping: " + to_str(sound->looping)).c_str());
+                    ImGui::InputFloat("volume ", &sound->volume);
+                    ImGui::Checkbox("play now ", &sound->play_now);
+
+                    ImGui::Dummy(ImVec2(10.0f, 10.0f));
+                }
+            }
+
+            if (ecs.timers.count(id))
+            {
+                auto& time = ecs.timers[id]->time;
+
+                ImGui::Text("timer");
+                ImGui::Separator();
+                ImGui::InputFloat("time", &time);
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+
+            if (ecs.transform_animations.count(id))
+            {
+                auto& key_frames = ecs.transform_animations[id]->key_frames;
+
+                ImGui::Text("transform_animation");
+                ImGui::Separator();
+                for (u32 i = 0; i < key_frames.size(); i++)
+                {
+                    auto& key_frame = key_frames[i];
+
+                    ImGui::Text(("frame: " + to_str(i)).c_str());
+                    ImGui::InputFloat3(("position_" + to_str(i)).c_str(), value_ptr(key_frame.transform.position));
+                    ImGui::InputFloat3(("rotation_" + to_str(i)).c_str(), value_ptr(key_frame.transform.rotation));
+                    ImGui::InputFloat3(("scale_" + to_str(i)).c_str(), value_ptr(key_frame.transform.scale));
+                    ImGui::InputFloat(("duration_" + to_str(i)).c_str(), &key_frame.duration);
+                    ImGui::Dummy(ImVec2(5.0f, 5.0f));
+                }
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
+        }
+
+        ImGui::End();
     }
 
     void Editor::push_style_vars()

@@ -135,16 +135,10 @@ namespace bls
             auto col_b = static_cast<SphereCollider*>(collider_b);
 
             // Point where the box 'begins'
-            vec3 min_aabb = vec3(0.0f);
-            min_aabb.x = trans_a.position.x - col_a->width;
-            min_aabb.y = trans_a.position.y - col_a->height;
-            min_aabb.z = trans_a.position.z - col_a->depth;
+            vec3 min_aabb = trans_a.position - col_a->dimensions;
 
             // Point where the box 'ends'
-            vec3 max_aabb = vec3(0.0f);
-            max_aabb.x = trans_a.position.x + col_a->width;
-            max_aabb.y = trans_a.position.y + col_a->height;
-            max_aabb.z = trans_a.position.z + col_a->depth;
+            vec3 max_aabb = trans_a.position + col_a->dimensions;
 
             // 1) find point 'pbox' on box the closest to the sphere centre.
             vec3 closest_point_aabb;
@@ -207,26 +201,12 @@ namespace bls
             auto col_b = static_cast<BoxCollider*>(collider_b);
 
             // Point where the box 'begins'
-            vec3 min_aabb_a = vec3(0.0f);
-            min_aabb_a.x = trans_a.position.x - col_a->width;
-            min_aabb_a.y = trans_a.position.y - col_a->height;
-            min_aabb_a.z = trans_a.position.z - col_a->depth;
-
-            vec3 min_aabb_b = vec3(0.0f);
-            min_aabb_b.x = trans_b.position.x - col_b->width;
-            min_aabb_b.y = trans_b.position.y - col_b->height;
-            min_aabb_b.z = trans_b.position.z - col_b->depth;
+            vec3 min_aabb_a = trans_a.position - col_a->dimensions;
+            vec3 min_aabb_b = trans_b.position - col_b->dimensions;
 
             // Point where the box 'ends'
-            vec3 max_aabb_a = vec3(0.0f);
-            max_aabb_a.x = trans_a.position.x + col_a->width;
-            max_aabb_a.y = trans_a.position.y + col_a->height;
-            max_aabb_a.z = trans_a.position.z + col_a->depth;
-
-            vec3 max_aabb_b = vec3(0.0f);
-            max_aabb_b.x = trans_b.position.x + col_b->width;
-            max_aabb_b.y = trans_b.position.y + col_b->height;
-            max_aabb_b.z = trans_b.position.z + col_b->depth;
+            vec3 max_aabb_a = trans_a.position + col_a->dimensions;
+            vec3 max_aabb_b = trans_b.position + col_b->dimensions;
 
             bool intersecting = (min_aabb_a.x <= max_aabb_b.x && max_aabb_a.x >= min_aabb_b.x &&
                                  min_aabb_a.y <= max_aabb_b.y && max_aabb_a.y >= min_aabb_b.y &&

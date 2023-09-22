@@ -186,6 +186,7 @@ namespace bls
             static std::shared_ptr<Model> create(const str& name, const str& path, bool flip_uvs); // i know i know
 
             str path;
+            bool flip_uvs;
             std::vector<Mesh*> meshes;
             std::map<str, BoneInfo> bone_info_map;
             std::map<str, std::unique_ptr<SkeletalAnimation>> animations;

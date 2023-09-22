@@ -9,6 +9,7 @@ namespace bls
     {
         importer = new Assimp::Importer();
         this->path = path;
+        this->flip_uvs = flip_uvs;
         this->bone_counter = 0;
         this->animator = nullptr;
 

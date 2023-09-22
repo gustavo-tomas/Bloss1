@@ -71,7 +71,7 @@ namespace bls
     class PointLight : public Component
     {
         public:
-            PointLight(const vec3& diffuse = vec3(1.0f), const vec3& ambient = vec3(0.0f), const vec3& specular = vec3(1.0f),
+            PointLight(const vec3& ambient = vec3(0.0f), const vec3& diffuse = vec3(1.0f), const vec3& specular = vec3(1.0f),
                        f32 constant = 1.0f, f32 linear = 0.0001f, f32 quadratic = 0.000001f)
                 : ambient(ambient), diffuse(diffuse), specular(specular),
                   constant(constant), linear(linear), quadratic(quadratic) { }
@@ -116,6 +116,25 @@ namespace bls
                 Box, Sphere
             };
 
+            static str get_collider_str(ColliderType type)
+            {
+                switch (type)
+                {
+                    case Sphere:
+                        return "sphere";
+                        break;
+
+                    case Box:
+                        return "box";
+                        break;
+
+                    default:
+                        std::cerr << "invalid collider type\n";
+                        return "";
+                        break;
+                }
+            }
+
             Collider(ColliderType type, const vec3& offset, bool immovable)
                 : type(type), offset(offset), immovable(immovable) { }
 
@@ -130,10 +149,10 @@ namespace bls
     class BoxCollider : public Collider
     {
         public:
-            BoxCollider(f32 width, f32 height, f32 depth, const vec3& offset = vec3(0.0f), bool immovable = false)
-                : Collider(ColliderType::Box, offset, immovable), width(width), height(height), depth(depth) { }
+            BoxCollider(const vec3& dimensions, const vec3& offset = vec3(0.0f), bool immovable = false)
+                : Collider(ColliderType::Box, offset, immovable), dimensions(dimensions) { }
 
-            f32 width, height, depth;
+            vec3 dimensions; // width, height, depth
     };
 
     class SphereCollider : public Collider
@@ -148,8 +167,8 @@ namespace bls
     class Timer : public Component
     {
         public:
-            Timer()
-                : time(0.0f) { }
+            Timer(f32 time = 0.0f)
+                : time(time) { }
 
             f32 time;
     };
@@ -157,12 +176,14 @@ namespace bls
     class Sound : public Component
     {
         public:
-            Sound(const str& name, f32 volume, bool play_now)
-                : name(name), volume(volume), play_now(play_now) { }
+            Sound(const str& file, const str& name, f32 volume, bool play_now, bool looping)
+                : file(file), name(name), volume(volume), play_now(play_now), looping(looping) { }
 
+            str file;
             str name;
             f32 volume;
             bool play_now;
+            bool looping;
     };
 
     // @TODO: same problem as model
@@ -170,10 +191,11 @@ namespace bls
     class Text : public Component
     {
         public:
-            Text(Font* font, str text, const vec3& color)
-                : font(font), text(text), color(color) { }
+            Text(Font* font, const str& font_file, const str& text, const vec3& color)
+                : font(font), font_file(font_file), text(text), color(color) { }
 
             Font* font;
+            str font_file;
             str text;
             vec3 color;
     };
