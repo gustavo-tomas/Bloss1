@@ -11,7 +11,7 @@ namespace bls
             case RenderingMode::Lines:  return GL_LINES;
             case RenderingMode::Triangles: return GL_TRIANGLES;
             case RenderingMode::TriangleStrip: return GL_TRIANGLE_STRIP;
-            default: throw std::runtime_error("invalid rendering mode: '" + to_str(mode) + "'");
+            default: throw std::runtime_error("invalid rendering mode\n");
         }
 
         return 0;

@@ -9,12 +9,12 @@
 
 namespace bls
 {
-    enum ShaderDataType
+    enum class ShaderDataType
     {
         Float, Int, Bool
     };
 
-    enum AttachmentType
+    enum class AttachmentType
     {
         Depth
     };

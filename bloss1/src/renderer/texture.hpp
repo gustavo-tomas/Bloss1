@@ -8,12 +8,12 @@
 
 namespace bls
 {
-    enum TextureType
+    enum class TextureType
     {
         None, Diffuse, Normal, Specular, Metalness, Roughness, AmbientOcclusion, Emissive
     };
 
-    enum ImageFormat
+    enum class ImageFormat
     {
         RGB8,
         RGBA8,
@@ -21,7 +21,7 @@ namespace bls
         RGBA32F
     };
 
-    enum TextureParameter
+    enum class TextureParameter
     {
         Repeat, ClampToEdge, Nearest, Linear
     };

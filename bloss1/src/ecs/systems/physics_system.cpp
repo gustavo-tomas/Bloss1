@@ -120,7 +120,7 @@ namespace bls
         Collision collision = { };
 
         // Sphere v. Box
-        if (collider_a->type == Collider::Sphere && collider_b->type == Collider::Box)
+        if (collider_a->type == Collider::ColliderType::Sphere && collider_b->type == Collider::ColliderType::Box)
         {
             // Swap
             auto temp = collider_a;
@@ -129,7 +129,7 @@ namespace bls
         }
 
         // Box v. Sphere
-        if (collider_a->type == Collider::Box && collider_b->type == Collider::Sphere)
+        if (collider_a->type == Collider::ColliderType::Box && collider_b->type == Collider::ColliderType::Sphere)
         {
             auto col_a = static_cast<BoxCollider*>(collider_a);
             auto col_b = static_cast<SphereCollider*>(collider_b);
@@ -167,7 +167,7 @@ namespace bls
         }
 
         // Sphere v. Sphere
-        else if (collider_a->type == Collider::Sphere && collider_b->type == Collider::Sphere)
+        else if (collider_a->type == Collider::ColliderType::Sphere && collider_b->type == Collider::ColliderType::Sphere)
         {
             auto col_a = static_cast<SphereCollider*>(collider_a);
             auto col_b = static_cast<SphereCollider*>(collider_b);
@@ -195,7 +195,7 @@ namespace bls
         }
 
         // Box v. Box
-        else if (collider_a->type == Collider::Box && collider_b->type == Collider::Box)
+        else if (collider_a->type == Collider::ColliderType::Box && collider_b->type == Collider::ColliderType::Box)
         {
             auto col_a = static_cast<BoxCollider*>(collider_a);
             auto col_b = static_cast<BoxCollider*>(collider_b);

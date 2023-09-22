@@ -8,7 +8,7 @@
 
 namespace bls
 {
-    enum RenderingMode
+    enum class RenderingMode
     {
         Lines, Triangles, TriangleStrip
     };

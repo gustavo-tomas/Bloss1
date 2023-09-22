@@ -111,7 +111,7 @@ namespace bls
     class Collider : public Component
     {
         public:
-            enum ColliderType
+            enum class ColliderType
             {
                 Box, Sphere
             };
@@ -120,11 +120,11 @@ namespace bls
             {
                 switch (type)
                 {
-                    case Sphere:
+                    case ColliderType::Sphere:
                         return "sphere";
                         break;
 
-                    case Box:
+                    case ColliderType::Box:
                         return "box";
                         break;
 

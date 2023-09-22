@@ -19,7 +19,7 @@ namespace bls
             case ImageFormat::RGBA8: return GL_RGBA8;
             case ImageFormat::RGB32F: return GL_RGB32F;
             case ImageFormat::RGBA32F: return GL_RGBA32F;
-            default: throw std::runtime_error("invalid image format: '" + to_str(format) + "'");
+            default: throw std::runtime_error("invalid image format\n");
         }
 
         return 0;
@@ -33,7 +33,7 @@ namespace bls
             case TextureParameter::ClampToEdge: return GL_CLAMP_TO_EDGE;
             case TextureParameter::Nearest: return GL_NEAREST;
             case TextureParameter::Linear: return GL_LINEAR;
-            default: throw std::runtime_error("invalid texture parameter: '" + to_str(parameter) + "'");
+            default: throw std::runtime_error("invalid texture parameter\n");
         }
 
         return 0;

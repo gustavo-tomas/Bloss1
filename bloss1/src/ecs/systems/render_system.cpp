@@ -379,7 +379,7 @@ namespace bls
                         case TextureType::AmbientOcclusion: type_name = "ao";        break;
                         case TextureType::Emissive:         type_name = "emissive";  break;
 
-                        default: std::cerr << "invalid texture type: '" << type << "'\n";
+                        default: std::cerr << "invalid texture type\n";
                     }
 
                     shader.set_uniform1("material." + type_name, i);
