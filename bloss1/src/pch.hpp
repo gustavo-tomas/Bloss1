@@ -15,6 +15,7 @@
 #include <map>        // Maps
 #include <memory>     // Unique ptr
 #include <random>     // RNG
+#include <set>        // Yes
 #include <sstream>    // String stream
 #include <stack>      // Stack data structure
 #include <string>     // Strings!
