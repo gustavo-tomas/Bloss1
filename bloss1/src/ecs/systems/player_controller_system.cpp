@@ -6,7 +6,7 @@ namespace bls
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
 
-    void camera_controller_system(ECS& ecs, f32 dt)
+    void player_controller_system(ECS& ecs, f32 dt)
     {
         // Update all controllers
         auto& camera_controllers = ecs.camera_controllers;
