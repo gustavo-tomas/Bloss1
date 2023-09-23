@@ -1,6 +1,9 @@
 #include "ecs/systems.hpp"
 
-#define GRAVITY 9.8f
+#define GRAVITY 50.0f
+#define DECELERATION 10.0f
+#define MIN_MASS 0.0001f
+#define MAX_MASS 1'000'000'000.0f
 
 // @TODO: use continuous collision detection
 namespace bls
@@ -58,6 +61,8 @@ namespace bls
         auto& colliders = ecs.colliders;
         for (auto& [id, object] : objects)
         {
+            object->mass = clamp(object->mass, MIN_MASS, MAX_MASS);
+
             // Do not apply forces to immovable ojbects
             if (!colliders[id]->immovable)
             {
@@ -66,10 +71,10 @@ namespace bls
                 object->velocity += (object->force / object->mass) * dt;
 
                 // Apply deceleration
-                object->velocity.x = apply_deceleration(object->velocity.x, 20.0f, object->mass, dt);
-                object->velocity.y = apply_deceleration(object->velocity.y, 1.0f, object->mass, dt);
-                object->velocity.z = apply_deceleration(object->velocity.z, 20.0f, object->mass, dt);
+                object->velocity.x = apply_deceleration(object->velocity.x, DECELERATION, object->mass, dt);
+                object->velocity.z = apply_deceleration(object->velocity.z, DECELERATION, object->mass, dt);
 
+                object->velocity = clamp(object->velocity, -object->terminal_velocity, object->terminal_velocity);
                 transforms[id]->position += object->velocity * dt;
             }
 
@@ -315,17 +320,13 @@ namespace bls
 
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
     {
+        velocity -= velocity * (deceleration / mass) * dt;
+
         if (velocity > 0)
-        {
-            velocity -= (deceleration / mass) * dt;
             return max(velocity, 0.0f);
-        }
 
         else if (velocity < 0)
-        {
-            velocity += (deceleration / mass) * dt;
             return min(velocity, 0.0f);
-        }
 
         return 0.0f;
     }

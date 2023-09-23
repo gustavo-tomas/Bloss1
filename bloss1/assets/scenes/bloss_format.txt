@@ -9,7 +9,7 @@
 // Components:
 model: file, flip_uvs;
 transform: position, rotation, scale;
-physics_object: velocity, force, mass;
+physics_object: velocity, terminal_velocity, force, mass;
 collider: type, dimensions, offset, immovable;
 dir_light: ambient, diffuse, specular;
 point_light: ambient, diffuse, specular, constant, linear, quadratic;
@@ -25,6 +25,6 @@ transform_animation: number_of_transforms, transform1, duration1; transform2, du
 {
     model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;
     transform: (10.0, 10.0, 0.0), (0.0, 90.0, 0.0), (5.0, 5.0, 5.0);
-    physics_object: (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 1.0;
+    physics_object: (0.0, 0.0, 0.0), (10.0, 10.0, 10.0), (0.0, 0.0, 0.0), 1.0;
     collider: sphere, 5.0, (0.0, 0.0, 0.0), 0;
 }

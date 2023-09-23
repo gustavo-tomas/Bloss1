@@ -31,7 +31,8 @@ namespace bls
         ecs->add_system(sound_system);
 
         // Load entities from file
-        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
+        // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
     }
 
     void TestStage::update(f32 dt)

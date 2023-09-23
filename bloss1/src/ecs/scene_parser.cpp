@@ -98,6 +98,7 @@ namespace bls
             {
                 scene << "\tphysics_object: ";
                 write_vec3(&scene, ecs.physics_objects[id]->velocity, ", ");
+                write_vec3(&scene, ecs.physics_objects[id]->terminal_velocity, ", ");
                 write_vec3(&scene, ecs.physics_objects[id]->force, ", ");
                 scene << to_str(ecs.physics_objects[id]->mass) << ";" << "\n";
             }
@@ -169,7 +170,7 @@ namespace bls
 
                 scene << "\tcamera_controller: ";
 
-                scene << to_str(controller.speed) << ", ";
+                write_vec3(&scene, controller.speed, ", ");
                 scene << to_str(controller.sensitivity) << ";" << "\n";
             }
 
@@ -265,13 +266,14 @@ namespace bls
         else if (component_name == "physics_object")
         {
             str mass;
-            vec3 velocity, force;
+            vec3 velocity, terminal_velocity, force;
 
             velocity = read_vec3(&iline, ',');
+            terminal_velocity = read_vec3(&iline, ',');
             force = read_vec3(&iline, ',');
             std::getline(iline, mass, ';');
 
-            ecs.physics_objects[entity_id] = std::make_unique<PhysicsObject>(PhysicsObject(velocity, force, stof(mass)));
+            ecs.physics_objects[entity_id] = std::make_unique<PhysicsObject>(PhysicsObject(velocity, terminal_velocity, force, stof(mass)));
         }
 
         else if (component_name == "collider")
@@ -354,12 +356,13 @@ namespace bls
 
         else if (component_name == "camera_controller")
         {
-            str speed, sensitivity;
+            str sensitivity;
+            vec3 speed;
 
-            std::getline(iline, speed, ',');
+            speed = read_vec3(&iline, ',');
             std::getline(iline, sensitivity, ';');
 
-            ecs.camera_controllers[entity_id] = std::make_unique<CameraController>(CameraController(stof(speed), stof(sensitivity)));
+            ecs.camera_controllers[entity_id] = std::make_unique<CameraController>(CameraController(speed, stof(sensitivity)));
         }
 
         else if (component_name == "text")

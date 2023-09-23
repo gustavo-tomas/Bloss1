@@ -50,10 +50,11 @@ namespace bls
     class CameraController : public Component
     {
         public:
-            CameraController(f32 speed = 80.0f, f32 sensitivity = 0.03f)
+            CameraController(const vec3& speed = vec3(100.0f), f32 sensitivity = 0.03f)
                 : speed(speed), sensitivity(sensitivity), mouse_x(0.0f), mouse_y(0.0f) { }
 
-            f32 speed, sensitivity;
+            vec3 speed;
+            f32 sensitivity;
             f32 mouse_x, mouse_y;
     };
 
@@ -99,10 +100,11 @@ namespace bls
     class PhysicsObject : public Component
     {
         public:
-            PhysicsObject(const vec3& velocity = vec3(0.0f), const vec3& force = vec3(0.0f), f32 mass = 1.0f)
-                : velocity(velocity), force(force), mass(mass) { }
+            PhysicsObject(const vec3& velocity = vec3(0.0f), const vec3& terminal_velocity = vec3(100.0f), const vec3& force = vec3(0.0f), f32 mass = 1.0f)
+                : velocity(velocity), terminal_velocity(terminal_velocity), force(force), mass(mass) { }
 
             vec3 velocity;
+            vec3 terminal_velocity;
             vec3 force;
             f32 mass;
     };

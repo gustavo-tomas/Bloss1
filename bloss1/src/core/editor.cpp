@@ -145,6 +145,7 @@ namespace bls
                 ImGui::Separator();
                 ImGui::InputFloat3("force", value_ptr(ecs.physics_objects[id]->force));
                 ImGui::InputFloat3("velocity", value_ptr(ecs.physics_objects[id]->velocity));
+                ImGui::InputFloat3("terminal velocity", value_ptr(ecs.physics_objects[id]->terminal_velocity));
                 ImGui::InputFloat("mass", &ecs.physics_objects[id]->mass);
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
@@ -218,7 +219,7 @@ namespace bls
                 ImGui::Text("camera controller");
                 ImGui::Separator();
                 ImGui::InputFloat("sensitivity", &ecs.camera_controllers[id]->sensitivity);
-                ImGui::InputFloat("speed", &ecs.camera_controllers[id]->speed);
+                ImGui::InputFloat3("speed", value_ptr(ecs.camera_controllers[id]->speed));
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }

@@ -16,12 +16,12 @@ namespace bls
             auto transform = transforms[id].get();
 
             // @TODO: use quaternions?
-            // Calculate target direction vectors
+            // Calculate target direction vectors without vertical influence
             vec3 front =
             {
-                cos(radians(transform->rotation.y))* cos(radians(transform->rotation.x)),
-                sin(radians(transform->rotation.x)),
-                sin(radians(transform->rotation.y))* cos(radians(transform->rotation.x))
+                cos(radians(transform->rotation.y))* cos(radians(0.0f)),
+                sin(radians(0.0f)),
+                sin(radians(transform->rotation.y))* cos(radians(0.0f))
             };
             front = normalize(front);
 
@@ -41,22 +41,23 @@ namespace bls
 
         // Position
         // -------------------------------------------------------------------------------------------------------------
+        const vec3 world_up = vec3(0.0f, 1.0f, 0.0f);
+
         // Define movement mappings
-        std::map<u32, vec3> movement_mappings =
+        std::map<u32, std::pair<vec3, f32>> movement_mappings =
         {
-            { KEY_W,          front },
-            { KEY_S,         -front },
-            { KEY_D,          right },
-            { KEY_A,         -right },
-            { KEY_SPACE,         up },
-            { KEY_LEFT_CONTROL, -up }
+            { KEY_W,     {  front,    controller->speed.z } },
+            { KEY_S,     { -front,    controller->speed.z } },
+            { KEY_D,     {  right,    controller->speed.x } },
+            { KEY_A,     { -right,    controller->speed.x } },
+            { KEY_SPACE, {  world_up, controller->speed.y } }
         };
 
         // Update speed based on input
         // Don't use dt here - the physics system will multiply the final force by dt on the same frame
-        for (const auto& [key, direction] : movement_mappings)
+        for (const auto& [key, mapping] : movement_mappings)
             if (Input::is_key_pressed(key))
-                object->force += direction * controller->speed;
+                object->force += mapping.first * mapping.second;
 
         // Rotation
         // -------------------------------------------------------------------------------------------------------------
