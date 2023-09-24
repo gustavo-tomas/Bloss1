@@ -6,6 +6,7 @@
 
 #include "ecs/ecs.hpp"
 #include "math/math.hpp"
+#include "ecs/state_machine.hpp"
 
 namespace bls
 {
@@ -217,5 +218,20 @@ namespace bls
 
             std::vector<KeyFrame> key_frames;
             u32 curr_frame_idx;
+    };
+
+    class State;
+    class StateMachine : public Component
+    {
+        public:
+            StateMachine(const std::map<str, State*>& states_map, State* current_state)
+                : current_state(current_state)
+            {
+                for (auto& [name, state] : states_map)
+                    states[name] = std::unique_ptr<State>(state);
+            }
+
+            std::map<str, std::unique_ptr<State>> states;
+            State* current_state;
     };
 };

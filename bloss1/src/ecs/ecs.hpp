@@ -23,19 +23,14 @@ namespace bls
     class ECS
     {
         public:
-            ECS(unsigned int max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
+            ECS(u32 max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
             {
-                for (unsigned int id = 0; id <= max_entity_id; id++)
+                for (u32 id = 0; id <= max_entity_id; id++)
                     available_ids.insert(id);
             }
 
             ~ECS()
             {
-                systems.clear();
-                transforms.clear();
-                models.clear();
-                dir_lights.clear();
-
                 std::cout << "world destroyed successfully\n";
             }
 
@@ -45,7 +40,7 @@ namespace bls
                 if (available_ids.empty())
                     std::runtime_error("no available ids left");
 
-                int id = *available_ids.begin();
+                u32 id = *available_ids.begin();
                 available_ids.erase(id);
 
                 return id;
@@ -74,6 +69,9 @@ namespace bls
                 timers.erase(id);
                 cameras.erase(id);
                 camera_controllers.erase(id);
+                texts.erase(id);
+                sounds.erase(id);
+                state_machines.erase(id);
 
                 available_ids.insert(id);
             }
@@ -96,10 +94,11 @@ namespace bls
             std::map<u32, std::unique_ptr<CameraController>> camera_controllers;
             std::map<u32, std::unique_ptr<Text>> texts;
             std::map<u32, std::map<str, std::unique_ptr<Sound>>> sounds;
+            std::map<u32, std::unique_ptr<StateMachine>> state_machines;
 
         private:
             // Entities IDs
-            unsigned int max_entity_id;
-            std::set<unsigned int> available_ids;
+            u32 max_entity_id;
+            std::set<u32> available_ids;
     };
 };

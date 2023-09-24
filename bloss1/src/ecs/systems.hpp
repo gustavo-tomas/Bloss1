@@ -14,4 +14,5 @@ namespace bls
     void camera_system(ECS& ecs, f32 dt);
     void player_controller_system(ECS& ecs, f32 dt);
     void sound_system(ECS& ecs, f32 dt);
+    void state_machine_system(ECS& ecs, f32 dt);
 };
