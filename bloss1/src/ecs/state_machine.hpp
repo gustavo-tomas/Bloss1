@@ -11,27 +11,28 @@
 
 namespace bls
 {
+    class ECS;
     class State
     {
         public:
-            virtual void enter() = 0;
-            virtual void update() = 0;
+            virtual void enter(ECS& ecs, u32 id) = 0;
+            virtual void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) = 0;
             virtual void exit() = 0;
     };
 
-    class IdleState : public State
+    class PlayerIdleState : public State
     {
         public:
-            void enter() override;
-            void update() override;
+            void enter(ECS& ecs, u32 id) override;
+            void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) override;
             void exit() override;
     };
 
-    class WalkingState : public State
+    class PlayerWalkingState : public State
     {
         public:
-            void enter() override;
-            void update() override;
+            void enter(ECS& ecs, u32 id) override;
+            void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) override;
             void exit() override;
     };
 };

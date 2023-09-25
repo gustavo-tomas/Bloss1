@@ -1,38 +1,68 @@
+#include "ecs/ecs.hpp"
 #include "ecs/state_machine.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {
+    SkeletalAnimation* last_animation = nullptr;
+    SkeletalAnimation* curr_animation = nullptr;
+    SkeletalAnimation* next_animation = nullptr;
+
     // Idle state
     // -----------------------------------------------------------------------------------------------------------------
-    void IdleState::enter()
+    void PlayerIdleState::enter(ECS& ecs, u32 id)
     {
-        std::cout << "Entering Idle State\n";
+        auto model = ecs.models[id]->model;
+        auto& animations = ecs.models[id]->model->animations;
+        auto& animator = ecs.models[id]->model->animator;
+
+        curr_animation = model->animator->get_current_animation();
+        next_animation = animations["Armature|Idle"].get();
+
+        // Blend from previous state to this state
+        last_animation = curr_animation;
+
+        animator->play(next_animation);
+        curr_animation = next_animation;
     }
 
-    void IdleState::update()
+    void PlayerIdleState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
     {
-        std::cout << "Idle State update\n";
+        auto& animator = ecs.models[id]->model->animator;
+        animator->blend_animations(last_animation, curr_animation, blend_factor, dt);
     }
 
-    void IdleState::exit()
+    void PlayerIdleState::exit()
     {
-        std::cout << "Exiting Idle State\n";
+
     }
 
     // Walking state
     // -----------------------------------------------------------------------------------------------------------------
-    void WalkingState::enter()
+    void PlayerWalkingState::enter(ECS& ecs, u32 id)
     {
-        std::cout << "Entering Walking State\n";
+        auto model = ecs.models[id]->model;
+        auto& animations = ecs.models[id]->model->animations;
+        auto& animator = ecs.models[id]->model->animator;
+
+        curr_animation = model->animator->get_current_animation();
+        next_animation = animations["Armature|Walking"].get();
+
+        // Blend from previous state to this state
+        last_animation = curr_animation;
+
+        animator->play(next_animation);
+        curr_animation = next_animation;
     }
 
-    void WalkingState::update()
+    void PlayerWalkingState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
     {
-        std::cout << "Walking State update\n";
+        auto& animator = ecs.models[id]->model->animator;
+        animator->blend_animations(last_animation, curr_animation, blend_factor, dt);
     }
 
-    void WalkingState::exit()
+    void PlayerWalkingState::exit()
     {
-        std::cout << "Exiting Walking State\n";
+
     }
 };

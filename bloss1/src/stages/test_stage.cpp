@@ -38,11 +38,13 @@ namespace bls
 
         // Create state machine for the player
         std::map<str, State*> states;
-        auto idle_state = new IdleState();
-        auto walking_state = new WalkingState();
+        auto idle_state = new PlayerIdleState();
+        auto walking_state = new PlayerWalkingState();
 
         states[PLAYER_STATE_IDLE] = idle_state;
         states[PLAYER_STATE_WALKING] = walking_state;
+
+        idle_state->enter(*ecs, 0);
         ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
     }
 

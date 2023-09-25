@@ -33,7 +33,7 @@ namespace bls
         }
     }
 
-    void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32)
+    void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3&, f32)
     {
         auto object = ecs.physics_objects[id].get();
         auto controller = ecs.camera_controllers[id].get();

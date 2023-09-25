@@ -202,7 +202,6 @@ namespace bls
 
             if (ecs.timers.count(id))
             {
-                auto& timer = ecs.timers[id];
                 scene << "\ttimer: ";
                 scene << to_str(0.0) << ";" << "\n";
             }

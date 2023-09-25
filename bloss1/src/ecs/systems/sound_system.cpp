@@ -4,7 +4,7 @@
 namespace bls
 {
     // Play any sound that is set to play
-    void sound_system(ECS& ecs, f32 dt)
+    void sound_system(ECS& ecs, f32)
     {
         auto& audio_engine = Game::get().get_audio_engine();
         for (auto& [id, sounds] : ecs.sounds)

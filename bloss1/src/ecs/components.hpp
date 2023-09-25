@@ -225,7 +225,7 @@ namespace bls
     {
         public:
             StateMachine(const std::map<str, State*>& states_map, State* current_state)
-                : current_state(current_state)
+                : current_state(current_state), blend_factor(0.0f)
             {
                 for (auto& [name, state] : states_map)
                     states[name] = std::unique_ptr<State>(state);
@@ -233,5 +233,6 @@ namespace bls
 
             std::map<str, std::unique_ptr<State>> states;
             State* current_state;
+            f32 blend_factor;
     };
 };
