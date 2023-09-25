@@ -72,6 +72,7 @@ namespace bls
                 texts.erase(id);
                 sounds.erase(id);
                 state_machines.erase(id);
+                projectiles.erase(id);
 
                 available_ids.insert(id);
             }
@@ -95,6 +96,7 @@ namespace bls
             std::map<u32, std::unique_ptr<Text>> texts;
             std::map<u32, std::map<str, std::unique_ptr<Sound>>> sounds;
             std::map<u32, std::unique_ptr<StateMachine>> state_machines;
+            std::map<u32, std::unique_ptr<Projectile>> projectiles;
 
         private:
             // Entities IDs

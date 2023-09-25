@@ -1,5 +1,7 @@
 #include "ecs/ecs.hpp"
+#include "ecs/entities.hpp"
 #include "core/input.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {
@@ -18,21 +20,27 @@ namespace bls
     const f32 MIN_CAMERA_ZOOM = 35.0f;
     const f32 MAX_CAMERA_ZOOM = 60.0f;
 
+    const vec3 BULLET_OFFSET = vec3(0.0f, 5.0f, 35.0f);
+
     const f32 PLAYER_TIMER_JUMP = 2.0f;
     const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
+    const f32 PLAYER_TIMER_SHOOT_COOLDOWN = 0.5f;
 
     const str PLAYER_TIMER_STR_JUMP = "jumping";
     const str PLAYER_TIMER_STR_JUMP_COOLDOWN = "jump_cooldown";
+    const str PLAYER_TIMER_STR_SHOOT_COOLDOWN = "shoot_cooldown";
 
     std::map<str, f32> player_timers =
     {
-        { PLAYER_TIMER_STR_JUMP,          0.0f },
-        { PLAYER_TIMER_STR_JUMP_COOLDOWN, 0.0f },
+        { PLAYER_TIMER_STR_JUMP,           0.0f },
+        { PLAYER_TIMER_STR_JUMP_COOLDOWN,  0.0f },
+        { PLAYER_TIMER_STR_SHOOT_COOLDOWN, PLAYER_TIMER_SHOOT_COOLDOWN }
     };
 
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt);
+    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front);
 
     void change_state(ECS& ecs, u32 id, State* new_state);
 
@@ -49,9 +57,9 @@ namespace bls
             // Calculate target direction vectors without vertical influence
             vec3 front =
             {
-                cos(radians(transform->rotation.y))* cos(radians(0.0f)),
-                sin(radians(0.0f)),
-                sin(radians(transform->rotation.y))* cos(radians(0.0f))
+                cos(radians(transform->rotation.y))* cos(radians(transform->rotation.x)),
+                sin(radians(transform->rotation.x)),
+                sin(radians(transform->rotation.y))* cos(radians(transform->rotation.x))
             };
             front = normalize(front);
 
@@ -111,7 +119,7 @@ namespace bls
         transform->rotation.y = yaw;
     }
 
-    void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3&, f32 dt)
+    void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt)
     {
         auto object = ecs.physics_objects[id].get();
         auto controller = ecs.camera_controllers[id].get();
@@ -126,8 +134,10 @@ namespace bls
         auto left_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_X);
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
+        vec3 clamped_front = vec3(front.x, 0.0f, front.z);
+
         if (fabs(left_y) >= TOLERANCE)
-            object->force += front * controller->speed * -left_y;
+            object->force += clamped_front * controller->speed * -left_y;
 
         if (fabs(left_x) >= TOLERANCE)
             object->force += right * controller->speed * left_x;
@@ -204,9 +214,27 @@ namespace bls
             camera->target_zoom = MAX_CAMERA_ZOOM;
 
         // Shoot
-        // @TODO: finish
         if (trigger_right >= TOLERANCE)
-            player_state = PlayerState::Shooting;
+        {
+            if (player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] >= PLAYER_TIMER_SHOOT_COOLDOWN)
+            {
+                player_state = PlayerState::Shooting;
+
+                Transform bullet_transform = *transform;
+                bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;
+                bullet_transform.position = bullet_transform.position + up    * BULLET_OFFSET.y;
+                bullet_transform.position = bullet_transform.position + front * BULLET_OFFSET.z;
+
+                bullet_transform.scale = vec3(2.0f);
+
+                PhysicsObject object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 1500000.0f, 15.0f);
+
+                shoot(ecs, bullet_transform, object, front);
+                player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = 0.0f;
+            }
+        }
+
+        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] += dt;
 
         camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 
@@ -252,5 +280,10 @@ namespace bls
         state_machine->current_state->exit();
         state_machine->current_state = new_state;
         state_machine->current_state->enter(ecs, id);
+    }
+
+    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front)
+    {
+        bullet(ecs, transform, object, front);
     }
 };

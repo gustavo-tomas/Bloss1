@@ -72,6 +72,7 @@ namespace bls
 
                 // Apply deceleration
                 object->velocity.x = apply_deceleration(object->velocity.x, DECELERATION, object->mass, dt);
+                object->velocity.y = apply_deceleration(object->velocity.y, DECELERATION, object->mass, dt);
                 object->velocity.z = apply_deceleration(object->velocity.z, DECELERATION, object->mass, dt);
 
                 object->velocity = clamp(object->velocity, -object->terminal_velocity, object->terminal_velocity);

@@ -235,4 +235,14 @@ namespace bls
             State* current_state;
             f32 blend_factor;
     };
+
+    class Projectile : public Component
+    {
+        public:
+            Projectile(f32 explosion_radius = 10.0f, f32 time_to_live = 5.0f)
+                : explosion_radius(explosion_radius), time_to_live(time_to_live) { }
+
+            f32 explosion_radius;
+            f32 time_to_live;
+    };
 };

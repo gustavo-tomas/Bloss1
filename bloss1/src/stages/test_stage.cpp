@@ -25,6 +25,7 @@ namespace bls
 
         // Add systems in order of execution
         ecs->add_system(physics_system);
+        ecs->add_system(projectile_system);
         ecs->add_system(player_controller_system);
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);

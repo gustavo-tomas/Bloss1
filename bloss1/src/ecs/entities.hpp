@@ -10,6 +10,7 @@ namespace bls
 {
     u32 empty_entity(ECS& ecs);
     u32 player(ECS& ecs, const Transform& transform);
+    u32 bullet(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front);
     u32 ball(ECS& ecs, const Transform& transform);
     u32 vampire(ECS& ecs, const Transform& transform);
     u32 abomination(ECS& ecs, const Transform& transform);
