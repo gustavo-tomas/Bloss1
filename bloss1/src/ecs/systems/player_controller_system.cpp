@@ -5,14 +5,18 @@ namespace bls
 {
     enum class PlayerState
     {
-        Idle    = 0x001,
-        Walking = 0x002,
-        Jumping = 0x004
+        Idle     = 0x001,
+        Walking  = 0x002,
+        Jumping  = 0x004,
+        Shooting = 0x008
     };
 
     // Constants
     const f32 TOLERANCE = 0.2f; // Tolerance to better handle floating point fuckery
     const vec3 WORLD_UP = vec3(0.0f, 1.0f, 0.0f);
+
+    const f32 MIN_CAMERA_ZOOM = 35.0f;
+    const f32 MAX_CAMERA_ZOOM = 60.0f;
 
     const f32 PLAYER_TIMER_JUMP = 2.0f;
     const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
@@ -182,7 +186,7 @@ namespace bls
             }
         }
 
-        // Zoom
+        // Shoot
         // -------------------------------------------------------------------------------------------------------------
         auto trigger_left  = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_TRIGGER);
         auto trigger_right = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_TRIGGER);
@@ -191,13 +195,20 @@ namespace bls
         trigger_left  += 1.0f;
         trigger_right += 1.0f;
 
+        // Zoom int
         if (trigger_left >= TOLERANCE)
-            camera->target_zoom += trigger_left * dt * 15.0f;
+            camera->target_zoom = MIN_CAMERA_ZOOM;
 
+        // Zoom out
+        else
+            camera->target_zoom = MAX_CAMERA_ZOOM;
+
+        // Shoot
+        // @TODO: finish
         if (trigger_right >= TOLERANCE)
-            camera->target_zoom -= trigger_right * dt * 15.0f;
+            player_state = PlayerState::Shooting;
 
-        camera->target_zoom = clamp(camera->target_zoom, 45.0f, 90.0f);
+        camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 
         update_state_machine(ecs, id, player_state, dt);
     }
@@ -219,6 +230,10 @@ namespace bls
 
             case PlayerState::Jumping:
                 change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
+                break;
+
+            case PlayerState::Shooting:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
                 break;
 
             default:

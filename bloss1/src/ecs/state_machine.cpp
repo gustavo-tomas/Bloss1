@@ -94,4 +94,21 @@ namespace bls
     {
 
     }
+
+    // Shooting state
+    // -----------------------------------------------------------------------------------------------------------------
+    void PlayerShootingState::enter(ECS& ecs, u32 id)
+    {
+        std::cout << "@TODO: player shooting enter\n";
+    }
+
+    void PlayerShootingState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
+    {
+        std::cout << "@TODO: player shooting update\n";
+    }
+
+    void PlayerShootingState::exit()
+    {
+
+    }
 };
