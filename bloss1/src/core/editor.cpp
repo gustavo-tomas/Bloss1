@@ -43,7 +43,7 @@ namespace bls
         std::cout << "editor destroyed successfully\n";
     }
 
-    void Editor::update(ECS& ecs, f32 dt)
+    void Editor::update(ECS& ecs, f32)
     {
         // Create ImGui frame
         ImGui_ImplOpenGL3_NewFrame();

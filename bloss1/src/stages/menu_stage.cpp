@@ -28,7 +28,7 @@ namespace bls
         audio_engine.play("test");
     }
 
-    void MenuStage::update(f32 dt)
+    void MenuStage::update(f32)
     {
         if (Input::is_key_pressed(KEY_SPACE))
             Game::get().change_stage(new TestStage());

@@ -5,6 +5,9 @@ namespace bls
 {
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
+    void update_state_machine(ECS& ecs, u32 id, bool walking, f32 dt);
+
+    void change_state(ECS& ecs, u32 id, State* new_state);
 
     void player_controller_system(ECS& ecs, f32 dt)
     {
@@ -28,8 +31,8 @@ namespace bls
             vec3 right = normalize(cross(front, { 0.0f, 1.0f, 0.0f }));
             vec3 up    = normalize(cross(right, front));
 
-            update_keyboard(ecs, id, front, right, up, dt);
-            update_controller(ecs, id, front, right, up, dt);
+            update_keyboard(ecs, id, front, right, up, dt);   // Keyboard for debugging purposes
+            update_controller(ecs, id, front, right, up, dt); // Controller is the actual player controller
         }
     }
 
@@ -104,6 +107,8 @@ namespace bls
         if (fabs(left_x) >= TOLERANCE)
             object->force += right * controller->speed * left_x;
 
+        bool walking = fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE;
+
         // Rotation
         // -------------------------------------------------------------------------------------------------------------
         auto right_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_X);
@@ -146,5 +151,31 @@ namespace bls
             camera->target_zoom -= trigger_right * dt * 15.0f;
 
         camera->target_zoom = clamp(camera->target_zoom, 45.0f, 90.0f);
+
+        update_state_machine(ecs, id, walking, dt);
+    }
+
+    void update_state_machine(ECS& ecs, u32 id, bool walking, f32 dt)
+    {
+        auto& state_machine = ecs.state_machines[id];
+        state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
+
+        if (walking)
+            change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+
+        else
+            change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+    }
+
+    void change_state(ECS& ecs, u32 id, State* new_state)
+    {
+        auto state_machine = ecs.state_machines[id].get();
+        if (state_machine->current_state == new_state)
+            return;
+
+        state_machine->blend_factor = 0.0f;
+        state_machine->current_state->exit();
+        state_machine->current_state = new_state;
+        state_machine->current_state->enter(ecs, id);
     }
 };
