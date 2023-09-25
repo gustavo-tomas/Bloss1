@@ -1,6 +1,6 @@
 [player]
 {
-	model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;
+	model: bloss1/assets/models/abomination2/abomination2.fbx, 0;
 	transform: (-10.791587, 4.998014, 17.268421), (-1.350099, 98.338959, 0.000000), (5.000000, 5.000000, 5.000000);
 	physics_object: (-0.000090, -0.215696, 0.000396), (70.000000, 70.000000, 70.000000), (0.000000, 0.000000, 0.000000), 5.000000;
 	collider: sphere, 5.000000, (0.000000, 0.000000, 0.000000), 0;
