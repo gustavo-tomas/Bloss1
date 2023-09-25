@@ -667,4 +667,9 @@ namespace bls
     {
         return final_bone_matrices;
     }
+
+    SkeletalAnimation* Animator::get_current_animation()
+    {
+        return current_animation;
+    }
 };

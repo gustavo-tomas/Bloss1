@@ -168,6 +168,7 @@ namespace bls
                                                   const mat4& parent_transform,
                                                   const f32 blend_factor);
             std::vector<mat4> get_final_bone_matrices();
+            SkeletalAnimation* get_current_animation();
 
         private:
             std::vector<mat4> final_bone_matrices;
