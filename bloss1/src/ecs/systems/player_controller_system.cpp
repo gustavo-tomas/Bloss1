@@ -3,9 +3,32 @@
 
 namespace bls
 {
+    enum class PlayerState
+    {
+        Idle    = 0x001,
+        Walking = 0x002,
+        Jumping = 0x004
+    };
+
+    // Constants
+    const f32 TOLERANCE = 0.2f; // Tolerance to better handle floating point fuckery
+    const vec3 WORLD_UP = vec3(0.0f, 1.0f, 0.0f);
+
+    const f32 PLAYER_TIMER_JUMP = 2.0f;
+    const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
+
+    const str PLAYER_TIMER_STR_JUMP = "jumping";
+    const str PLAYER_TIMER_STR_JUMP_COOLDOWN = "jump_cooldown";
+
+    std::map<str, f32> player_timers =
+    {
+        { PLAYER_TIMER_STR_JUMP,          0.0f },
+        { PLAYER_TIMER_STR_JUMP_COOLDOWN, 0.0f },
+    };
+
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
-    void update_state_machine(ECS& ecs, u32 id, bool walking, f32 dt);
+    void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt);
 
     void change_state(ECS& ecs, u32 id, State* new_state);
 
@@ -44,8 +67,6 @@ namespace bls
 
         // Position
         // -------------------------------------------------------------------------------------------------------------
-        const vec3 world_up = vec3(0.0f, 1.0f, 0.0f);
-
         // Define movement mappings
         std::map<u32, std::pair<vec3, f32>> movement_mappings =
         {
@@ -53,7 +74,7 @@ namespace bls
             { KEY_S,     { -front,    controller->speed.z } },
             { KEY_D,     {  right,    controller->speed.x } },
             { KEY_A,     { -right,    controller->speed.x } },
-            { KEY_SPACE, {  world_up, controller->speed.y } }
+            { KEY_SPACE, {  WORLD_UP, controller->speed.y } }
         };
 
         // Update speed based on input
@@ -93,10 +114,10 @@ namespace bls
         auto camera = ecs.cameras[id].get();
         auto transform = ecs.transforms[id].get();
 
-        // Tolerance to better handle floating point fuckery
-        const f32 TOLERANCE = 0.2f;
+        // Current state
+        PlayerState player_state = PlayerState::Idle;
 
-        // Position
+        // Walk
         // -------------------------------------------------------------------------------------------------------------
         auto left_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_X);
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
@@ -107,9 +128,10 @@ namespace bls
         if (fabs(left_x) >= TOLERANCE)
             object->force += right * controller->speed * left_x;
 
-        bool walking = fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE;
+        if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
+            player_state = PlayerState::Walking;
 
-        // Rotation
+        // Turn
         // -------------------------------------------------------------------------------------------------------------
         auto right_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_X);
         auto right_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_Y);
@@ -135,6 +157,31 @@ namespace bls
         transform->rotation.x = pitch;
         transform->rotation.y = yaw;
 
+        // Jump
+        // -------------------------------------------------------------------------------------------------------------
+        if (Input::is_joystick_button_pressed(JOYSTICK_2, GAMEPAD_BUTTON_CROSS))
+        {
+            if (player_timers[PLAYER_TIMER_STR_JUMP] <= PLAYER_TIMER_JUMP)
+            {
+                player_state = PlayerState::Jumping;
+                object->force += WORLD_UP * controller->speed.y;
+                player_timers[PLAYER_TIMER_STR_JUMP] += dt;
+            }
+        }
+
+        // Reset jump
+        else
+        {
+            if (player_timers[PLAYER_TIMER_STR_JUMP] > PLAYER_TIMER_JUMP)
+                player_timers[PLAYER_TIMER_STR_JUMP_COOLDOWN] += dt;
+
+            if (player_timers[PLAYER_TIMER_STR_JUMP_COOLDOWN] > PLAYER_TIMER_JUMP_COOLDOWN)
+            {
+                player_timers[PLAYER_TIMER_STR_JUMP_COOLDOWN] = 0.0f;
+                player_timers[PLAYER_TIMER_STR_JUMP] = 0.0f;
+            }
+        }
+
         // Zoom
         // -------------------------------------------------------------------------------------------------------------
         auto trigger_left  = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_TRIGGER);
@@ -152,19 +199,32 @@ namespace bls
 
         camera->target_zoom = clamp(camera->target_zoom, 45.0f, 90.0f);
 
-        update_state_machine(ecs, id, walking, dt);
+        update_state_machine(ecs, id, player_state, dt);
     }
 
-    void update_state_machine(ECS& ecs, u32 id, bool walking, f32 dt)
+    void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt)
     {
         auto& state_machine = ecs.state_machines[id];
         state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
 
-        if (walking)
-            change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+        switch (player_state)
+        {
+            case PlayerState::Idle:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+                break;
 
-        else
-            change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+            case PlayerState::Walking:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+                break;
+
+            case PlayerState::Jumping:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
+                break;
+
+            default:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+                break;
+        }
     }
 
     void change_state(ECS& ecs, u32 id, State* new_state)

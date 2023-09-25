@@ -65,4 +65,33 @@ namespace bls
     {
 
     }
+
+    // Jumping state
+    // -----------------------------------------------------------------------------------------------------------------
+    void PlayerJumpingState::enter(ECS& ecs, u32 id)
+    {
+        auto model = ecs.models[id]->model;
+        auto& animations = ecs.models[id]->model->animations;
+        auto& animator = ecs.models[id]->model->animator;
+
+        curr_animation = model->animator->get_current_animation();
+        next_animation = animations["Armature|Jumping"].get();
+
+        // Blend from previous state to this state
+        last_animation = curr_animation;
+
+        animator->play(next_animation);
+        curr_animation = next_animation;
+    }
+
+    void PlayerJumpingState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
+    {
+        auto& animator = ecs.models[id]->model->animator;
+        animator->blend_animations(last_animation, curr_animation, blend_factor, dt);
+    }
+
+    void PlayerJumpingState::exit()
+    {
+
+    }
 };

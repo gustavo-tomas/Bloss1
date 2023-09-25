@@ -8,6 +8,7 @@
 
 #define PLAYER_STATE_IDLE    "idle"
 #define PLAYER_STATE_WALKING "walking"
+#define PLAYER_STATE_JUMPING "jumping"
 
 namespace bls
 {
@@ -29,6 +30,14 @@ namespace bls
     };
 
     class PlayerWalkingState : public State
+    {
+        public:
+            void enter(ECS& ecs, u32 id) override;
+            void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) override;
+            void exit() override;
+    };
+
+    class PlayerJumpingState : public State
     {
         public:
             void enter(ECS& ecs, u32 id) override;

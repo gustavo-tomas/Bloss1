@@ -40,9 +40,11 @@ namespace bls
         std::map<str, State*> states;
         auto idle_state = new PlayerIdleState();
         auto walking_state = new PlayerWalkingState();
+        auto jumping_state = new PlayerJumpingState();
 
         states[PLAYER_STATE_IDLE] = idle_state;
         states[PLAYER_STATE_WALKING] = walking_state;
+        states[PLAYER_STATE_JUMPING] = jumping_state;
 
         idle_state->enter(*ecs, 0);
         ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
