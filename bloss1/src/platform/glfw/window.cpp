@@ -40,6 +40,7 @@ namespace bls
         glfwGetWindowSize(native_window, (i32*) &width, (i32*) &height);
 
         // Set debug callbacks
+        #if defined(_DEBUG)
         if (GLEW_ARB_debug_output)
         {
             glDebugMessageCallbackARB(&debug_callback, NULL);
@@ -48,6 +49,7 @@ namespace bls
 
         else
             std::cout << "ARB Debug extension not supported\n";
+        #endif
 
         // Disable sticky keys
         glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GLFW_FALSE);

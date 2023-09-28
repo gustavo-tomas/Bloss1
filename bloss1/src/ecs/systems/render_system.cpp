@@ -67,7 +67,6 @@ namespace bls
         render_state.g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
 
         // Create and attach framebuffer textures
-        // @TODO: this is hardcoded
         std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "emissive", "depth" };
         for (const auto& name : texture_names)
         {

@@ -22,7 +22,6 @@ namespace bls
             line.erase(std::remove(line.begin(), line.end(), '('), line.end());
             line.erase(std::remove(line.begin(), line.end(), ')'), line.end());
 
-            // @TODO: oooofff
             bool insideQuotes = false;
             str processed_line = "";
             for (const char c : line)
