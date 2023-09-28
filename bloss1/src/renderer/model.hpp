@@ -16,7 +16,6 @@
 #define MAX_BONE_PER_VERTEX 4
 #define MAX_BONE_MATRICES 100
 
-// @TODO: for now model = meshes + textures
 namespace bls
 {
     struct AssNodeData
@@ -208,6 +207,6 @@ namespace bls
             void set_vertex_bone_data(Vertex& vertex, i32 bone_id, f32 weight);
             void extract_bone_weight_for_vertices(std::vector<Vertex>& vertices, aiMesh* mesh);
 
-            Assimp::Importer* importer; // @TODO: find a better solution
+            Assimp::Importer* importer;
     };
 };

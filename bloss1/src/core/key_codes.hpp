@@ -187,7 +187,6 @@
 #define GAMEPAD_BUTTON_TRIANGLE    GAMEPAD_BUTTON_Y
 
 // Controller sticks/triggers
-// @TODO: investigate controller fuckery
 #define GAMEPAD_AXIS_LEFT_X        0
 #define GAMEPAD_AXIS_LEFT_Y        1
 #define GAMEPAD_AXIS_RIGHT_X       3

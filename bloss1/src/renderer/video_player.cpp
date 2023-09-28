@@ -36,8 +36,6 @@ namespace bls
 
     void VideoPlayer::play_video()
     {
-        // @TODO: Create a stage for this?
-
         Game::get().set_target_fps(frame_rate);
 
         auto& window = Game::get().get_window();

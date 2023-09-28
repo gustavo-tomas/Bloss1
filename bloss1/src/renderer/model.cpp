@@ -215,7 +215,6 @@ namespace bls
                     break;
             }
 
-            // @TODO: might wanna check if texture was already loaded for another mesh
             auto texture = Texture::create(str.C_Str(), directory + "/" + str.C_Str(), texture_type);
             textures.push_back(texture);
         }

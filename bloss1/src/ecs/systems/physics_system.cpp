@@ -5,7 +5,6 @@
 #define MIN_MASS 0.0001f
 #define MAX_MASS 1'000'000'000.0f
 
-// @TODO: use continuous collision detection
 namespace bls
 {
     struct Collision

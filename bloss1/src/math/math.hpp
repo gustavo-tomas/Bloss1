@@ -4,8 +4,6 @@
  * @brief The maths library. For now, just a wrapper for glm.
  */
 
-// @TODO: type checking, unions, simd or smth
-
 #include "math/mat.hpp"
 #include "math/vec.hpp"
 #include "math/to_str.hpp"

@@ -52,7 +52,6 @@ namespace bls
         #endif
     }
 
-    // @TODO: there must be a better way
     std::shared_ptr<Model> Model::create(const str& name, const str& path, bool flip_uvs)
     {
         if (ModelManager::get().exists(name))

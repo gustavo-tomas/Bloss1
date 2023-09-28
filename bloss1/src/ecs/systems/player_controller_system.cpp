@@ -53,7 +53,6 @@ namespace bls
         {
             auto transform = transforms[id].get();
 
-            // @TODO: use quaternions?
             // Calculate target direction vectors without vertical influence
             vec3 front =
             {
@@ -108,7 +107,6 @@ namespace bls
         f32 yaw = transform->rotation.y + x_offset * controller->sensitivity;
 
         pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
-        // yaw = fmod(fmod(yaw, 360.0f) + 360.0f, 360.0f); // @TODO: fix yaw overflow
 
         // Update last mouse values
         controller->mouse_x = curr_mouse_x;
@@ -165,7 +163,6 @@ namespace bls
         f32 yaw   = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
 
         pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
-        // yaw = fmod(fmod(yaw, 360.0f) + 360.0f, 360.0f); // @TODO: fix yaw overflow
 
         // Update target rotation
         transform->rotation.x = pitch;

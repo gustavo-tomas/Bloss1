@@ -87,7 +87,6 @@ namespace bls
             f32 quadratic;
     };
 
-    // @TODO: find a better solution (get rid of model entirely?)
     class Model;
     class ModelComponent : public Component
     {
@@ -189,7 +188,6 @@ namespace bls
             bool looping;
     };
 
-    // @TODO: same problem as model
     class Font;
     class Text : public Component
     {

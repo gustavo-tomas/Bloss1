@@ -8,8 +8,6 @@ uniform float roughness;
 
 const float PI = 3.14159265359;
 
-// @TODO: DRY these funcions (and others) across shaders
-
 vec2 Hammersley(uint i, uint N);
 vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness);
 float DistributionGGX(vec3 N, vec3 H, float roughness);

@@ -159,7 +159,6 @@ namespace bls
         renderer.clear();
         renderer.set_viewport(0, 0, width, height);
 
-        // @TODO: see if this can be done during geometry pass
         // Render shadow map
         shadow_map->bind();
         render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
@@ -310,8 +309,6 @@ namespace bls
 
             // Translate
             model_matrix = translate(model_matrix, transform->position);
-
-            // @TODO: i dont know what im doing but it works
 
             // Player model matrix
             if (ecs.names[id] == "player")

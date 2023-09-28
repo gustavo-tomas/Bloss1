@@ -7,8 +7,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
-// @TODO: temporary (use a filesystem pls tyty)
-
 namespace bls
 {
     static GLenum convert_to_opengl_internal_format(ImageFormat format)
@@ -67,7 +65,6 @@ namespace bls
     {
         stbi_set_flip_vertically_on_load(true);
 
-        // @TODO: use a filesystem (and make the other params configurable)
         const str extension = std::filesystem::path(path).extension();
 
         if (extension == ".hdr")

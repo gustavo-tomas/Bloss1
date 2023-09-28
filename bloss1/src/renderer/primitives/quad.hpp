@@ -14,7 +14,7 @@ namespace bls
         public:
             Quad(Renderer& renderer, bool flip_uvs = false) : renderer(renderer)
             {
-                // Flip 'V' // @TODO: see if this flip is really needed after the modifications on the texture
+                // Flip 'V'
                 if (flip_uvs)
                     for (u32 i = 0, flip = 0; i < 4; i++, flip = !flip)
                         vertices[(i + 1) * 4 + i] = flip;
