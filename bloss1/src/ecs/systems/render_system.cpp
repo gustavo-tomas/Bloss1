@@ -91,8 +91,9 @@ namespace bls
 
         // Create a skybox
         // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10));
-        // render_state.skybox = Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10);
+        // render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10));
+        // render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10));
+        render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32, 1024, 1024, 10));
 
         // Create a quad for rendering
         render_state.quad = std::make_unique<Quad>(renderer);
@@ -108,12 +109,12 @@ namespace bls
 
         // Create post processing system
         render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
-        render_state.post_processing->add_render_pass(new FXAAPass(width, height));
+        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
         render_state.post_processing->add_render_pass(new FogPass(width, height,
-                vec3(0.5f),
+                vec3(0.0f),
                 vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
                 ecs.cameras[0].get()->position, render_state.textures[0].second.get()));
-        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
+        // render_state.post_processing->add_render_pass(new FXAAPass(width, height));
         // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
         // render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
         // render_state.post_processing->add_render_pass(new PixelizationPass(width, height, 4));
@@ -274,10 +275,12 @@ namespace bls
         }
 
         // Draw the skybox last
-        skybox->draw(view, projection);
+        // skybox->draw(view, projection);
 
         // Render debug lines
+        #if defined(_DEBUG)
         render_colliders(ecs, projection, view);
+        #endif
 
         // Render texts
         render_texts(ecs);

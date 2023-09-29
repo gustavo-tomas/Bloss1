@@ -24,7 +24,9 @@ namespace bls
         renderer->initialize();
 
         // Create the editor
+        // #if defined(_DEBUG)
         editor = std::make_unique<Editor>(*window.get());
+        // #endif
 
         // Create the audio engine
         // @TODO: might wanna create a wrapper just like the renderer
@@ -80,7 +82,9 @@ namespace bls
                 break;
 
             // Update editor
+            // #if defined(_DEBUG)
             editor->update(*stage->ecs, dt);
+            // #endif
 
             // Update window
             window->update();
