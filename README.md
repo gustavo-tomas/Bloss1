@@ -38,3 +38,4 @@ $ scripts/clean.sh
 - [3D game shaders for beginners](https://github.com/lettier/3d-game-shaders-for-beginners)
 - [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
 - [Particle system](https://github.com/TheCherno/OneHourParticleSystem)
+- [Finite State Machine (FSM)](https://gameprogrammingpatterns.com/state.html)
