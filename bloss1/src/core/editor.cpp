@@ -1,4 +1,5 @@
-#include "editor.hpp"
+#include "core/editor.hpp"
+#include "core/logger.hpp"
 #include "platform/glfw/window.hpp"
 
 #include "imgui/imgui.h"
@@ -40,7 +41,7 @@ namespace bls
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
-        std::cout << "editor destroyed successfully\n";
+        LOG_INFO("editor destroyed successfully");
     }
 
     void Editor::update(ECS& ecs, f32)

@@ -1,4 +1,5 @@
 #include "core/game.hpp"
+#include "core/logger.hpp"
 // #include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
 
@@ -117,7 +118,7 @@ namespace bls
             EventSystem::fire_event(static_cast<const MouseMoveEvent&>(event));
 
         else
-            std::cerr << "invalid event type\n";
+            LOG_ERROR("invalid event type");
     }
 
     Game& Game::get()

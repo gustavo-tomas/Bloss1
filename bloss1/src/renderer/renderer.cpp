@@ -12,6 +12,7 @@
 #include "managers/texture_manager.hpp"
 #include "managers/model_manager.hpp"
 #include "managers/font_manager.hpp"
+#include "core/logger.hpp"
 
 namespace bls
 {
@@ -122,7 +123,7 @@ namespace bls
                 break;
 
             default:
-                std::cerr << "invalid texture type for default texture\n";
+                LOG_ERROR("invalid texture type for default texture");
                 break;
         }
 

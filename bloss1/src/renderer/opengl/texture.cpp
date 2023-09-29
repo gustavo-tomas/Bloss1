@@ -1,4 +1,5 @@
 #include "renderer/opengl/texture.hpp"
+#include "core/logger.hpp"
 #include "math/math.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
@@ -135,7 +136,7 @@ namespace bls
                 const char* failure_reason = stbi_failure_reason();
                 if (failure_reason)
                 {
-                    std::cerr << "failure reason: " << failure_reason << "\n";
+                    LOG_ERROR("failure reason '%s'", failure_reason);
                     stbi__err(0, 0);
                 }
 

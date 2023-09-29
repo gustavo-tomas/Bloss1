@@ -1,4 +1,5 @@
-#include "audio_engine.hpp"
+#include "core/audio_engine.hpp"
+#include "core/logger.hpp"
 #include "soloud/include/soloud_echofilter.h"
 
 namespace bls
@@ -21,7 +22,7 @@ namespace bls
     {
         if (audios.count(name))
         {
-            std::cerr << "audio '" << name << "' is already loaded\n";
+            LOG_WARNING("audio '%s' is already loaded", name);
             return;
         }
 

@@ -2,6 +2,7 @@
 #include "renderer/texture.hpp"
 
 #include "assimp/postprocess.h"
+#include "core/logger.hpp"
 
 namespace bls
 {
@@ -23,7 +24,7 @@ namespace bls
 
         if (!scene || !scene->mRootNode || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE))
         {
-            std::cerr << "error loading model: '" << importer->GetErrorString() << "'\n";
+            LOG_ERROR("error loading model '%s'", importer->GetErrorString());
             return;
         }
 
@@ -211,7 +212,7 @@ namespace bls
                 case aiTextureType_EMISSIVE:  texture_type = TextureType::Emissive;  break;
 
                 default:
-                    std::cerr << "invalid texture type for material: '" << type << "'\n";
+                    LOG_ERROR("invalid texture type for material '%d'", type);
                     break;
             }
 

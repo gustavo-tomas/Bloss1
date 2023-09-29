@@ -1,4 +1,5 @@
 #include "renderer/opengl/shader.hpp"
+#include "core/logger.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
 #include "GLFW/glfw3.h"
@@ -53,7 +54,7 @@ namespace bls
 
         catch (...)
         {
-            std::cerr << "error when reading files '" << vertex_path << "' and '" << fragment_path << "'\n";
+            LOG_ERROR("error when reading files '%s' and '%s'", vertex_path, fragment_path);
         }
 
         // Compile shaders

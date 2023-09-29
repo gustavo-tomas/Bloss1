@@ -5,6 +5,7 @@
  */
 
 #include "ecs/ecs.hpp"
+#include "core/logger.hpp"
 #include "math/math.hpp"
 #include "ecs/state_machine.hpp"
 
@@ -131,7 +132,7 @@ namespace bls
                         break;
 
                     default:
-                        std::cerr << "invalid collider type\n";
+                        LOG_ERROR("invalid collider type");
                         return "";
                         break;
                 }

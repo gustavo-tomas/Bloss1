@@ -1,5 +1,6 @@
 #include "renderer/opengl/font.hpp"
 #include "core/game.hpp"
+#include "core/logger.hpp"
 
 // Free type for loading ttf
 #include <freetype2/freetype/freetype.h>
@@ -55,7 +56,7 @@ namespace bls
             // Load character glyph
             if (FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
-                std::cerr << "failed to load glyph: '" << c << "'\n";
+                LOG_ERROR("failed to load glyph '%c'", c);
                 continue;
             }
 

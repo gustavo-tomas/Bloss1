@@ -3,6 +3,7 @@
 #include "renderer/model.hpp"
 #include "renderer/font.hpp"
 #include "core/game.hpp"
+#include "core/logger.hpp"
 
 namespace bls
 {
@@ -304,7 +305,7 @@ namespace bls
             }
 
             else
-                std::cerr << "invalid collider type\n";
+                LOG_ERROR("invalid collider type");
         }
 
         else if (component_name == "dir_light")

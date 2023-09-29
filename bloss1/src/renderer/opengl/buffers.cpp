@@ -1,4 +1,5 @@
 #include "renderer/opengl/buffers.hpp"
+#include "core/logger.hpp"
 
 #include <GL/glew.h> // Include glew before glfw
 #include "GLFW/glfw3.h"
@@ -133,7 +134,7 @@ namespace bls
         // Check if framebuffer is complete
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
-            std::cerr << "error generating framebuffer: '" << FBO << "'\n";
+            LOG_ERROR("error generating framebuffer '%u'", FBO);
             return false;
         }
 
