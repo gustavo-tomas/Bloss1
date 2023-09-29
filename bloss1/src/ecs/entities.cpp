@@ -124,10 +124,6 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        // @TODO: dont forget to create a debugging model (and shader for that model)
-        // auto model = Model::create("directional_light", "bloss1/assets/models/debug", false);
-
-        // ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.names[id] = "directional_light";
         ecs.dir_lights[id] = std::make_unique<DirectionalLight>(light);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
@@ -139,10 +135,6 @@ namespace bls
     {
         u32 id = ecs.get_id();
 
-        // @TODO: dont forget to create a debugging model (and shader for that model)
-        // auto model = Model::create("directional_light", "bloss1/assets/models/debug", false);
-
-        // ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.names[id] = "point_light";
         ecs.point_lights[id] = std::make_unique<PointLight>(light);
         ecs.transforms[id] = std::make_unique<Transform>(transform);
