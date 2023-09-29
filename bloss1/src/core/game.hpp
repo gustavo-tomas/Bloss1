@@ -10,7 +10,7 @@
 #include "core/editor.hpp"
 #include "stages/stage.hpp"
 #include "renderer/renderer.hpp"
-#include "audio_engine.hpp"
+#include "audio_engine/audio_engine.hpp"
 #include "math/random.hpp"
 
 namespace bls

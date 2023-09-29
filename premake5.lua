@@ -7,7 +7,7 @@ workspace "bloss1"
     configurations { "debug", "release" }
 
     -- Change backends here
-    defines { "_GLFW", "_OPENGL", "WITH_ALSA" }
+    defines { "_GLFW", "_OPENGL", "_SOLOUD", "WITH_ALSA" }
 
     -- Run vendor premakes here
     include "vendor/soloud"

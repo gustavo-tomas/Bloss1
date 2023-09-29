@@ -1,10 +1,10 @@
-#include "core/audio_engine.hpp"
+#include "audio_engine/soloud/audio_engine.hpp"
 #include "core/logger.hpp"
 #include "soloud/include/soloud_echofilter.h"
 
 namespace bls
 {
-    AudioEngine::AudioEngine()
+    SoloudAudioEngine::SoloudAudioEngine()
     {
         // Initialize SoLoud (automatic back-end selection)
         // also, enable visualization for FFT calc
@@ -12,13 +12,13 @@ namespace bls
         soloud.setVisualizationEnable(1);
     }
 
-    AudioEngine::~AudioEngine()
+    SoloudAudioEngine::~SoloudAudioEngine()
     {
         // Clean up SoLoud
         soloud.deinit();
     }
 
-    void AudioEngine::load(const str& name, const str& path, bool looping)
+    void SoloudAudioEngine::load(const str& name, const str& path, bool looping)
     {
         if (audios.count(name))
         {
@@ -38,7 +38,7 @@ namespace bls
         audios[name] = std::unique_ptr<SoLoud::Wav>(wav);
     }
 
-    void AudioEngine::play(const str& name, const vec3& position, const vec3& velocity, f32 volume)
+    void SoloudAudioEngine::play(const str& name, const vec3& position, const vec3& velocity, f32 volume)
     {
         // This returns a handle
         soloud.play3d(*audios[name],
@@ -52,7 +52,7 @@ namespace bls
         // soloud.setRelativePlaySpeed(handle, 0.7f); // Play a bit slower; 1.0f is normal
     }
 
-    void AudioEngine::set_echo_filter(const str& name, f32 delay, f32 decay)
+    void SoloudAudioEngine::set_echo_filter(const str& name, f32 delay, f32 decay)
     {
         if (!filters.count(name))
             filters[name] = std::make_unique<SoLoud::EchoFilter>();

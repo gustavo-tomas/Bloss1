@@ -29,8 +29,7 @@ namespace bls
         // #endif
 
         // Create the audio engine
-        // @TODO: might wanna create a wrapper just like the renderer
-        audio_engine = std::make_unique<AudioEngine>();
+        audio_engine = std::unique_ptr<AudioEngine>(AudioEngine::create());
 
         // Create RNG engine
         random_engine = std::make_unique<Random>();
