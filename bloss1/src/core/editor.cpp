@@ -40,8 +40,6 @@ namespace bls
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-
-        LOG_INFO("editor destroyed successfully");
     }
 
     void Editor::update(ECS& ecs, f32)

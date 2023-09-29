@@ -19,7 +19,7 @@ namespace bls
 
     OpenGLRenderer::~OpenGLRenderer()
     {
-        std::cout << "opengl renderer destroyed successfully\n";
+
     }
 
     void OpenGLRenderer::initialize()

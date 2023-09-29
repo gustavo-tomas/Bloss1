@@ -65,7 +65,7 @@ namespace bls
             compile_shader(geometry_path, geometry_shader_code, geometry_shader_id);
 
         // Link the program
-        std::cout << "linking program\n";
+        LOG_INFO("linking program");
         id = glCreateProgram();
 
         glAttachShader(id, vertex_shader_id);
@@ -89,8 +89,10 @@ namespace bls
 
             str error = "";
             for (auto c : error_message) { error += c; }
-            std::cout << "error when linking shader: " << vertex_path << "\n";
-            std::cout << "error when linking program: \n" << error << "\n";
+            LOG_ERROR("linking program");
+            LOG_ERROR("error when linking shader: '%s'", vertex_path.c_str());
+            LOG_ERROR("error when linking program: '%s'", error.c_str());
+
             throw std::runtime_error("failed to link program");
         }
 
@@ -106,7 +108,7 @@ namespace bls
         if (geometry_path != "")
             glDeleteShader(geometry_shader_id);
 
-        std::cout << "shaders compiled & linked successfully\n";
+        LOG_SUCCESS("shaders compiled & linked successfully");
     }
 
     void OpenGLShader::compile_shader(const str& path, const str& code, u32 ID)
@@ -115,7 +117,8 @@ namespace bls
         int log_length = 0;
 
         // Compile shader
-        std::cout << "compiling shader: '" << path << "'\n";
+        LOG_INFO("compiling shader '%s'", path.c_str());
+
         char const* sourcePtr = code.c_str();
         glShaderSource(ID, 1, &sourcePtr, NULL);
         glCompileShader(ID);
@@ -131,7 +134,7 @@ namespace bls
 
             str error = "";
             for (auto c : error_message) { error += c; }
-            std::cout << "error when compiling '" << path << "': " << error << "\n";
+            LOG_ERROR("error when compiling '%s': %s", path.c_str(), error.c_str());
         }
     }
 

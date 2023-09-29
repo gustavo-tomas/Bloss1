@@ -30,8 +30,6 @@ namespace bls
         av_packet_free(&packet);
 
         delete[] data;
-
-        std::cout << "video player destroyed successfully\n";
     }
 
     void VideoPlayer::play_video()

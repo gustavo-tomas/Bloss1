@@ -31,7 +31,7 @@ namespace bls
 
             ~ECS()
             {
-                std::cout << "world destroyed successfully\n";
+
             }
 
             // Return a new id (create a new entity)

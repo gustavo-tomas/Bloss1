@@ -20,7 +20,7 @@ namespace bls
 
         const aiScene* scene = importer->ReadFile(path, flags);
 
-        std::cout << "loading model: '" << path << "'\n";
+        LOG_INFO("loading model '%s'", path.c_str());
 
         if (!scene || !scene->mRootNode || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE))
         {
@@ -45,9 +45,9 @@ namespace bls
                     animator = std::make_unique<Animator>(animations[name].get());
             }
 
-            std::cout << "animations found:\n";
+            LOG_INFO("animations found:");
             for (const auto& [name, anim] : animations)
-                std::cout << "> " << name << "\n";
+                LOG_INFO("> %s", name.c_str());
         }
     }
 
@@ -334,7 +334,7 @@ namespace bls
 
     Bone::~Bone()
     {
-        std::cout << "bone destroyed successfully\n";
+
     }
 
     void Bone::update(f32 animation_time)
@@ -454,7 +454,6 @@ namespace bls
     SkeletalAnimation::~SkeletalAnimation()
     {
         for (auto bone : bones) { delete bone; }
-        std::cout << "animation destroyed successfully\n";
     }
 
     Bone* SkeletalAnimation::find_bone(const str& name)
@@ -539,7 +538,7 @@ namespace bls
 
     Animator::~Animator()
     {
-        std::cout << "animator destroyed successfully\n";
+
     }
 
     void Animator::update(f32 dt)

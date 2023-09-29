@@ -1,5 +1,6 @@
 #include "ecs/ecs.hpp"
 #include "ecs/state_machine.hpp"
+#include "core/logger.hpp"
 #include "renderer/model.hpp"
 
 namespace bls
@@ -99,12 +100,12 @@ namespace bls
     // -----------------------------------------------------------------------------------------------------------------
     void PlayerShootingState::enter(ECS& ecs, u32 id)
     {
-        std::cout << "@TODO: player shooting enter\n";
+        LOG_WARNING("@TODO: player shooting enter");
     }
 
     void PlayerShootingState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
     {
-        std::cout << "@TODO: player shooting update\n";
+        LOG_WARNING("@TODO: player shooting update");
     }
 
     void PlayerShootingState::exit()

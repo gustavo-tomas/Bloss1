@@ -40,7 +40,7 @@ namespace bls
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt);
-    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front);
+    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object);
 
     void change_state(ECS& ecs, u32 id, State* new_state);
 
@@ -226,7 +226,7 @@ namespace bls
 
                 PhysicsObject object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 1500000.0f, 15.0f);
 
-                shoot(ecs, bullet_transform, object, front);
+                shoot(ecs, bullet_transform, object);
                 player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = 0.0f;
             }
         }
@@ -279,8 +279,8 @@ namespace bls
         state_machine->current_state->enter(ecs, id);
     }
 
-    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front)
+    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object)
     {
-        bullet(ecs, transform, object, front);
+        bullet(ecs, transform, object);
     }
 };

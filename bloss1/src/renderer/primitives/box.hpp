@@ -54,8 +54,6 @@ namespace bls
                 delete vao;
                 delete vbo;
                 delete ebo;
-
-                // std::cout << "box destroyed successfully\n";
             };
 
             void render()

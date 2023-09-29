@@ -1,6 +1,7 @@
 #include "platform/glfw/window.hpp"
 #include "platform/glfw/extensions.hpp"
 #include "core/event.hpp"
+#include "core/logger.hpp"
 
 namespace bls
 {
@@ -48,7 +49,7 @@ namespace bls
         }
 
         else
-            std::cout << "ARB Debug extension not supported\n";
+            LOG_WARNING("ARB Debug extension not supported");
         #endif
 
         // Disable sticky keys
@@ -114,7 +115,6 @@ namespace bls
     GlfwWindow::~GlfwWindow()
     {
         glfwTerminate();
-        std::cout << "glfw window destroyed successfully\n";
     }
 
     void GlfwWindow::update()

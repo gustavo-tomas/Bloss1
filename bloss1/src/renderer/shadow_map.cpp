@@ -84,8 +84,6 @@ namespace bls
         glDeleteFramebuffers(1, &light_FBO);
         glDeleteBuffers(1, &matrices_UBO);
         glDeleteTextures(1, &light_depth_maps);
-
-        std::cout << "shadow map destroyed successfully\n";
     }
 
     void ShadowMap::bind()

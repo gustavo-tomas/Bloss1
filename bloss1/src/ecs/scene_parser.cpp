@@ -67,7 +67,7 @@ namespace bls
         }
 
         scene.close();
-        std::cout << "scene loaded from: '" << file << "'\n";
+        LOG_SUCCESS("scene loaded from '%s'", file.c_str());
     }
 
     void SceneParser::save_scene(ECS& ecs, const str& file)
@@ -227,7 +227,7 @@ namespace bls
         }
 
         scene.close();
-        std::cout << "current scene saved to: '" << file << "'\n";
+        LOG_SUCCESS("current scene saved to '%s'", file);
     }
 
     void SceneParser::parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name)

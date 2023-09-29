@@ -99,8 +99,6 @@ namespace bls
                 delete vao;
                 delete vbo;
                 delete ebo;
-
-                // std::cout << "sphere destroyed successfully\n";
             };
 
             void render()

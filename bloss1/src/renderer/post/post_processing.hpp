@@ -31,7 +31,7 @@ namespace bls
 
             virtual ~RenderPass()
             {
-                std::cout << "post processing texture destroyed successfully\n";
+
             }
 
             virtual void bind()
@@ -247,7 +247,7 @@ namespace bls
 
             ~PostProcessingSystem()
             {
-                std::cout << "post processing system destroyed successfully\n";
+
             }
 
             void add_render_pass(RenderPass* texture)

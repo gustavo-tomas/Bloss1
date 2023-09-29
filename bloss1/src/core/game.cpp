@@ -42,7 +42,7 @@ namespace bls
 
     Game::~Game()
     {
-        std::cout << "game destroyed successfully\n";
+
     }
 
     void Game::run()
@@ -160,19 +160,18 @@ namespace bls
         window_open = false;
     }
 
-    void Game::on_key_press(const KeyPressEvent& event)
+    void Game::on_key_press(const KeyPressEvent&)
     {
-        std::cout << "Key pressed: " << event.key << "\n";
+
     }
 
-    void Game::on_mouse_scroll(const MouseScrollEvent& event)
+    void Game::on_mouse_scroll(const MouseScrollEvent&)
     {
-        std::cout << "Scroll X: " << event.x_offset << " Scroll Y: " << event.y_offset << "\n";
+
     }
 
     void Game::on_window_resize(const WindowResizeEvent& event)
     {
-        std::cout << "Width: " << event.width << " Height: " << event.height << "\n";
         if (event.width <= 100 || event.height <= 100)
             minimized = true;
 

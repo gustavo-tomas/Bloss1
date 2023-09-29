@@ -34,8 +34,6 @@ namespace bls
             {
                 delete vao;
                 delete vbo;
-
-                // std::cout << "line destroyed successfully\n";
             };
 
             void render()

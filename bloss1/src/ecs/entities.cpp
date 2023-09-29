@@ -33,7 +33,7 @@ namespace bls
         return id;
     }
 
-    u32 bullet(ECS& ecs, const Transform& transform, const PhysicsObject& object, const vec3& front)
+    u32 bullet(ECS& ecs, const Transform& transform, const PhysicsObject& object)
     {
         auto id = ecs.get_id();
         auto model = Model::create("bullet", "bloss1/assets/models/sphere/rusted_sphere.gltf", false);

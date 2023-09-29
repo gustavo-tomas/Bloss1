@@ -152,8 +152,6 @@ namespace bls
     OpenGLTexture::~OpenGLTexture()
     {
         glDeleteTextures(1, &texture_id);
-
-        std::cout << "texture '" << texture_id << "' destroyed successfully\n";
     }
 
     void OpenGLTexture::bind(u32 slot)

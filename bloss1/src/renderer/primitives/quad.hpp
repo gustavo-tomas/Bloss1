@@ -35,8 +35,6 @@ namespace bls
                 delete vao;
                 delete vbo;
                 delete ebo;
-
-                std::cout << "quad destroyed successfully\n";
             };
 
             void render()

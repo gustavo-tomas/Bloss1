@@ -9,7 +9,7 @@ namespace bls
 
     Random::~Random()
     {
-        std::cout << "random engine destroyed successfully\n";
+
     }
 
     f32 Random::get_float(f32 begin, f32 end)
