@@ -21,7 +21,6 @@ namespace bls
 
         // Create the renderer
         renderer = std::unique_ptr<Renderer>(Renderer::create());
-        renderer->initialize();
 
         // Create the editor
         // #if defined(_DEBUG)
@@ -50,6 +49,9 @@ namespace bls
     {
         // Register initial stage
         change_stage(new TestStage());
+
+        // Initialize after the ecs
+        renderer->initialize();
 
         // Time variation
         f64 last_time = window->get_time(), current_time = 0, dt = 0;
@@ -150,6 +152,11 @@ namespace bls
     Random& Game::get_random_engine()
     {
         return *random_engine;
+    }
+
+    Stage& Game::get_curr_stage()
+    {
+        return *stage;
     }
 
     void Game::set_target_fps(u32 fps)
