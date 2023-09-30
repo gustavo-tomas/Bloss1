@@ -27,8 +27,7 @@ namespace bls
         auto width = window.get_width();
         auto height = window.get_height();
 
-        // @TODO: player id
-        auto camera = ecs.cameras[0].get();
+        auto camera = ecs.cameras.begin()->second.get();
         auto position = camera->position;
         auto projection = camera->projection_matrix;
         auto view = camera->view_matrix;

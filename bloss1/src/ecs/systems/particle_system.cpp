@@ -51,8 +51,7 @@ namespace bls
         renderer.set_blending(true);
         renderer.set_face_culling(false);
 
-        // @TODO hardcoded
-        auto camera = ecs.cameras[0].get();
+        auto camera = ecs.cameras.begin()->second.get();
 
         for (auto& particle : particle_state.particle_pool)
         {

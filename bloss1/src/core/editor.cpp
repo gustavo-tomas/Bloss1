@@ -107,7 +107,6 @@ namespace bls
         // Scene entities
         ImGui::Begin("Entities");
 
-        // @TODO: oooofff
         for (const auto& [id, name] : ecs.names)
         {
             if (!ImGui::CollapsingHeader((name + "_" + to_str(id)).c_str()))
