@@ -65,5 +65,5 @@ project "bloss1"
     filter "configurations:release"
         defines { "_RELEASE" }
         symbols "Off"
-        optimize "On" -- '-O2'
+        optimize "Full" -- '-O3'
         runtime "Release"
