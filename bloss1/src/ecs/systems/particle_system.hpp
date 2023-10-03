@@ -6,7 +6,6 @@
  */
 
 #include "ecs/ecs.hpp"
-#include "math/math.hpp"
 
 namespace bls
 {
@@ -23,6 +22,29 @@ namespace bls
         f32 life_remaining = 0.0f;
 
         bool active = false;
+    };
+
+    class Emitter
+    {
+        public:
+            virtual ~Emitter() { }
+
+        private:
+            virtual vec3 generate_random_point_on_surface() = 0;
+    };
+
+    class SphereEmitter : public Emitter
+    {
+        public:
+            SphereEmitter(const Transform& transform, f32 radius);
+
+            void emit();
+
+        private:
+            vec3 generate_random_point_on_surface() override;
+
+            Transform transform;
+            f32 radius;
     };
 
     void particle_system(ECS& ecs, f32 dt);

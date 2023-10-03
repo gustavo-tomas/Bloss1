@@ -146,4 +146,42 @@ namespace bls
 
         particle_state.pool_index = min(--particle_state.pool_index, static_cast<u32>(particle_state.particle_pool.size() - 1));
     }
+
+    // SphereEmitter
+    // -----------------------------------------------------------------------------------------------------------------
+    SphereEmitter::SphereEmitter(const Transform& transform, f32 radius)
+    {
+        this->transform = transform;
+        this->radius = radius;
+    }
+
+    void SphereEmitter::emit()
+    {
+        Particle particle = { };
+        particle.color_begin = { 0.9f, 0.9f, 0.3f, 1.0f };
+        particle.color_end = { 0.3f, 0.9f, 0.9f, 1.0f };
+        particle.scale_begin = vec3(0.5f);
+        particle.scale_variation = vec3(0.3f);
+        particle.scale_end = vec3(0.01f);
+        particle.life_time = 10.0f;
+        particle.velocity = vec3(0.0f);
+        particle.velocity_variation = { 3.0f, 1.0f, 0.0f };
+        particle.position = generate_random_point_on_surface();
+
+        emit_particle(particle);
+    }
+
+    vec3 SphereEmitter::generate_random_point_on_surface()
+    {
+        auto random_engine = Game::get().get_random_engine();
+
+        f32 theta = random_engine.get_float(0.0f, 2.0f * M_PI); // Azimuthal angle
+        f32 phi = random_engine.get_float(0.0f, M_PI);          // Polar angle
+
+        f32 x = transform.position.x + radius * sin(phi) * cos(theta);
+        f32 y = transform.position.y + radius * sin(phi) * sin(theta);
+        f32 z = transform.position.z + radius * cos(phi);
+
+        return vec3(x, y, z);
+    }
 };

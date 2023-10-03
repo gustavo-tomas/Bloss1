@@ -20,6 +20,7 @@ namespace bls
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
     void render_texts(ECS& ecs);
 
+    SphereEmitter* emitter = nullptr;
     void render_system(ECS& ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("render_system");
@@ -154,19 +155,10 @@ namespace bls
         // Create and emit particles
         if (Input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
         {
-            Particle particle = { };
-            particle.color_begin = { 0.9f, 0.9f, 0.3f, 1.0f };
-            particle.color_end = { 0.3f, 0.9f, 0.9f, 1.0f };
-            particle.scale_begin = vec3(0.5f);
-            particle.scale_variation = vec3(0.3f);
-            particle.scale_end = vec3(0.01f);
-            particle.life_time = 10.0f;
-            particle.velocity = vec3(0.0f);
-            particle.velocity_variation = { 3.0f, 1.0f, 0.0f };
-            particle.position = ecs.transforms[0].get()->position;
+            if (!emitter)
+                emitter = new SphereEmitter(ecs.transforms[0].get()->position, 10.0f);
 
-            for (u32 i = 0; i < 5; i++)
-                emit_particle(particle);
+            emitter->emit();
         }
 
         // Draw the skybox last
