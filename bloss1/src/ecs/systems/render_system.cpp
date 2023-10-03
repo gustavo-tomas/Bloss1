@@ -173,7 +173,7 @@ namespace bls
         // skybox->draw(view, projection);
 
         // Render debug lines
-        #if defined(_DEBUG)
+        #if !defined(_RELEASE)
         render_colliders(ecs, projection, view);
         #endif
 
