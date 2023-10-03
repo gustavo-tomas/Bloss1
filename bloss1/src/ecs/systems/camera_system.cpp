@@ -1,10 +1,13 @@
 #include "ecs/ecs.hpp"
 #include "core/game.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
     void camera_system(ECS& ecs, f32 dt)
     {
+        BLS_PROFILE_SCOPE("camera_system");
+
         auto width  = static_cast<f32>(Game::get().get_window().get_width());
         auto height = static_cast<f32>(Game::get().get_window().get_height());
 

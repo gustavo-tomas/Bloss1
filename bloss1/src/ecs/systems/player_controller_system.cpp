@@ -2,6 +2,7 @@
 #include "ecs/entities.hpp"
 #include "core/input.hpp"
 #include "renderer/model.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
@@ -46,6 +47,8 @@ namespace bls
 
     void player_controller_system(ECS& ecs, f32 dt)
     {
+        BLS_PROFILE_SCOPE("player_controller_system");
+
         // Update all controllers
         auto& camera_controllers = ecs.camera_controllers;
         auto& transforms = ecs.transforms;

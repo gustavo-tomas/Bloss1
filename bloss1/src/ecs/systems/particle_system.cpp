@@ -5,6 +5,7 @@
 #include "renderer/texture.hpp"
 #include "renderer/model.hpp"
 #include "renderer/primitives/quad.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
@@ -41,6 +42,8 @@ namespace bls
 
     void particle_system(ECS& ecs, f32 dt)
     {
+        BLS_PROFILE_SCOPE("particle_system");
+
         if (!initialized)
         {
             initialize();
