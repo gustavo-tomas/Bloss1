@@ -9,19 +9,19 @@ C++ game engine.
 ## Build
 
 ```
-$ scripts/build.sh release
+$ just build release
 ```
 
 ## Run
 
 ```
-$ scripts/run.sh release
+$ just run release
 ```
 
 ## Clean
 
 ```
-$ scripts/clean.sh
+$ just clean release
 ```
 
 ## References
