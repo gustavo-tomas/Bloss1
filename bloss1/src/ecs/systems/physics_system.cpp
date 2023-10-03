@@ -56,8 +56,6 @@ namespace bls
 
     void update_physics(ECS& ecs, f32 dt)
     {
-        resolve_collisions(ecs);
-
         auto& transforms = ecs.transforms;
         auto& objects = ecs.physics_objects;
         auto& colliders = ecs.colliders;
@@ -84,6 +82,8 @@ namespace bls
             // Reset forces
             object->force = vec3(0.0f);
         }
+
+        resolve_collisions(ecs);
     }
 
     void resolve_collisions(ECS& ecs)
@@ -302,23 +302,38 @@ namespace bls
         auto collider_a = ecs.colliders[id_a].get();
         auto collider_b = ecs.colliders[id_b].get();
 
+        auto trans_a = ecs.transforms[id_a].get();
+        auto trans_b = ecs.transforms[id_b].get();
+
+        auto displacement_a = normal * dist * 0.5f;
+        auto displacement_b = normal * dist * 0.5f;
+
         if (!collider_a->immovable)
         {
-            auto trans_a = ecs.transforms[id_a].get();
             auto object_a = ecs.physics_objects[id_a].get();
-
-            trans_a->position += normal * dist * 0.5f;
             object_a->velocity = object_a->velocity - (dot(object_a->velocity, normal) * normal);
+        }
+
+        else
+        {
+            displacement_a = vec3(0.0f);
+            displacement_b *= 2.0f;
         }
 
         if (!collider_b->immovable)
         {
-            auto trans_b = ecs.transforms[id_b].get();
             auto object_b = ecs.physics_objects[id_b].get();
-
-            trans_b->position -= normal * dist * 0.5f;
             object_b->velocity = object_b->velocity - (dot(object_b->velocity, normal) * normal);
         }
+
+        else
+        {
+            displacement_a *= 2.0f;
+            displacement_b = vec3(0.0f);
+        }
+
+        trans_a->position += displacement_a;
+        trans_b->position -= displacement_b;
     }
 
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt)
