@@ -1,4 +1,5 @@
 #include "ecs/systems.hpp"
+#include "tools/profiler.hpp"
 
 #define GRAVITY 50.0f
 #define DECELERATION 10.0f
@@ -23,6 +24,8 @@ namespace bls
     f64 accumulator = 0.0;
     void physics_system(ECS& ecs, f32 dt)
     {
+        BLS_PROFILE_SCOPE("physics_system");
+
         // Clamp dt to a higher bound
         dt = clamp(static_cast<f64>(dt), 0.0, 0.1);
 

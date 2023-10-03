@@ -5,6 +5,7 @@
 #include "ecs/entities.hpp"
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
@@ -55,6 +56,8 @@ namespace bls
 
     void TestStage::update(f32 dt)
     {
+        BLS_PROFILE_SCOPE("update");
+
         // Update all systems in registration order
         auto& systems = ecs->systems;
         for (auto& system : systems)

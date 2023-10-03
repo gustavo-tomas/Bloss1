@@ -40,5 +40,8 @@ bin/
 Makefile
 !premake5_windows.exe
 
+# Generated reports
+profile/
+
 # Imgui files
 imgui.ini

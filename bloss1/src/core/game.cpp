@@ -2,6 +2,7 @@
 #include "core/logger.hpp"
 // #include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
@@ -23,9 +24,9 @@ namespace bls
         renderer = std::unique_ptr<Renderer>(Renderer::create());
 
         // Create the editor
-        // #if defined(_DEBUG)
+        #if !defined(_RELEASE)
         editor = std::make_unique<Editor>(*window.get());
-        // #endif
+        #endif
 
         // Create the audio engine
         audio_engine = std::unique_ptr<AudioEngine>(AudioEngine::create());
@@ -47,6 +48,8 @@ namespace bls
 
     void Game::run()
     {
+        BLS_PROFILE_BEGIN_SESSION("MainLoop", "profile/runtime.json");
+
         // Register initial stage
         change_stage(new TestStage());
 
@@ -83,9 +86,9 @@ namespace bls
                 break;
 
             // Update editor
-            // #if defined(_DEBUG)
+            #if !defined(_RELEASE)
             editor->update(*stage->ecs, dt);
-            // #endif
+            #endif
 
             // Update window
             window->update();
@@ -95,6 +98,8 @@ namespace bls
             if (target_spf - elapsed > 0.0)
                 window->sleep(target_spf - elapsed);
         }
+
+        BLS_PROFILE_END_SESSION();
     }
 
     void Game::change_stage(Stage* new_stage)

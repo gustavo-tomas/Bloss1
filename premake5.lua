@@ -4,7 +4,7 @@ workspace "bloss1"
     toolset "gcc"
     language "C++"
     cppdialect "C++17"
-    configurations { "debug", "release" }
+    configurations { "debug", "profile", "release" }
 
     -- Change backends here
     defines { "_GLFW", "_OPENGL", "_SOLOUD", "WITH_ALSA" }
@@ -57,10 +57,16 @@ project "bloss1"
         buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
         linkoptions { "-fsanitize=address" }
 
-        defines { "_DEBUG" }
+        defines { "_DEBUG", "BLS_PROFILE" }
         symbols "On" -- '-g'
         optimize "Off" -- '-O0'
         runtime "Debug"
+
+    filter "configurations:profile"
+        defines { "_PROFILE", "BLS_PROFILE" }
+        symbols "Off"
+        optimize "On" -- 'O2'
+        runtime "Release"
 
     filter "configurations:release"
         defines { "_RELEASE" }
