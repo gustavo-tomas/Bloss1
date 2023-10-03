@@ -39,3 +39,4 @@ $ scripts/clean.sh
 - [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
 - [Particle system](https://github.com/TheCherno/OneHourParticleSystem)
 - [Finite State Machine (FSM)](https://gameprogrammingpatterns.com/state.html)
+- [The Cherno Profiler](https://www.youtube.com/watch?v=qiD39bB7DvA)
