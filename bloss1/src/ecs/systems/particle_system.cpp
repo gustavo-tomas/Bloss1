@@ -87,7 +87,7 @@ namespace bls
             vec4 color = mix(particle.color_end, particle.color_begin, life);
             vec3 size = mix(particle.scale_end, particle.scale_begin, life);
 
-            // Render @TODO: check rotation
+            // Render
             mat4 model_matrix = translate(mat4(1.0f), particle.position)
                                 * rotate(mat4(1.0f), particle.rotation.z, { 0.0f, 0.0f, 1.0f })
                                 * rotate(mat4(1.0f), particle.rotation.y, { 0.0f, 1.0f, 0.0f })
