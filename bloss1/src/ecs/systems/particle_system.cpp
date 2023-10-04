@@ -189,4 +189,70 @@ namespace bls
 
         return vec3(x, y, z);
     }
+
+    // BoxEmitter
+    // -----------------------------------------------------------------------------------------------------------------
+    BoxEmitter::BoxEmitter(const vec3& center, const vec3& dimensions)
+    {
+        this->center = center;
+        this->dimensions = dimensions;
+    }
+
+    void BoxEmitter::emit()
+    {
+        Particle particle = { };
+        particle.color_begin = { 0.9f, 0.9f, 0.3f, 1.0f };
+        particle.color_end = { 0.3f, 0.9f, 0.9f, 1.0f };
+        particle.scale_begin = vec3(0.5f);
+        particle.scale_variation = vec3(0.3f);
+        particle.scale_end = vec3(0.01f);
+        particle.life_time = 10.0f;
+        particle.velocity = vec3(0.0f);
+        particle.velocity_variation = { 0.5f, 2.0f, 0.5f };
+        particle.position = generate_random_point_on_surface();
+
+        emit_particle(particle);
+    }
+
+    vec3 BoxEmitter::generate_random_point_on_surface()
+    {
+        auto random_engine = Game::get().get_random_engine();
+
+        vec3 min_aabb = center - dimensions;
+        vec3 max_aabb = center + dimensions;
+
+        vec3 point;
+        for (u32 i = 0; i < 3; i++)
+            point[i] = random_engine.get_float(min_aabb[i], max_aabb[i]);
+
+        u32 face = random_engine.get_int(0, 6);
+        switch (face)
+        {
+            case 0:
+                point.x = max_aabb.x;
+                break;
+            case 1:
+                point.x = min_aabb.x;
+                break;
+            case 2:
+                point.y = max_aabb.y;
+                break;
+            case 3:
+                point.y = min_aabb.y;
+                break;
+            case 4:
+                point.z = max_aabb.z;
+                break;
+            case 5:
+                point.z = min_aabb.z;
+                break;
+        }
+
+        return point;
+    }
+
+    void BoxEmitter::set_center(const vec3& new_center)
+    {
+        this->center = new_center;
+    }
 };

@@ -20,7 +20,7 @@ namespace bls
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
     void render_texts(ECS& ecs);
 
-    SphereEmitter* emitter = nullptr;
+    BoxEmitter* emitter = nullptr;
     void render_system(ECS& ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("render_system");
@@ -156,7 +156,7 @@ namespace bls
         if (Input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
         {
             if (!emitter)
-                emitter = new SphereEmitter(ecs.transforms[0].get()->position, 10.0f);
+                emitter = new BoxEmitter(ecs.transforms[0].get()->position, vec3(10.0f));
 
             emitter->set_center(ecs.transforms[0].get()->position);
             emitter->emit();

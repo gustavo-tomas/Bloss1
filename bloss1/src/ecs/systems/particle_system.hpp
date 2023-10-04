@@ -47,6 +47,21 @@ namespace bls
             f32 radius;
     };
 
+    class BoxEmitter : public Emitter
+    {
+        public:
+            BoxEmitter(const vec3& center, const vec3& dimensions);
+
+            void emit() override;
+            void set_center(const vec3& new_center);
+
+        private:
+            vec3 generate_random_point_on_surface();
+
+            vec3 center;
+            vec3 dimensions;
+    };
+
     void particle_system(ECS& ecs, f32 dt);
     void emit_particle(const Particle& particle_props);
 };
