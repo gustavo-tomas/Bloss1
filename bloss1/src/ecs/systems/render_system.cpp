@@ -158,6 +158,7 @@ namespace bls
             if (!emitter)
                 emitter = new SphereEmitter(ecs.transforms[0].get()->position, 10.0f);
 
+            emitter->set_center(ecs.transforms[0].get()->position);
             emitter->emit();
         }
 

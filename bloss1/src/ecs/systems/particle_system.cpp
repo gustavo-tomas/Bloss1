@@ -149,9 +149,9 @@ namespace bls
 
     // SphereEmitter
     // -----------------------------------------------------------------------------------------------------------------
-    SphereEmitter::SphereEmitter(const Transform& transform, f32 radius)
+    SphereEmitter::SphereEmitter(const vec3& center, f32 radius)
     {
-        this->transform = transform;
+        this->center = center;
         this->radius = radius;
     }
 
@@ -171,6 +171,11 @@ namespace bls
         emit_particle(particle);
     }
 
+    void SphereEmitter::set_center(const vec3& new_center)
+    {
+        this->center = new_center;
+    }
+
     vec3 SphereEmitter::generate_random_point_on_surface()
     {
         auto random_engine = Game::get().get_random_engine();
@@ -178,9 +183,9 @@ namespace bls
         f32 theta = random_engine.get_float(0.0f, 2.0f * M_PI); // Azimuthal angle
         f32 phi = random_engine.get_float(0.0f, M_PI);          // Polar angle
 
-        f32 x = transform.position.x + radius * sin(phi) * cos(theta);
-        f32 y = transform.position.y + radius * sin(phi) * sin(theta);
-        f32 z = transform.position.z + radius * cos(phi);
+        f32 x = center.x + radius * sin(phi) * cos(theta);
+        f32 y = center.y + radius * sin(phi) * sin(theta);
+        f32 z = center.z + radius * cos(phi);
 
         return vec3(x, y, z);
     }

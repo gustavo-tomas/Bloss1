@@ -29,21 +29,21 @@ namespace bls
         public:
             virtual ~Emitter() { }
 
-        private:
-            virtual vec3 generate_random_point_on_surface() = 0;
+            virtual void emit() = 0;
     };
 
     class SphereEmitter : public Emitter
     {
         public:
-            SphereEmitter(const Transform& transform, f32 radius);
+            SphereEmitter(const vec3& center, f32 radius);
 
-            void emit();
+            void emit() override;
+            void set_center(const vec3& new_center);
 
         private:
-            vec3 generate_random_point_on_surface() override;
+            vec3 generate_random_point_on_surface();
 
-            Transform transform;
+            vec3 center;
             f32 radius;
     };
 
