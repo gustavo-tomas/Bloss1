@@ -163,7 +163,7 @@ namespace bls
         }
 
         // Draw the skybox last
-        // skybox->draw(view, projection);
+        skybox->draw(view, projection);
 
         // Render debug lines
         #if !defined(_RELEASE)
@@ -206,7 +206,7 @@ namespace bls
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
                 model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
-                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x - 90.0f), vec3(1.0f, 0.0f, 0.0f));
             }
 
             else

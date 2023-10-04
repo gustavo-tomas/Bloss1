@@ -238,7 +238,8 @@ namespace bls
 
         camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 
-        update_state_machine(ecs, id, player_state, dt);
+        // @TODO: finish player state machine
+        // update_state_machine(ecs, id, player_state, dt);
     }
 
     void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt)

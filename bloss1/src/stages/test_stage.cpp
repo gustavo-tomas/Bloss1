@@ -38,20 +38,20 @@ namespace bls
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
 
-        // Create state machine for the player
-        std::map<str, State*> states;
-        auto idle_state = new PlayerIdleState();
-        auto walking_state = new PlayerWalkingState();
-        auto jumping_state = new PlayerJumpingState();
-        auto shooting_state = new PlayerShootingState();
+        // @TODO: Create state machine for the player
+        // std::map<str, State*> states;
+        // auto idle_state = new PlayerIdleState();
+        // auto walking_state = new PlayerWalkingState();
+        // auto jumping_state = new PlayerJumpingState();
+        // auto shooting_state = new PlayerShootingState();
 
-        states[PLAYER_STATE_IDLE]     = idle_state;
-        states[PLAYER_STATE_WALKING]  = walking_state;
-        states[PLAYER_STATE_JUMPING]  = jumping_state;
-        states[PLAYER_STATE_SHOOTING] = shooting_state;
+        // states[PLAYER_STATE_IDLE]     = idle_state;
+        // states[PLAYER_STATE_WALKING]  = walking_state;
+        // states[PLAYER_STATE_JUMPING]  = jumping_state;
+        // states[PLAYER_STATE_SHOOTING] = shooting_state;
 
-        idle_state->enter(*ecs, 0);
-        ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
+        // idle_state->enter(*ecs, 0);
+        // ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
     }
 
     void TestStage::update(f32 dt)
