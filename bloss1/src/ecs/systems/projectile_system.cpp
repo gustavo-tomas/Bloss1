@@ -3,6 +3,8 @@
 
 namespace bls
 {
+    std::map<u32, Timer> explosion_timers;
+
     void projectile_system(ECS& ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("projectile_system");
@@ -15,8 +17,25 @@ namespace bls
             // Explode when projectile expires
             if (timer->time >= projectile->time_to_live)
             {
-                // @TODO: explode on death
+                ecs.models.erase(id);
+                ecs.physics_objects[id]->terminal_velocity = vec3(0.0f);
+
+                ecs.colliders[id]->immovable = true;
+                static_cast<SphereCollider*>(ecs.colliders[id].get())->radius = projectile->explosion_radius;
+
+                if (!explosion_timers.count(id))
+                    explosion_timers[id] = Timer();
+
+                explosion_timers[id].time += dt;
+            }
+
+            // Delete bullet after explosion
+            if (explosion_timers.count(id) && explosion_timers[id].time >= projectile->explosion_duration)
+            {
                 ecs.erase_entity(id);
+                explosion_timers.erase(id);
+
+                std::cout << "RADIUS: " << projectile->explosion_radius << "\n";
             }
         }
     }
