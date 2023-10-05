@@ -104,6 +104,13 @@ namespace bls
                 auto collision = test_collision(ecs, id_a, id_b);
                 if (collision.has_collision)
                 {
+                    // Projectile collision (destroy projectile)
+                    if (ecs.projectiles.count(id_a))
+                        ecs.projectiles[id_a]->time_to_live = 0.0f;
+
+                    if (ecs.projectiles.count(id_b))
+                        ecs.projectiles[id_b]->time_to_live = 0.0f;
+
                     collider_a->color = { 1.0f, 0.0f, 0.0f };
                     collider_b->color = { 1.0f, 0.0f, 0.0f };
                     solve_collision(ecs, id_a, id_b, collision);
