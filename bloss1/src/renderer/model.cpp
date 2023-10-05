@@ -81,43 +81,48 @@ namespace bls
         // Process vertex positions, normals and texture coordinates
         for (u32 i = 0; i < mesh->mNumVertices; i++)
         {
-            Vertex vertex;
+            Vertex vertex = { };
             vec3 vector;
 
             // Set bone data
             set_vertex_bone_data_to_default(vertex);
 
             // Position
-            vector.x = mesh->mVertices[i].x;
-            vector.y = mesh->mVertices[i].y;
-            vector.z = mesh->mVertices[i].z;
-            vertex.position = vector;
+            if (mesh->HasPositions())
+            {
+                vector.x = mesh->mVertices[i].x;
+                vector.y = mesh->mVertices[i].y;
+                vector.z = mesh->mVertices[i].z;
+                vertex.position = vector;
+            }
 
             // Normal
-            vector.x = mesh->mNormals[i].x;
-            vector.y = mesh->mNormals[i].y;
-            vector.z = mesh->mNormals[i].z;
-            vertex.normal = vector;
+            if (mesh->HasNormals())
+            {
+                vector.x = mesh->mNormals[i].x;
+                vector.y = mesh->mNormals[i].y;
+                vector.z = mesh->mNormals[i].z;
+                vertex.normal = vector;
+            }
 
             // Tangents
-            vector.x = mesh->mTangents[i].x;
-            vector.y = mesh->mTangents[i].y;
-            vector.z = mesh->mTangents[i].z;
-            vertex.tangent = vector;
+            if (mesh->HasTangentsAndBitangents())
+            {
+                vector.x = mesh->mTangents[i].x;
+                vector.y = mesh->mTangents[i].y;
+                vector.z = mesh->mTangents[i].z;
+                vertex.tangent = vector;
 
-            // Bitangents
-            vector.x = mesh->mBitangents[i].x;
-            vector.y = mesh->mBitangents[i].y;
-            vector.z = mesh->mBitangents[i].z;
-            vertex.bitangent = vector;
+                // Bitangents
+                vector.x = mesh->mBitangents[i].x;
+                vector.y = mesh->mBitangents[i].y;
+                vector.z = mesh->mBitangents[i].z;
+                vertex.bitangent = vector;
+            }
 
             // Texture coordinates
-            if (mesh->mTextureCoords[0])
+            if (mesh->HasTextureCoords(0))
                 vertex.tex_coords = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
-
-            // No texture present
-            else
-                vertex.tex_coords = vec2(0.0f, 0.0f);
 
             vertices.push_back(vertex);
         }
