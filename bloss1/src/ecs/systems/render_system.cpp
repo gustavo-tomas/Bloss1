@@ -205,8 +205,8 @@ namespace bls
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-                model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
-                model_matrix = rotate(model_matrix, radians(transform->rotation.x - 90.0f), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
             }
 
             else

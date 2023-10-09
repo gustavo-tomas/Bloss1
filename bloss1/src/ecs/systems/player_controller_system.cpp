@@ -238,8 +238,7 @@ namespace bls
 
         camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 
-        // @TODO: finish player state machine
-        // update_state_machine(ecs, id, player_state, dt);
+        update_state_machine(ecs, id, player_state, dt);
     }
 
     void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt)
@@ -247,23 +246,24 @@ namespace bls
         auto& state_machine = ecs.state_machines[id];
         state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
 
+        // @TODO: finish player state machine
         switch (player_state)
         {
             case PlayerState::Idle:
                 change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
                 break;
 
-            case PlayerState::Walking:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
-                break;
+            // case PlayerState::Walking:
+            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+            //     break;
 
-            case PlayerState::Jumping:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
-                break;
+            // case PlayerState::Jumping:
+            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
+            //     break;
 
-            case PlayerState::Shooting:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
-                break;
+            // case PlayerState::Shooting:
+            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
+            //     break;
 
             default:
                 change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
