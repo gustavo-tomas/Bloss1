@@ -253,9 +253,9 @@ namespace bls
                 change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
                 break;
 
-            // case PlayerState::Walking:
-            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
-            //     break;
+            case PlayerState::Walking:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+                break;
 
             // case PlayerState::Jumping:
             //     change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
