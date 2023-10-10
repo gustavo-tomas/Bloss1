@@ -261,9 +261,9 @@ namespace bls
             //     change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
             //     break;
 
-            // case PlayerState::Shooting:
-            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
-            //     break;
+            case PlayerState::Shooting:
+                change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
+                break;
 
             default:
                 change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());

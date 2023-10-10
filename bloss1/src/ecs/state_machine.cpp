@@ -100,12 +100,24 @@ namespace bls
     // -----------------------------------------------------------------------------------------------------------------
     void PlayerShootingState::enter(ECS& ecs, u32 id)
     {
-        LOG_WARNING("@TODO: player shooting enter");
+        auto model = ecs.models[id]->model;
+        auto& animations = ecs.models[id]->model->animations;
+        auto& animator = ecs.models[id]->model->animator;
+
+        curr_animation = model->animator->get_current_animation();
+        next_animation = animations["Armature|Shoot"].get();
+
+        // Blend from previous state to this state
+        last_animation = curr_animation;
+
+        animator->play(next_animation);
+        curr_animation = next_animation;
     }
 
     void PlayerShootingState::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
     {
-        LOG_WARNING("@TODO: player shooting update");
+        auto& animator = ecs.models[id]->model->animator;
+        animator->blend_animations(last_animation, curr_animation, blend_factor, dt);
     }
 
     void PlayerShootingState::exit()
