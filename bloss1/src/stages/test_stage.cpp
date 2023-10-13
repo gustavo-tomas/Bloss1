@@ -26,6 +26,7 @@ namespace bls
 
         // Add systems in order of execution
         ecs->add_system(player_controller_system);
+        ecs->add_system(ophanim_controller_system);
         ecs->add_system(physics_system);
         ecs->add_system(projectile_system);
         ecs->add_system(state_machine_system);
@@ -52,6 +53,15 @@ namespace bls
 
         idle_state->enter(*ecs, 0);
         ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
+
+        // @TODO: Create state machine for ophanim
+        std::map<str, State*> ophanim_states;
+        auto ophanim_idle_state = new OphanimIdleState();
+
+        ophanim_states[OPHANIM_STATE_IDLE] = ophanim_idle_state;
+
+        ophanim_idle_state->enter(*ecs, 1);
+        ecs->state_machines[1] = std::make_unique<StateMachine>(ophanim_states, ophanim_idle_state);
     }
 
     void TestStage::update(f32 dt)

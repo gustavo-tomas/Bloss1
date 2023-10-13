@@ -11,6 +11,8 @@
 #define PLAYER_STATE_JUMPING  "jumping"
 #define PLAYER_STATE_SHOOTING "shooting"
 
+#define OPHANIM_STATE_IDLE "idle"
+
 namespace bls
 {
     class ECS;
@@ -22,6 +24,8 @@ namespace bls
             virtual void exit() = 0;
     };
 
+    // PlayerState
+    // -----------------------------------------------------------------------------------------------------------------
     class PlayerIdleState : public State
     {
         public:
@@ -47,6 +51,16 @@ namespace bls
     };
 
     class PlayerShootingState : public State
+    {
+        public:
+            void enter(ECS& ecs, u32 id) override;
+            void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) override;
+            void exit() override;
+    };
+
+    // OphanimState
+    // -----------------------------------------------------------------------------------------------------------------
+    class OphanimIdleState : public State
     {
         public:
             void enter(ECS& ecs, u32 id) override;

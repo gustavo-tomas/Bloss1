@@ -8,6 +8,12 @@
 	camera_controller: (200.000000, 350.000000, 230.000000), 0.030000;
 }
 
+[ophanim]
+{
+	model: bloss1/assets/models/ophanim/ophanim.fbx, 0;
+	transform: (0.000000, 0.000000, 0.000000), (0.000000, 0.000000, 0.000000), (1.000000, 1.000000, 1.000000);
+}
+
 [floor]
 {
 	model: bloss1/assets/models/floor_marble/marble_floor.gltf, 0;

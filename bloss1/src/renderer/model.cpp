@@ -601,11 +601,9 @@ namespace bls
         const f32 anim_speed_multiplier_down = mix(a, b, blend_factor);
 
         // Current time of each animation, "scaled" by the above speed multiplier variables
-        static f32 current_time_base = 0.0f;
         current_time_base += base_animation->get_ticks_per_second() * dt * anim_speed_multiplier_up;
         current_time_base = fmod(current_time_base, base_animation->get_duration());
 
-        static f32 current_time_layered = 0.0f;
         current_time_layered += layered_animation->get_ticks_per_second() * dt * anim_speed_multiplier_down;
         current_time_layered = fmod(current_time_layered, layered_animation->get_duration());
 
