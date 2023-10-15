@@ -62,6 +62,10 @@ namespace bls
 
         ophanim_idle_state->enter(*ecs, 1);
         ecs->state_machines[1] = std::make_unique<StateMachine>(ophanim_states, ophanim_idle_state);
+
+        // @TODO: add to scene
+        ecs->hitpoints[0] = 100;
+        ecs->hitpoints[1] = 10000;
     }
 
     void TestStage::update(f32 dt)
@@ -72,6 +76,14 @@ namespace bls
         auto& systems = ecs->systems;
         for (auto& system : systems)
             system(*ecs, dt);
+
+        // @TODO: Player won
+        if (ecs->hitpoints[1] <= 0.0f)
+            Game::get().change_stage(nullptr);
+
+        // @TODO: Player lost
+        if (ecs->hitpoints[0] <= 0.0f)
+            Game::get().change_stage(nullptr);
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))

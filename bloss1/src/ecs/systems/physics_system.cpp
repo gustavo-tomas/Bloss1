@@ -20,6 +20,7 @@ namespace bls
     void solve_collision(ECS& ecs, u32 id_a, u32 id_b, Collision collision);
     f32 apply_deceleration(f32 velocity, f32 deceleration, f32 mass, f32 dt);
     void update_physics(ECS& ecs, f32 dt);
+    void hit_entity(ECS& ecs, u32 projectile_id, u32 hp_id);
 
     f64 accumulator = 0.0;
     void physics_system(ECS& ecs, f32 dt)
@@ -116,6 +117,28 @@ namespace bls
 
                     if (ecs.projectiles.count(id_b))
                         ecs.projectiles[id_b]->time_to_live = 0.0f;
+
+                    // Player hit
+                    if ((ecs.projectiles.count(id_a) || ecs.projectiles.count(id_b)) &&
+                        (ecs.names[id_a] == "player" || ecs.names[id_b] == "player"))
+                    {
+                        if (ecs.projectiles.count(id_a))
+                            hit_entity(ecs, id_a, id_b);
+
+                        else
+                            hit_entity(ecs, id_b, id_a);
+                    }
+
+                    // Enemy hit
+                    if ((ecs.projectiles.count(id_a) || ecs.projectiles.count(id_b)) &&
+                        (ecs.names[id_a] == "ophanim" || ecs.names[id_b] == "ophanim"))
+                    {
+                        if (ecs.projectiles.count(id_a))
+                            hit_entity(ecs, id_a, id_b);
+
+                        else
+                            hit_entity(ecs, id_b, id_a);
+                    }
 
                     solve_collision(ecs, id_a, id_b, collision);
                 }
@@ -358,5 +381,16 @@ namespace bls
             return min(velocity, 0.0f);
 
         return 0.0f;
+    }
+
+    void hit_entity(ECS& ecs, u32 projectile_id, u32 hp_id)
+    {
+        auto entity_hp = &ecs.hitpoints[hp_id];
+        auto projectile = ecs.projectiles[projectile_id].get();
+
+        *entity_hp = clamp(*entity_hp - projectile->damage, 0.0f, *entity_hp);
+        projectile->explosion_duration = 0.0f;
+
+        std::cout << "ID: " << hp_id << " ENTT HP: " << *entity_hp << "\n";
     }
 };

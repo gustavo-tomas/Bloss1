@@ -34,8 +34,6 @@ namespace bls
             {
                 ecs.erase_entity(id);
                 explosion_timers.erase(id);
-
-                std::cout << "RADIUS: " << projectile->explosion_radius << "\n";
             }
         }
     }

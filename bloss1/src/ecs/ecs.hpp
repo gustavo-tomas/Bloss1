@@ -96,6 +96,7 @@ namespace bls
             std::map<u32, std::map<str, std::unique_ptr<Sound>>> sounds;
             std::map<u32, std::unique_ptr<StateMachine>> state_machines;
             std::map<u32, std::unique_ptr<Projectile>> projectiles;
+            std::map<u32, f32> hitpoints;
 
         private:
             // Entities IDs
