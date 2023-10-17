@@ -18,8 +18,8 @@ namespace bls
     const f32 TOLERANCE = 0.2f; // Tolerance to better handle floating point fuckery
     const vec3 WORLD_UP = vec3(0.0f, 1.0f, 0.0f);
 
-    const f32 MIN_CAMERA_ZOOM = 35.0f;
-    const f32 MAX_CAMERA_ZOOM = 60.0f;
+    const f32 MIN_CAMERA_ZOOM = 45.0f;
+    const f32 MAX_CAMERA_ZOOM = 70.0f;
 
     const vec3 BULLET_OFFSET = vec3(0.0f, 5.0f, 35.0f);
 
@@ -218,7 +218,7 @@ namespace bls
         {
             if (player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] >= PLAYER_TIMER_SHOOT_COOLDOWN)
             {
-                player_state = PlayerState::Shooting;
+                // player_state = PlayerState::Shooting;
 
                 Transform bullet_transform = *transform;
                 bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;
