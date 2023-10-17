@@ -125,7 +125,7 @@ namespace bls
                                          ecs->cameras[0].get()->position, textures[0].second.get()));
         // post_processing->add_render_pass(new FXAAPass(width, height));
         // post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
-        // post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
+        post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
         // post_processing->add_render_pass(new PixelizationPass(width, height, 4));
     }
 

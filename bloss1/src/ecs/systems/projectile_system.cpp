@@ -32,8 +32,8 @@ namespace bls
             // Delete bullet after explosion
             if (explosion_timers.count(id) && explosion_timers[id].time >= projectile->explosion_duration)
             {
-                ecs.erase_entity(id);
                 explosion_timers.erase(id);
+                ecs.erase_entity(id);
             }
         }
     }
