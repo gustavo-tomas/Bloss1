@@ -21,6 +21,9 @@ namespace bls
     const f32 MIN_CAMERA_ZOOM = 45.0f;
     const f32 MAX_CAMERA_ZOOM = 70.0f;
 
+    const f32 MIN_PLAYER_PITCH = 0.0f;
+    const f32 MAX_PLAYER_PITCH = 25.0f;
+
     const vec3 BULLET_OFFSET = vec3(0.0f, 5.0f, 35.0f);
 
     const f32 PLAYER_TIMER_JUMP = 2.0f;
@@ -165,7 +168,7 @@ namespace bls
         f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt * 250.0f;
         f32 yaw   = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
 
-        pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
+        pitch = clamp(pitch, MIN_PLAYER_PITCH, MAX_PLAYER_PITCH); // Clamp pitch to avoid flipping
 
         // Update target rotation
         transform->rotation.x = pitch;
