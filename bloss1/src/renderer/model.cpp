@@ -518,6 +518,11 @@ namespace bls
         return duration;
     }
 
+    f32 SkeletalAnimation::get_duration_seconds()
+    {
+        return duration / ticks_per_second;
+    }
+
     AssNodeData& SkeletalAnimation::get_root_node()
     {
         return root_node;

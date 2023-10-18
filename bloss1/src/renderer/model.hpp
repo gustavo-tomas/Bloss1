@@ -135,6 +135,7 @@ namespace bls
             Bone* find_bone(const str& name);
             f32 get_ticks_per_second();
             f32 get_duration();
+            f32 get_duration_seconds();
             AssNodeData& get_root_node();
             std::map<str, BoneInfo>& get_bone_id_map();
 
