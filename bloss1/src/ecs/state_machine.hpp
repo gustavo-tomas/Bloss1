@@ -11,7 +11,8 @@
 #define PLAYER_STATE_JUMPING  "jumping"
 #define PLAYER_STATE_SHOOTING "shooting"
 
-#define OPHANIM_STATE_IDLE "idle"
+#define OPHANIM_STATE_IDLE  "idle"
+#define OPHANIM_STATE_ALERT "alert"
 
 namespace bls
 {
@@ -61,6 +62,14 @@ namespace bls
     // OphanimState
     // -----------------------------------------------------------------------------------------------------------------
     class OphanimIdleState : public State
+    {
+        public:
+            void enter(ECS& ecs, u32 id) override;
+            void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt) override;
+            void exit() override;
+    };
+
+    class OphanimAlertState : public State
     {
         public:
             void enter(ECS& ecs, u32 id) override;

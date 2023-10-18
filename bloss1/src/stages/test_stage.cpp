@@ -57,8 +57,10 @@ namespace bls
         // @TODO: Create state machine for ophanim
         std::map<str, State*> ophanim_states;
         auto ophanim_idle_state = new OphanimIdleState();
+        auto ophanim_alert_state = new OphanimAlertState();
 
         ophanim_states[OPHANIM_STATE_IDLE] = ophanim_idle_state;
+        ophanim_states[OPHANIM_STATE_ALERT] = ophanim_alert_state;
 
         ophanim_idle_state->enter(*ecs, 1);
         ecs->state_machines[1] = std::make_unique<StateMachine>(ophanim_states, ophanim_idle_state);
