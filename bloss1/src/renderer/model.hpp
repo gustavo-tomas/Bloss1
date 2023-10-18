@@ -174,8 +174,8 @@ namespace bls
             std::vector<mat4> final_bone_matrices;
             SkeletalAnimation* current_animation;
             f32 current_time;
-            f32 current_time_base = 0.0f;
-            f32 current_time_layered = 0.0f;
+            f32 current_time_base;
+            f32 current_time_layered;
     };
 
     // Model

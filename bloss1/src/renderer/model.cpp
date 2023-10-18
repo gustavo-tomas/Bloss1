@@ -537,7 +537,9 @@ namespace bls
     // -----------------------------------------------------------------------------------------------------------------
     Animator::Animator(SkeletalAnimation* animation)
     {
-        current_time = 0.0;
+        current_time = 0.0f;
+        current_time_base = 0.0f;
+        current_time_layered = 0.0f;
         current_animation = animation;
 
         final_bone_matrices.reserve(MAX_BONE_MATRICES);
