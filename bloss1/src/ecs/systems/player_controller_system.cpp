@@ -221,7 +221,7 @@ namespace bls
         {
             if (player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] >= PLAYER_TIMER_SHOOT_COOLDOWN)
             {
-                // player_state = PlayerState::Shooting;
+                player_state = PlayerState::Shooting;
 
                 Transform bullet_transform = *transform;
                 bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;

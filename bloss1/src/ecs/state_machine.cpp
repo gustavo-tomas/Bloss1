@@ -105,7 +105,7 @@ namespace bls
         auto& animator = ecs.models[id]->model->animator;
 
         curr_animation = model->animator->get_current_animation();
-        next_animation = animations["Armature|Shoot"].get();
+        next_animation = animations["Armature|Shooting"].get();
 
         // Blend from previous state to this state
         last_animation = curr_animation;
