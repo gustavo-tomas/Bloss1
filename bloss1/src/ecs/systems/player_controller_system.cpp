@@ -247,17 +247,17 @@ namespace bls
     void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt)
     {
         auto& state_machine = ecs.state_machines[id];
-        state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
+        State* next_state = nullptr;
 
         // @TODO: finish player state machine
         switch (player_state)
         {
             case PlayerState::Idle:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+                next_state = state_machine->states[PLAYER_STATE_IDLE].get();
                 break;
 
             case PlayerState::Walking:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_WALKING].get());
+                next_state = state_machine->states[PLAYER_STATE_WALKING].get();
                 break;
 
             // case PlayerState::Jumping:
@@ -265,13 +265,16 @@ namespace bls
             //     break;
 
             case PlayerState::Shooting:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_SHOOTING].get());
+                next_state = state_machine->states[PLAYER_STATE_SHOOTING].get();
                 break;
 
             default:
-                change_state(ecs, id, state_machine->states[PLAYER_STATE_IDLE].get());
+                next_state = state_machine->states[PLAYER_STATE_IDLE].get();
                 break;
         }
+
+        state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
+        change_state(ecs, id, next_state);
     }
 
     void change_state(ECS& ecs, u32 id, State* new_state)
@@ -280,7 +283,7 @@ namespace bls
         if (state_machine->current_state == new_state)
             return;
 
-        state_machine->blend_factor = 0.0f;
+        state_machine->blend_factor = 1.0f - state_machine->blend_factor;
         state_machine->current_state->exit();
         state_machine->current_state = new_state;
         state_machine->current_state->enter(ecs, id);

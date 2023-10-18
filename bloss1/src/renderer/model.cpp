@@ -567,6 +567,8 @@ namespace bls
     {
         current_animation = animation;
         current_time = 0.0f;
+
+        std::swap(current_time_base, current_time_layered);
     }
 
     void Animator::calculate_bone_transform(const AssNodeData* node, mat4 parent_transform)
