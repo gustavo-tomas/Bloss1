@@ -623,7 +623,6 @@ namespace bls
     {
         blend_factor = clamp(blend_factor + dt, 0.0f, 1.0f);
 
-        // Current time of each animation, "scaled" by the above speed multiplier variables
         current_time += current_animation->get_ticks_per_second() * dt;
         current_time = fmod(current_time, current_animation->get_duration());
 
