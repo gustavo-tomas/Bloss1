@@ -9,6 +9,6 @@ namespace bls
         BLS_PROFILE_SCOPE("state_machine_system");
 
         for (auto& [id, state_machine] : ecs.state_machines)
-            state_machine->state->update(ecs, id, state_machine->blend_factor, dt);
+            state_machine->state->update(ecs, id, dt);
     }
 };

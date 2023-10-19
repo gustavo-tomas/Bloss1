@@ -451,6 +451,7 @@ namespace bls
     {
         duration = animation->mDuration;
         ticks_per_second = animation->mTicksPerSecond;
+        name = animation->mName.C_Str();
 
         read_hierarchy_data(root_node, root);
         read_missing_bones(animation, model_bone_info_map, model_bone_count);
@@ -508,6 +509,11 @@ namespace bls
         }
     }
 
+    str SkeletalAnimation::get_name()
+    {
+        return name;
+    }
+
     f32 SkeletalAnimation::get_ticks_per_second()
     {
         return ticks_per_second;
@@ -538,8 +544,7 @@ namespace bls
     Animator::Animator(SkeletalAnimation* animation)
     {
         current_time = 0.0f;
-        current_time_base = 0.0f;
-        current_time_layered = 0.0f;
+        previous_time = 0.0f;
         current_animation = animation;
 
         final_bone_matrices.reserve(MAX_BONE_MATRICES);
@@ -566,9 +571,25 @@ namespace bls
     void Animator::play(SkeletalAnimation* animation)
     {
         current_animation = animation;
-        current_time = 0.0f;
+    }
 
-        std::swap(current_time_base, current_time_layered);
+    void Animator::crossfade_from(SkeletalAnimation* prev_animation, f32 blend_factor, bool synchronize)
+    {
+        this->previous_animation = prev_animation;
+        this->blend_factor = blend_factor;
+
+        auto temp = current_time;
+
+        if (synchronize)
+        {
+            const f32 ratio = current_animation->get_duration() / prev_animation->get_duration();
+            current_time = previous_time * ratio;
+        }
+
+        else
+            current_time = 0.0f;
+
+        previous_time = temp;
     }
 
     void Animator::calculate_bone_transform(const AssNodeData* node, mat4 parent_transform)
@@ -598,27 +619,21 @@ namespace bls
             calculate_bone_transform(&node->children[i], global_transformation);
     }
 
-    void Animator::blend_animations(SkeletalAnimation* base_animation, SkeletalAnimation* layered_animation, f32 blend_factor, f32 dt)
+    void Animator::update_blended(f32 dt)
     {
-        // Speed multipliers to correctly transition from one animation to another
-        f32 a = 1.0f;
-        f32 b = base_animation->get_duration() / layered_animation->get_duration();
-        const f32 anim_speed_multiplier_up = mix(a, b, blend_factor);
-
-        a = layered_animation->get_duration() / base_animation->get_duration();
-        b = 1.0f;
-        const f32 anim_speed_multiplier_down = mix(a, b, blend_factor);
+        blend_factor = clamp(blend_factor + dt, 0.0f, 1.0f);
 
         // Current time of each animation, "scaled" by the above speed multiplier variables
-        current_time_base += base_animation->get_ticks_per_second() * dt * anim_speed_multiplier_up;
-        current_time_base = fmod(current_time_base, base_animation->get_duration());
+        current_time += current_animation->get_ticks_per_second() * dt;
+        current_time = fmod(current_time, current_animation->get_duration());
 
-        current_time_layered += layered_animation->get_ticks_per_second() * dt * anim_speed_multiplier_down;
-        current_time_layered = fmod(current_time_layered, layered_animation->get_duration());
+        previous_time += previous_animation->get_ticks_per_second() * dt;
+        previous_time = fmod(previous_time, previous_animation->get_duration());
 
-        calculate_blended_bone_transform(base_animation, &base_animation->get_root_node(),
-                                         layered_animation, &layered_animation->get_root_node(),
-                                         current_time_base, current_time_layered,
+        calculate_blended_bone_transform(previous_animation, &previous_animation->get_root_node(),
+                                         current_animation, &current_animation->get_root_node(),
+                                         previous_time,
+                                         current_time,
                                          mat4(1.0f),
                                          blend_factor);
     }
@@ -682,5 +697,10 @@ namespace bls
     SkeletalAnimation* Animator::get_current_animation()
     {
         return current_animation;
+    }
+
+    f32 Animator::get_blend_factor()
+    {
+        return blend_factor;
     }
 };

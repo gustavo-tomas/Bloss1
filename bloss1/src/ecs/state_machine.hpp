@@ -25,13 +25,12 @@ namespace bls
     {
         public:
             virtual void enter(ECS& ecs, u32 id, const str& state);
-            virtual void update(ECS& ecs, u32 id, f32 blend_factor, f32 dt);
+            virtual void update(ECS& ecs, u32 id, f32 dt);
             virtual void exit();
 
         protected:
             SkeletalAnimation* last_animation = nullptr;
             SkeletalAnimation* curr_animation = nullptr;
-            SkeletalAnimation* next_animation = nullptr;
     };
 
     class PlayerStateMachine : public State { };

@@ -133,6 +133,7 @@ namespace bls
             ~SkeletalAnimation();
 
             Bone* find_bone(const str& name);
+            str get_name();
             f32 get_ticks_per_second();
             f32 get_duration();
             f32 get_duration_seconds();
@@ -145,6 +146,7 @@ namespace bls
 
             f32 duration;
             i32 ticks_per_second;
+            str name;
             std::vector<Bone*> bones;
             AssNodeData root_node;
             std::map<str, BoneInfo> bone_info_map;
@@ -159,23 +161,29 @@ namespace bls
             ~Animator();
 
             void update(f32 dt);
+            void update_blended(f32 dt);
+
             void play(SkeletalAnimation* animation);
-            void blend_animations(SkeletalAnimation* base_animation, SkeletalAnimation* layered_animation, f32 blend_factor, f32 dt);
+            void crossfade_from(SkeletalAnimation* prev_animation, f32 blend_factor, bool synchronize = false);
+            
             void calculate_bone_transform(const AssNodeData* node, mat4 parent_transform);
             void calculate_blended_bone_transform(SkeletalAnimation* base_animation, const AssNodeData* base_node,
                                                   SkeletalAnimation* layered_animation, const AssNodeData* layered_node,
                                                   const f32 current_time_base, const f32 current_time_layered,
                                                   const mat4& parent_transform,
                                                   const f32 blend_factor);
+
             std::vector<mat4> get_final_bone_matrices();
             SkeletalAnimation* get_current_animation();
+            f32 get_blend_factor();
 
         private:
             std::vector<mat4> final_bone_matrices;
             SkeletalAnimation* current_animation;
+            SkeletalAnimation* previous_animation;
             f32 current_time;
-            f32 current_time_base;
-            f32 current_time_layered;
+            f32 previous_time;
+            f32 blend_factor;
     };
 
     // Model

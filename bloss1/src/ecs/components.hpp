@@ -224,14 +224,13 @@ namespace bls
     {
         public:
             StateMachine(const str& current_state)
-                : current_state(current_state), blend_factor(0.0f)
+                : current_state(current_state)
             {
                 state = std::make_unique<State>();
             }
 
             std::unique_ptr<State> state;
             str current_state;
-            f32 blend_factor;
     };
 
     class Projectile : public Component

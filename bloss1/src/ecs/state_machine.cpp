@@ -8,21 +8,25 @@ namespace bls
         auto& animations = ecs.models[id]->model->animations;
         auto& animator = ecs.models[id]->model->animator;
 
-        curr_animation = animator->get_current_animation();
-        next_animation = animations[state].get();
-
-
         // Blend from previous state to this state
-        last_animation = curr_animation;
+        last_animation = animator->get_current_animation();
+        curr_animation = animations[state].get();
 
-        animator->play(next_animation);
-        curr_animation = next_animation;
+        auto blend_factor = animator->get_blend_factor();
+
+        if (curr_animation->get_name() == PLAYER_STATE_IDLE || curr_animation->get_name() == PLAYER_STATE_WALKING)
+            animator->crossfade_from(last_animation, 1.0f - blend_factor, true);
+        
+        else
+            animator->crossfade_from(last_animation, 1.0f - blend_factor, true);
+
+        animator->play(curr_animation);
     }
 
-    void State::update(ECS& ecs, u32 id, f32 blend_factor, f32 dt)
+    void State::update(ECS& ecs, u32 id, f32 dt)
     {
         auto& animator = ecs.models[id]->model->animator;
-        animator->blend_animations(last_animation, curr_animation, blend_factor, dt);
+        animator->update_blended(dt);
     }
 
     void State::exit()
@@ -33,12 +37,9 @@ namespace bls
     void update_state_machine(ECS& ecs, u32 id, const str& state, f32 dt)
     {
         auto& state_machine = ecs.state_machines[id];
-        state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
-        
         if (state_machine->current_state == state)
             return;
 
-        state_machine->blend_factor = 1.0f - state_machine->blend_factor;
         state_machine->state->exit();
         state_machine->state->enter(ecs, id, state);
         state_machine->current_state = state;
