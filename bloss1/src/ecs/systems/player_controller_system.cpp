@@ -205,6 +205,8 @@ namespace bls
         else
             camera->target_zoom = MAX_CAMERA_ZOOM;
 
+        camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
+
         // Shoot
         if (trigger_right >= TOLERANCE)
         {
@@ -226,9 +228,7 @@ namespace bls
             }
         }
 
-        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] += dt;
-
-        camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
+        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] + dt, 0.0f, PLAYER_TIMER_SHOOT_COOLDOWN);
 
         update_state_machine(ecs, id, player_state, dt);
     }
