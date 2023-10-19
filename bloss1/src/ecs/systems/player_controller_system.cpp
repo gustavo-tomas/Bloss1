@@ -25,13 +25,17 @@ namespace bls
     const str PLAYER_TIMER_STR_JUMP = "jumping";
     const str PLAYER_TIMER_STR_JUMP_COOLDOWN = "jump_cooldown";
     const str PLAYER_TIMER_STR_SHOOT_COOLDOWN = "shoot_cooldown";
+    const str PLAYER_TIMER_STR_SHOOT_ANIMATION = "shoot_animation";
 
     std::map<str, f32> player_timers =
     {
         { PLAYER_TIMER_STR_JUMP,           0.0f },
         { PLAYER_TIMER_STR_JUMP_COOLDOWN,  0.0f },
+        { PLAYER_TIMER_STR_SHOOT_ANIMATION, 0.0f },
         { PLAYER_TIMER_STR_SHOOT_COOLDOWN, PLAYER_TIMER_SHOOT_COOLDOWN }
     };
+
+    bool player_shooting = false;
 
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
@@ -118,6 +122,7 @@ namespace bls
         auto controller = ecs.camera_controllers[id].get();
         auto camera = ecs.cameras[id].get();
         auto transform = ecs.transforms[id].get();
+        auto model = ecs.models[id].get();
 
         // Current state
         str player_state = PLAYER_STATE_IDLE;
@@ -213,6 +218,7 @@ namespace bls
             if (player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] >= PLAYER_TIMER_SHOOT_COOLDOWN)
             {
                 player_state = PLAYER_STATE_SHOOTING;
+                player_shooting = true;
 
                 Transform bullet_transform = *transform;
                 bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;
@@ -228,7 +234,30 @@ namespace bls
             }
         }
 
-        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] + dt, 0.0f, PLAYER_TIMER_SHOOT_COOLDOWN);
+        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] + dt,
+                                                               0.0f,
+                                                               PLAYER_TIMER_SHOOT_COOLDOWN);
+        
+        // Wait for shooting animation to finish
+        if (player_shooting)
+        {
+            auto animation_dur = model->model->animations[PLAYER_STATE_SHOOTING]->get_duration_seconds();
+
+            player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] + dt,
+                                                                    0.0f,
+                                                                    animation_dur);
+
+            // Animation is finished, proceed to next state
+            if (player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] >= animation_dur)
+            {
+                player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] = 0.0f;
+                player_shooting = false;
+            }
+
+            // Animation is still going, stay in the shooting state
+            else
+                player_state = PLAYER_STATE_SHOOTING;
+        }
 
         update_state_machine(ecs, id, player_state, dt);
     }
