@@ -592,33 +592,6 @@ namespace bls
         previous_time = temp;
     }
 
-    void Animator::calculate_bone_transform(const AssNodeData* node, mat4 parent_transform)
-    {
-        str node_name = node->name;
-        mat4 node_transform = node->transformation;
-
-        Bone* bone = current_animation->find_bone(node_name);
-
-        if (bone)
-        {
-            bone->update(current_time);
-            node_transform = bone->get_local_transform();
-        }
-
-        mat4 global_transformation = parent_transform * node_transform;
-
-        auto bone_info_map = current_animation->get_bone_id_map();
-        if (bone_info_map.find(node_name) != bone_info_map.end())
-        {
-            i32 index = bone_info_map[node_name].id;
-            mat4 offset = bone_info_map[node_name].offset;
-            final_bone_matrices[index] = global_transformation * offset;
-        }
-
-        for (i32 i = 0; i < node->children_count; i++)
-            calculate_bone_transform(&node->children[i], global_transformation);
-    }
-
     void Animator::update_blended(f32 dt)
     {
         blend_factor = clamp(blend_factor + dt, 0.0f, 1.0f);
@@ -686,6 +659,33 @@ namespace bls
                                              current_time_base, current_time_layered,
                                              global_transform,
                                              blend_factor);
+    }
+
+    void Animator::calculate_bone_transform(const AssNodeData* node, mat4 parent_transform)
+    {
+        str node_name = node->name;
+        mat4 node_transform = node->transformation;
+
+        Bone* bone = current_animation->find_bone(node_name);
+
+        if (bone)
+        {
+            bone->update(current_time);
+            node_transform = bone->get_local_transform();
+        }
+
+        mat4 global_transformation = parent_transform * node_transform;
+
+        auto bone_info_map = current_animation->get_bone_id_map();
+        if (bone_info_map.find(node_name) != bone_info_map.end())
+        {
+            i32 index = bone_info_map[node_name].id;
+            mat4 offset = bone_info_map[node_name].offset;
+            final_bone_matrices[index] = global_transformation * offset;
+        }
+
+        for (i32 i = 0; i < node->children_count; i++)
+            calculate_bone_transform(&node->children[i], global_transformation);
     }
 
     std::vector<mat4> Animator::get_final_bone_matrices()
