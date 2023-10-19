@@ -39,35 +39,18 @@ namespace bls
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
 
-        // @TODO: Create state machine for the player
-        std::map<str, State*> states;
-        auto idle_state = new PlayerIdleState();
-        auto walking_state = new PlayerWalkingState();
-        // auto jumping_state = new PlayerJumpingState();
-        auto shooting_state = new PlayerShootingState();
+        const u32 player_id = 0;
+        const u32 ophanim_id = 1;
 
-        states[PLAYER_STATE_IDLE]     = idle_state;
-        states[PLAYER_STATE_WALKING]  = walking_state;
-        // states[PLAYER_STATE_JUMPING]  = jumping_state;
-        states[PLAYER_STATE_SHOOTING] = shooting_state;
+        ecs->state_machines[player_id] = std::make_unique<StateMachine>(PLAYER_STATE_IDLE);
+        ecs->state_machines[player_id]->state->enter(*ecs, player_id, ecs->state_machines[player_id]->current_state);
 
-        idle_state->enter(*ecs, 0);
-        ecs->state_machines[0] = std::make_unique<StateMachine>(states, idle_state);
-
-        // @TODO: Create state machine for ophanim
-        std::map<str, State*> ophanim_states;
-        auto ophanim_idle_state = new OphanimIdleState();
-        auto ophanim_alert_state = new OphanimAlertState();
-
-        ophanim_states[OPHANIM_STATE_IDLE] = ophanim_idle_state;
-        ophanim_states[OPHANIM_STATE_ALERT] = ophanim_alert_state;
-
-        ophanim_idle_state->enter(*ecs, 1);
-        ecs->state_machines[1] = std::make_unique<StateMachine>(ophanim_states, ophanim_idle_state);
+        ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
+        ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
 
         // @TODO: add to scene
-        ecs->hitpoints[0] = 100;
-        ecs->hitpoints[1] = 10000;
+        ecs->hitpoints[player_id] = 100;
+        ecs->hitpoints[ophanim_id] = 10000;
     }
 
     void TestStage::update(f32 dt)

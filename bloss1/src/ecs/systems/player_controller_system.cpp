@@ -6,14 +6,6 @@
 
 namespace bls
 {
-    enum class PlayerState
-    {
-        Idle     = 0x001,
-        Walking  = 0x002,
-        Jumping  = 0x004,
-        Shooting = 0x008
-    };
-
     // Constants
     const f32 TOLERANCE = 0.2f; // Tolerance to better handle floating point fuckery
     const vec3 WORLD_UP = vec3(0.0f, 1.0f, 0.0f);
@@ -43,10 +35,7 @@ namespace bls
 
     void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
     void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
-    void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt);
     void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object);
-
-    void change_state(ECS& ecs, u32 id, State* new_state);
 
     void player_controller_system(ECS& ecs, f32 dt)
     {
@@ -131,7 +120,7 @@ namespace bls
         auto transform = ecs.transforms[id].get();
 
         // Current state
-        PlayerState player_state = PlayerState::Idle;
+        str player_state = PLAYER_STATE_IDLE;
 
         // Walk
         // -------------------------------------------------------------------------------------------------------------
@@ -147,7 +136,7 @@ namespace bls
             object->force += right * controller->speed * left_x;
 
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
-            player_state = PlayerState::Walking;
+            player_state = PLAYER_STATE_WALKING;
 
         // Turn
         // -------------------------------------------------------------------------------------------------------------
@@ -180,7 +169,7 @@ namespace bls
         {
             if (player_timers[PLAYER_TIMER_STR_JUMP] <= PLAYER_TIMER_JUMP)
             {
-                player_state = PlayerState::Jumping;
+                player_state = PLAYER_STATE_IDLE; // @TODO: finish jumping state
                 object->force += WORLD_UP * controller->speed.y;
                 player_timers[PLAYER_TIMER_STR_JUMP] += dt;
             }
@@ -221,7 +210,7 @@ namespace bls
         {
             if (player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] >= PLAYER_TIMER_SHOOT_COOLDOWN)
             {
-                player_state = PlayerState::Shooting;
+                player_state = PLAYER_STATE_SHOOTING;
 
                 Transform bullet_transform = *transform;
                 bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;
@@ -242,51 +231,6 @@ namespace bls
         camera->target_zoom = clamp(camera->target_zoom, MIN_CAMERA_ZOOM, MAX_CAMERA_ZOOM);
 
         update_state_machine(ecs, id, player_state, dt);
-    }
-
-    void update_state_machine(ECS& ecs, u32 id, PlayerState player_state, f32 dt)
-    {
-        auto& state_machine = ecs.state_machines[id];
-        State* next_state = nullptr;
-
-        // @TODO: finish player state machine
-        switch (player_state)
-        {
-            case PlayerState::Idle:
-                next_state = state_machine->states[PLAYER_STATE_IDLE].get();
-                break;
-
-            case PlayerState::Walking:
-                next_state = state_machine->states[PLAYER_STATE_WALKING].get();
-                break;
-
-            // case PlayerState::Jumping:
-            //     change_state(ecs, id, state_machine->states[PLAYER_STATE_JUMPING].get());
-            //     break;
-
-            case PlayerState::Shooting:
-                next_state = state_machine->states[PLAYER_STATE_SHOOTING].get();
-                break;
-
-            default:
-                next_state = state_machine->states[PLAYER_STATE_IDLE].get();
-                break;
-        }
-
-        state_machine->blend_factor = clamp(state_machine->blend_factor + dt, 0.0f, 1.0f);
-        change_state(ecs, id, next_state);
-    }
-
-    void change_state(ECS& ecs, u32 id, State* new_state)
-    {
-        auto state_machine = ecs.state_machines[id].get();
-        if (state_machine->current_state == new_state)
-            return;
-
-        state_machine->blend_factor = 1.0f - state_machine->blend_factor;
-        state_machine->current_state->exit();
-        state_machine->current_state = new_state;
-        state_machine->current_state->enter(ecs, id);
     }
 
     void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object)

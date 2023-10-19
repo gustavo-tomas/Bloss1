@@ -223,15 +223,14 @@ namespace bls
     class StateMachine : public Component
     {
         public:
-            StateMachine(const std::map<str, State*>& states_map, State* current_state)
+            StateMachine(const str& current_state)
                 : current_state(current_state), blend_factor(0.0f)
             {
-                for (auto& [name, state] : states_map)
-                    states[name] = std::unique_ptr<State>(state);
+                state = std::make_unique<State>();
             }
 
-            std::map<str, std::unique_ptr<State>> states;
-            State* current_state;
+            std::unique_ptr<State> state;
+            str current_state;
             f32 blend_factor;
     };
 
