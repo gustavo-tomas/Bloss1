@@ -6,10 +6,11 @@
 
 #include "core/core.hpp"
 
-#define PLAYER_STATE_IDLE     "Armature|Idle"
-#define PLAYER_STATE_WALKING  "Armature|Walk"
-#define PLAYER_STATE_JUMPING  "Armature|Jumping"
-#define PLAYER_STATE_SHOOTING "Armature|Shooting"
+#define PLAYER_STATE_IDLE         "Armature|Idle"
+#define PLAYER_STATE_WALKING      "Armature|Walk"
+#define PLAYER_STATE_WALKING_BACK "Armature|WalkBack"
+#define PLAYER_STATE_JUMPING      "Armature|Jumping"
+#define PLAYER_STATE_SHOOTING     "Armature|Shooting"
 
 #define OPHANIM_STATE_IDLE  "OphanimArmature|OphanimIdle"
 #define OPHANIM_STATE_ALERT "OphanimArmature|OphanimAlert"

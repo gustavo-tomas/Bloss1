@@ -20,7 +20,7 @@ namespace bls
 
     const f32 PLAYER_TIMER_JUMP = 2.0f;
     const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
-    const f32 PLAYER_TIMER_SHOOT_COOLDOWN = 0.5f;
+    const f32 PLAYER_TIMER_SHOOT_COOLDOWN = 1.0f;
 
     const str PLAYER_TIMER_STR_JUMP = "jumping";
     const str PLAYER_TIMER_STR_JUMP_COOLDOWN = "jump_cooldown";
@@ -141,7 +141,12 @@ namespace bls
             object->force += right * controller->speed * left_x;
 
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
+        {
             player_state = PLAYER_STATE_WALKING;
+
+            if (left_y >= TOLERANCE)
+                player_state = PLAYER_STATE_WALKING_BACK;
+        }
 
         // Turn
         // -------------------------------------------------------------------------------------------------------------
