@@ -14,9 +14,15 @@ namespace bls
 
         auto blend_factor = animator->get_blend_factor();
 
-        if (curr_animation->get_name() == PLAYER_STATE_IDLE || curr_animation->get_name() == PLAYER_STATE_WALKING)
+        // Idle/Walking transitions
+        if ((curr_animation->get_name() == PLAYER_STATE_IDLE || curr_animation->get_name() == PLAYER_STATE_WALKING) &&
+            (last_animation->get_name() == PLAYER_STATE_IDLE || last_animation->get_name() == PLAYER_STATE_WALKING))
             animator->crossfade_from(last_animation, 1.0f - blend_factor, true);
-        
+
+        // Shooting transition
+        else if (curr_animation->get_name() == PLAYER_STATE_SHOOTING || last_animation->get_name() == PLAYER_STATE_SHOOTING)
+            animator->crossfade_from(last_animation, 1.0f, false);
+
         else
             animator->crossfade_from(last_animation, 1.0f - blend_factor, true);
 
