@@ -12,4 +12,4 @@
 	url = https://github.com/gustavo-tomas/assimp.git
 [submodule "vendor/imgui"]
 	path = vendor/imgui
-	url = https://github.com/gustavo-tomas/imgui
+	url = https://github.com/gustavo-tomas/imgui.git
