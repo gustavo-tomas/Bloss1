@@ -36,13 +36,13 @@ namespace bls
     u32 bullet(ECS& ecs, const Transform& transform, const PhysicsObject& object)
     {
         auto id = ecs.get_id();
-        auto model = Model::create("bullet", "bloss1/assets/models/sphere/rusted_sphere.gltf", false);
+        auto model = Model::create("bullet", "bloss1/assets/models/bullet/bullet.fbx", false);
 
         ecs.names[id] = "bullet";
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>(object);
-        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
+        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x / 5.0f);
         ecs.projectiles[id] = std::make_unique<Projectile>();
         ecs.timers[id] = std::make_unique<Timer>();
 

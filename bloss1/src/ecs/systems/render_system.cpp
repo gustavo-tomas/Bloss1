@@ -201,7 +201,7 @@ namespace bls
             model_matrix = translate(model_matrix, transform->position);
 
             // Player model matrix
-            if (ecs.names[id] == "player")
+            if (ecs.names[id] == "player" || ecs.names[id] == "bullet")
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));

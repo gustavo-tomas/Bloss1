@@ -16,7 +16,7 @@ namespace bls
     const f32 MIN_PLAYER_PITCH = 0.0f;
     const f32 MAX_PLAYER_PITCH = 25.0f;
 
-    const vec3 BULLET_OFFSET = vec3(0.0f, 5.0f, 35.0f);
+    const vec3 BULLET_OFFSET = vec3(7.0f, 3.0f, 10.0f);
 
     const f32 PLAYER_TIMER_JUMP = 2.0f;
     const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
@@ -64,7 +64,7 @@ namespace bls
             vec3 right = normalize(cross(front, { 0.0f, 1.0f, 0.0f }));
             vec3 up    = normalize(cross(right, front));
 
-            update_keyboard(ecs, id, front, right, up, dt);   // Keyboard for debugging purposes
+            // update_keyboard(ecs, id, front, right, up, dt);   // Keyboard for debugging purposes
             update_controller(ecs, id, front, right, up, dt); // Controller is the actual player controller
         }
     }
@@ -230,9 +230,9 @@ namespace bls
                 bullet_transform.position = bullet_transform.position + up    * BULLET_OFFSET.y;
                 bullet_transform.position = bullet_transform.position + front * BULLET_OFFSET.z;
 
-                bullet_transform.scale = vec3(2.0f);
+                bullet_transform.scale = vec3(15.0f);
 
-                PhysicsObject object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 1500000.0f, 15.0f);
+                PhysicsObject object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 500'000.0f, 15.0f);
 
                 shoot(ecs, bullet_transform, object);
                 player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = 0.0f;
