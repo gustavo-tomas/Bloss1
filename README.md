@@ -6,22 +6,30 @@ C++ game engine.
 
 :)
 
+> Note: the build/run commands use the [just command runner](https://github.com/casey/just)
+
+## Build & Run
+
+```
+$ just
+```
+
 ## Build
 
 ```
-$ just build release
+$ just build cfg
 ```
 
 ## Run
 
 ```
-$ just run release
+$ just run cfg
 ```
 
 ## Clean
 
 ```
-$ just clean release
+$ just clean cfg
 ```
 
 ## References
@@ -39,4 +47,5 @@ $ just clean release
 - [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
 - [Particle system](https://github.com/TheCherno/OneHourParticleSystem)
 - [Finite State Machine (FSM)](https://gameprogrammingpatterns.com/state.html)
+- [Character controller](https://www.youtube.com/watch?v=EkPfhzIbp2g&t=470s)
 - [The Cherno Profiler](https://www.youtube.com/watch?v=qiD39bB7DvA)
