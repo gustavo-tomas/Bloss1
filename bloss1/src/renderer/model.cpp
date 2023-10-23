@@ -282,13 +282,13 @@ namespace bls
 
             assert(boneID != -1);
             auto weights = mesh->mBones[boneIndex]->mWeights;
-            i32 numWeights = mesh->mBones[boneIndex]->mNumWeights;
+            u32 numWeights = mesh->mBones[boneIndex]->mNumWeights;
 
-            for (i32 weightIndex = 0; weightIndex < numWeights; weightIndex++)
+            for (u32 weightIndex = 0; weightIndex < numWeights; weightIndex++)
             {
-                i32 vertexId = weights[weightIndex].mVertexId;
+                u32 vertexId = weights[weightIndex].mVertexId;
                 f32 weight = weights[weightIndex].mWeight;
-                assert(vertexId <= static_cast<i32>(vertices.size()));
+                assert(vertexId <= static_cast<u32>(vertices.size()));
                 set_vertex_bone_data(vertices[vertexId], boneID, weight);
             }
         }
