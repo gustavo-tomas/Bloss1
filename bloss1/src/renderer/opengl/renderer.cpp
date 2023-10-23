@@ -102,7 +102,9 @@ namespace bls
         // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
         // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10));
         // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10));
-        skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32, 1024, 1024, 10));
+        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32, 1024, 1024, 10));
+        skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/satara_night_no_lamps_4k.hdr", 1024, 32, 1024, 1024, 10));
+        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_05_4k.hdr", 1024, 32, 1024, 1024, 10));
 
         // Create a quad for rendering
         quad = std::make_unique<Quad>(*this);
