@@ -1,5 +1,6 @@
 #include "core/editor.hpp"
 #include "core/logger.hpp"
+#include "core/game.hpp"
 #include "platform/glfw/window.hpp"
 
 #include "imgui/imgui.h"
@@ -8,10 +9,8 @@
 #include "imgui/backends/imgui_impl_opengl3.h"
 
 #include "renderer/model.hpp"
+#include "renderer/post/post_processing.hpp"
 #include "ecs/scene_parser.hpp"
-
-// bool ImGui::BeginTable(const char* str_id, int columns_count, ImGuiTableFlags flags, const ImVec2& outer_size, float inner_width);
-// void ImGui::EndTable();
 
 namespace bls
 {
@@ -128,8 +127,7 @@ namespace bls
     {
         ImGui::Begin("Configuration");
         ImGui::Text("Post processing passes");
-        
-        bool show = true;
+
         ImGuiTableFlags flags = ImGuiTableFlags_Borders |
                                 ImGuiTableFlags_RowBg |
                                 ImGuiTableFlags_Borders |
@@ -142,26 +140,38 @@ namespace bls
                                 ImGuiTableFlags_BordersOuter |
                                 ImGuiTableFlags_BordersInner;
                             //    ImGuiTableFlags_NoBordersInBody;
-
-        ImGui::BeginTable("render_passes_table", 3, flags);
         
-        ImGui::TableSetupColumn("Active");
+        ImGui::BeginTable("render_passes_table", 4, flags);
+        
+        ImGui::TableSetupColumn("ID");
         ImGui::TableSetupColumn("Position");
         ImGui::TableSetupColumn("Pass");
+        ImGui::TableSetupColumn("Active");
 
         ImGui::TableHeadersRow();
-        for (const auto& [position, name] : app_configs.render_passes)
+        for (auto& pass : app_configs.render_passes)
         {
             ImGui::TableNextRow();
 
             ImGui::TableSetColumnIndex(0);
-            ImGui::Checkbox("##", &show);
+            ImGui::Text(to_str(pass.id).c_str());
 
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text(std::to_string(position).c_str());
+            ImGui::Text(to_str(pass.position).c_str());
 
             ImGui::TableSetColumnIndex(2);
-            ImGui::Text(name.c_str());
+            ImGui::Text(pass.name.c_str());
+
+            ImGui::TableSetColumnIndex(3);
+            if (pass.id > 0)
+            {
+                ImGui::Checkbox(to_str(pass.id).c_str(), &pass.enabled);
+                auto& post_processing = Game::get().get_renderer().get_post_processing();
+                post_processing->set_pass(pass.id, pass.enabled);
+            }
+
+            else
+                ImGui::Text("BasePass is always active");
         }
         ImGui::EndTable();
         ImGui::End();

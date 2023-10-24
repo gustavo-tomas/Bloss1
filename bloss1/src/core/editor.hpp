@@ -8,7 +8,14 @@ namespace bls
     class Editor
     {
         public:
-            typedef std::pair<u32, str> pass_position_name_pair;
+            struct PassConfig
+            {
+                u32 id;
+                u32 position;
+                str name;
+                bool enabled;
+            };
+
             struct Stats
             {
                 u32 vertices = 0;
@@ -18,7 +25,7 @@ namespace bls
 
             struct Configs
             {
-                std::vector<pass_position_name_pair> render_passes;
+                std::vector<PassConfig> render_passes;
             };
 
             Editor(Window& window);

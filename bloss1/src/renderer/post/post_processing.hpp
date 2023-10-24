@@ -253,48 +253,78 @@ namespace bls
 
     class PostProcessingSystem
     {
-        typedef std::pair<std::unique_ptr<RenderPass>, u32> pass_position_pair;
+        struct PostProcessingPass
+        {
+            u32 id;
+            u32 position;
+            RenderPass* render_pass;
+            bool enabled;
+        };
 
         public:
             // Always add a base pass
             PostProcessingSystem(u32 width, u32 height)
             {
-                add_render_pass(new BasePass(width, height), 0);
+                for (u32 i = 0; i < 100; i++)
+                    available_ids.insert(i);
+
+                add_pass(new BasePass(width, height), 0);
             }
 
             ~PostProcessingSystem()
             {
-
+                for (auto& pass : passes)
+                    delete pass.render_pass;
             }
 
-            void add_render_pass(RenderPass* texture, u32 position = 1)
+            void add_pass(RenderPass* texture, u32 position = 1)
             {
-                render_passes.push_back({ std::unique_ptr<RenderPass>(texture), position });
+                passes.push_back({ get_id(), position, texture, true });
                 sort_render_passes();
+            }
+
+            void set_pass(u32 id, bool enabled)
+            {
+                for (auto& pass : passes)
+                {
+                    if (pass.id == id)
+                    {
+                        pass.enabled = enabled;
+                        break;
+                    }
+                }
             }
 
             void begin()
             {
-                render_passes.front().first->bind();
+                passes.front().render_pass->bind();
             }
 
             void end()
             {
-                render_passes.front().first->unbind();
-                
-                // Render all passes in the provided order
-                for (u64 i = 1; i < render_passes.size(); i++)
-                {
-                    auto& [prev_pass, prev_pos] = render_passes[i - 1];
-                    auto& [curr_pass, curr_pos] = render_passes[i];
+                passes.front().render_pass->unbind();
 
-                    curr_pass->bind();   // Bind texture for post processing
-                    prev_pass->render(); // Render scene to texture
-                    curr_pass->unbind(); // Unbind post processing texture
+                // Make a copy with only enabled passes
+                std::vector<PostProcessingPass> enabled_passes;
+
+                // Filter passes
+                for (const auto& pass : passes)
+                    if (pass.enabled)
+                        enabled_passes.push_back(pass);
+
+                // Render all passes in the provided order
+                for (u64 i = 1; i < enabled_passes.size(); i++)
+                {
+                    auto& prev_pass = enabled_passes[i - 1];
+                    auto& curr_pass = enabled_passes[i];
+
+                    curr_pass.render_pass->bind();   // Bind texture for post processing
+                    prev_pass.render_pass->render(); // Render scene to texture
+                    curr_pass.render_pass->unbind(); // Unbind post processing texture
                 }
 
                 // Render final pass
-                render_passes.back().first->render();
+                enabled_passes.back().render_pass->render();
             }
 
         private:
@@ -302,11 +332,11 @@ namespace bls
             {
                 // Sort in ascending order
                 std::sort(
-                    render_passes.begin(),
-                    render_passes.end(),
-                    [](const pass_position_pair& a,  const pass_position_pair& b)
+                    passes.begin(),
+                    passes.end(),
+                    [](const PostProcessingPass& a,  const PostProcessingPass& b)
                     {
-                        return a.second < b.second;    
+                        return a.position < b.position;    
                     }
                 );
 
@@ -315,12 +345,24 @@ namespace bls
                 auto& configs = editor.app_configs;
                 configs.render_passes = { };
 
-                for (auto& [pass, position] : render_passes)
-                    configs.render_passes.push_back({ position, pass->get_name() });
+                for (const auto& pass : passes)
+                    configs.render_passes.push_back({ pass.id, pass.position, pass.render_pass->get_name(), pass.enabled });
 
                 editor.update_configs(configs);
             }
 
-            std::vector<pass_position_pair> render_passes;
+            u32 get_id()
+            {
+                if (available_ids.empty())
+                    throw std::runtime_error("no available post processing ids left");
+
+                u32 id = *available_ids.begin();
+                available_ids.erase(id);
+
+                return id;
+            }
+
+            std::set<u32> available_ids;
+            std::vector<PostProcessingPass> passes;
     };
 };

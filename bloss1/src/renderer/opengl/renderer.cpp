@@ -119,16 +119,20 @@ namespace bls
         }
 
         // Create post processing system
+        u32 pass_position = 1;
+
         post_processing = std::make_unique<PostProcessingSystem>(width, height);
-        post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f), 1);
-        // post_processing->add_render_pass(new FogPass(width, height,
-        //                                  vec3(0.0f),
-        //                                  vec2(ecs->cameras[0].get()->far / 3.0f, ecs->cameras[0].get()->far / 2.0f),
-        //                                  ecs->cameras[0].get()->position, textures[0].second.get()));
-        // post_processing->add_render_pass(new FXAAPass(width, height));
-        // post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
-        post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f), 2);
-        // post_processing->add_render_pass(new PixelizationPass(width, height, 4));
+        post_processing->add_pass(new FXAAPass(width, height), pass_position++);
+        post_processing->add_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f), pass_position++);
+
+        post_processing->add_pass(new FogPass(width, height,
+                                              vec3(0.0f),
+                                              vec2(ecs->cameras[0].get()->far / 3.0f, ecs->cameras[0].get()->far / 2.0f),
+                                              ecs->cameras[0].get()->position, textures[0].second.get()), pass_position++);
+
+        post_processing->add_pass(new SharpenPass(width, height, 0.05f), pass_position++);
+        post_processing->add_pass(new PosterizationPass(width, height, 8.0f), pass_position++);
+        post_processing->add_pass(new PixelizationPass(width, height, 4), pass_position++);
     }
 
     void OpenGLRenderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
