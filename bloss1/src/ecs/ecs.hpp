@@ -38,7 +38,7 @@ namespace bls
             u32 get_id()
             {
                 if (available_ids.empty())
-                    std::runtime_error("no available ids left");
+                    throw std::runtime_error("no available ids left");
 
                 u32 id = *available_ids.begin();
                 available_ids.erase(id);
