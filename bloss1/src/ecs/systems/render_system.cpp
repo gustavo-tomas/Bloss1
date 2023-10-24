@@ -256,6 +256,9 @@ namespace bls
 
                 // Reset
                 mesh->vao->unbind();
+                
+                // Update stats
+                Game::get().get_editor().app_stats.vertices += mesh->vertices.size();
             }
         }
     }

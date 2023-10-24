@@ -30,6 +30,7 @@ namespace bls
             static Game& get(); // im sorry i can change
             Window& get_window();
             Renderer& get_renderer();
+            Editor& get_editor();
             AudioEngine& get_audio_engine();
             Random& get_random_engine();
             Stage& get_curr_stage();

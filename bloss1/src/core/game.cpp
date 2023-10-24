@@ -144,6 +144,11 @@ namespace bls
         return *renderer;
     }
 
+    Editor& Game::get_editor()
+    {
+        return *editor;
+    }
+
     AudioEngine& Game::get_audio_engine()
     {
         return *audio_engine;

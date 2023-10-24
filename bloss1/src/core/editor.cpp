@@ -67,10 +67,10 @@ namespace bls
                 if (ImGui::SmallButton("save"))
                     SceneParser::save_scene(ecs, save_file);
 
-                if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
-                {
+                // if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
+                // {
 
-                }
+                // }
 
                 ImGui::Separator();
                 ImGui::EndMenu();
@@ -80,9 +80,9 @@ namespace bls
         }
 
         // Application status
-        ImGui::Begin("Status");
-        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
+        app_stats.framerate = io.Framerate;
+        app_stats.ms_per_frame = 1000.0f / io.Framerate;
+        render_status();
 
         // Entities
         render_entities(ecs);
@@ -100,6 +100,17 @@ namespace bls
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    void Editor::render_status()
+    {
+        ImGui::Begin("Status");
+        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", app_stats.ms_per_frame, app_stats.framerate);
+        ImGui::Text("Vertices: %u", app_stats.vertices);
+        ImGui::End();
+
+        // Reset stats
+        app_stats = { };
     }
 
     void Editor::render_entities(ECS& ecs)
