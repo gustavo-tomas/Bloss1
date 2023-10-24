@@ -144,9 +144,6 @@ namespace bls
         quad->render();      // Render light quad
         post_processing->end();
 
-        // Render all passes
-        post_processing->render();
-
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
         // -------------------------------------------------------------------------------------------------------------
         g_buffer->bind_and_blit(width, height);

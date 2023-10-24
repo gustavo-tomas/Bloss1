@@ -237,12 +237,13 @@ namespace bls
 
     class PostProcessingSystem
     {
-        public:
+        typedef std::pair<std::unique_ptr<RenderPass>, u32> pass_position_pair;
 
+        public:
             // Always add a base pass
             PostProcessingSystem(u32 width, u32 height)
             {
-                add_render_pass(new BasePass(width, height));
+                add_render_pass(new BasePass(width, height), 0);
             }
 
             ~PostProcessingSystem()
@@ -250,28 +251,26 @@ namespace bls
 
             }
 
-            void add_render_pass(RenderPass* texture)
+            void add_render_pass(RenderPass* texture, u32 position = 1)
             {
-                render_passes.push_back(std::unique_ptr<RenderPass>(texture));
+                render_passes.push_back({ std::unique_ptr<RenderPass>(texture), position });
+                sort_render_passes();
             }
 
             void begin()
             {
-                render_passes.front()->bind();
+                render_passes.front().first->bind();
             }
 
             void end()
             {
-                render_passes.front()->unbind();
-            }
-
-            void render()
-            {
+                render_passes.front().first->unbind();
+                
                 // Render all passes in the provided order
                 for (u64 i = 1; i < render_passes.size(); i++)
                 {
-                    auto& prev_pass = render_passes[i - 1];
-                    auto& curr_pass = render_passes[i];
+                    auto& [prev_pass, prev_pos] = render_passes[i - 1];
+                    auto& [curr_pass, curr_pos] = render_passes[i];
 
                     curr_pass->bind();   // Bind texture for post processing
                     prev_pass->render(); // Render scene to texture
@@ -279,10 +278,23 @@ namespace bls
                 }
 
                 // Render final pass
-                render_passes.back()->render();
+                render_passes.back().first->render();
             }
 
         private:
-            std::vector<std::unique_ptr<RenderPass>> render_passes;
+            void sort_render_passes()
+            {
+                // Sort in ascending order
+                std::sort(
+                    render_passes.begin(),
+                    render_passes.end(),
+                    [](const pass_position_pair& a,  const pass_position_pair& b)
+                    {
+                        return a.second < b.second;    
+                    }
+                );
+            }
+
+            std::vector<pass_position_pair> render_passes;
     };
 };
