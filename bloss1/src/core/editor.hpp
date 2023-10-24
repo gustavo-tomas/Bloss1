@@ -25,6 +25,8 @@ namespace bls
         private:
             void render_entities(ECS& ecs);
             void render_status();
+            void render_config();
+
             void push_style_vars();
             void pop_style_vars();
 

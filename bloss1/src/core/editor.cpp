@@ -84,6 +84,9 @@ namespace bls
         app_stats.ms_per_frame = 1000.0f / io.Framerate;
         render_status();
 
+        // Configuration parameters
+        render_config();
+
         // Entities
         render_entities(ecs);
 
@@ -111,6 +114,13 @@ namespace bls
 
         // Reset stats
         app_stats = { };
+    }
+
+    void Editor::render_config()
+    {
+        ImGui::Begin("Configuration");
+        ImGui::Text("Configuration parameters here");
+        ImGui::End();
     }
 
     void Editor::render_entities(ECS& ecs)
