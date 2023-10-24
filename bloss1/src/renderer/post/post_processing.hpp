@@ -56,6 +56,8 @@ namespace bls
                 quad->render();
             }
 
+            virtual str get_name() = 0;
+
         protected:
             u32 width, height;
 
@@ -75,6 +77,8 @@ namespace bls
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
             }
+
+            str get_name() override { return "BasePass"; }
     };
 
     class FogPass : public RenderPass
@@ -107,6 +111,8 @@ namespace bls
 
                 quad->render();
             }
+
+            str get_name() override { return "FogPass"; }
 
             vec3 fog_color;
             vec2 min_max;
@@ -141,6 +147,8 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override { return "BloomPass"; }
+
             u32 samples;
             f32 spread;
             f32 threshold;
@@ -167,6 +175,8 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override { return "SharpenPass"; }
+
             f32 amount;
     };
 
@@ -189,6 +199,8 @@ namespace bls
                 screen_texture->bind(0);
                 quad->render();
             }
+
+            str get_name() override { return "PosterizationPass"; }
 
             f32 levels;
     };
@@ -213,6 +225,8 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override { return "PixelizationPass"; }
+
             u32 pixel_size;
     };
 
@@ -233,6 +247,8 @@ namespace bls
                 screen_texture->bind(0);
                 quad->render();
             }
+
+            str get_name() override { return "FXAAPass"; }
     };
 
     class PostProcessingSystem
@@ -293,6 +309,16 @@ namespace bls
                         return a.second < b.second;    
                     }
                 );
+
+                // Update renderpass configs
+                auto& editor = Game::get().get_editor();
+                auto& configs = editor.app_configs;
+                configs.render_passes = { };
+
+                for (auto& [pass, position] : render_passes)
+                    configs.render_passes.push_back({ position, pass->get_name() });
+
+                editor.update_configs(configs);
             }
 
             std::vector<pass_position_pair> render_passes;

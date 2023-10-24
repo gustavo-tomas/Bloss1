@@ -8,6 +8,7 @@ namespace bls
     class Editor
     {
         public:
+            typedef std::pair<u32, str> pass_position_name_pair;
             struct Stats
             {
                 u32 vertices = 0;
@@ -15,12 +16,19 @@ namespace bls
                 f32 ms_per_frame = 0.0f;
             };
 
+            struct Configs
+            {
+                std::vector<pass_position_name_pair> render_passes;
+            };
+
             Editor(Window& window);
             ~Editor();
 
             void update(ECS& ecs, f32 dt);
+            void update_configs(Configs configs);
 
             Stats app_stats;
+            Configs app_configs;
 
         private:
             void render_entities(ECS& ecs);

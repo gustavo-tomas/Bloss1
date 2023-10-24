@@ -10,6 +10,9 @@
 #include "renderer/model.hpp"
 #include "ecs/scene_parser.hpp"
 
+// bool ImGui::BeginTable(const char* str_id, int columns_count, ImGuiTableFlags flags, const ImVec2& outer_size, float inner_width);
+// void ImGui::EndTable();
+
 namespace bls
 {
     Editor::Editor(Window& window) : window(window), save_file("bloss1/assets/scenes/test_stage2.bloss")
@@ -105,6 +108,11 @@ namespace bls
         }
     }
 
+    void Editor::update_configs(Configs configs)
+    {
+        this->app_configs = configs;
+    }
+
     void Editor::render_status()
     {
         ImGui::Begin("Status");
@@ -119,7 +127,43 @@ namespace bls
     void Editor::render_config()
     {
         ImGui::Begin("Configuration");
-        ImGui::Text("Configuration parameters here");
+        ImGui::Text("Post processing passes");
+        
+        bool show = true;
+        ImGuiTableFlags flags = ImGuiTableFlags_Borders |
+                                ImGuiTableFlags_RowBg |
+                                ImGuiTableFlags_Borders |
+                                ImGuiTableFlags_BordersH |
+                                ImGuiTableFlags_BordersOuterH |
+                                ImGuiTableFlags_BordersInnerH |
+                                ImGuiTableFlags_BordersV |
+                                ImGuiTableFlags_BordersOuterV |
+                                ImGuiTableFlags_BordersInnerV |
+                                ImGuiTableFlags_BordersOuter |
+                                ImGuiTableFlags_BordersInner;
+                            //    ImGuiTableFlags_NoBordersInBody;
+
+        ImGui::BeginTable("render_passes_table", 3, flags);
+        
+        ImGui::TableSetupColumn("Active");
+        ImGui::TableSetupColumn("Position");
+        ImGui::TableSetupColumn("Pass");
+
+        ImGui::TableHeadersRow();
+        for (const auto& [position, name] : app_configs.render_passes)
+        {
+            ImGui::TableNextRow();
+
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Checkbox("##", &show);
+
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text(std::to_string(position).c_str());
+
+            ImGui::TableSetColumnIndex(2);
+            ImGui::Text(name.c_str());
+        }
+        ImGui::EndTable();
         ImGui::End();
     }
 
