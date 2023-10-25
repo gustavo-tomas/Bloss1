@@ -60,7 +60,6 @@ namespace bls
         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoCloseButton);
 
         // Options
-        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("Options"))
@@ -68,11 +67,6 @@ namespace bls
                 ImGui::InputTextWithHint("##", "file", save_file, 64); ImGui::SameLine();
                 if (ImGui::SmallButton("Save to File"))
                     SceneParser::save_scene(ecs, save_file);
-
-                // if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
-                // {
-
-                // }
 
                 ImGui::Separator();
                 ImGui::EndMenu();
