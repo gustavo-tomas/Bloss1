@@ -1,0 +1,9 @@
+<post_processing>
+{
+	fog_pass: 1, 1, (0.0, 0.0, 0.0), (100.0, 200.0);
+	bloom_pass: ;
+	sharpen_pass: ;
+	posterization_pass: ;
+	pixelization_pass: ;
+	fxaa_pass: ;
+}

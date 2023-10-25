@@ -20,6 +20,7 @@ namespace bls
     class Shader;
     class Texture;
     class FrameBuffer;
+    class ECS;
 
     // Renderer backend (OpenGL, Vulkan, Metal, DirectX, ...)
     class Renderer
@@ -38,6 +39,9 @@ namespace bls
             virtual void clear() = 0;
             virtual void draw_indexed(RenderingMode mode, u32 count) = 0;
             virtual void draw_arrays(RenderingMode mode, u32 count) = 0;
+
+            virtual void create_shadow_map(ECS& ecs) = 0;
+            virtual void create_post_processing_passes() = 0;
 
             virtual std::map<str, std::shared_ptr<Shader>>& get_shaders() = 0;
             virtual std::vector<std::pair<str, std::shared_ptr<Texture>>>& get_textures() = 0;

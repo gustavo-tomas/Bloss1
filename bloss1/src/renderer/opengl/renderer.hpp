@@ -29,6 +29,9 @@ namespace bls
             void draw_indexed(RenderingMode mode, u32 count) override;
             void draw_arrays(RenderingMode mode, u32 count) override;
 
+            void create_shadow_map(ECS& ecs) override;
+            void create_post_processing_passes() override;
+
             std::map<str, std::shared_ptr<Shader>>& get_shaders() override;
             std::vector<std::pair<str, std::shared_ptr<Texture>>>& get_textures() override;
             std::unique_ptr<FrameBuffer>& get_gbuffer() override;

@@ -2,8 +2,10 @@
 #include "ecs/entities.hpp"
 #include "renderer/model.hpp"
 #include "renderer/font.hpp"
+#include "renderer/post/post_processing.hpp"
 #include "core/game.hpp"
 #include "core/logger.hpp"
+#include "config.hpp"
 
 namespace bls
 {
@@ -14,8 +16,10 @@ namespace bls
         u32 id = 0;
         str entity_name = "";
         str component_name = "";
+        str config_name = "";
         str line = "";
         bool entity_detected = false;
+        bool config_detected = false;
 
         while (std::getline(scene, line))
         {
@@ -55,15 +59,30 @@ namespace bls
                 continue;
             }
 
-            // Finish parsing entity
+            // Parse configuration
+            if (line[0] == '<')
+            {
+                line.erase(std::remove(line.begin(), line.end(), '<'), line.end());
+                line.erase(std::remove(line.begin(), line.end(), '>'), line.end());
+
+                config_name = line;
+                config_detected = true;
+                continue;
+            }
+
+            // Finish parsing object
             else if (line[0] == '}')
             {
                 entity_detected = false;
+                config_detected = false;
                 continue;
             }
 
             if (entity_detected)
                 parse_component(ecs, line, id, entity_name);
+
+            else if (config_detected)
+                parse_config(line, config_name);
         }
 
         scene.close();
@@ -421,6 +440,41 @@ namespace bls
         }
     }
 
+    void SceneParser::parse_config(const str& line, const str& config_name)
+    {
+        if (config_name == "post_processing")
+        {
+            str parameter;
+            std::istringstream iline(line);
+            std::getline(iline, parameter, ':');
+            
+            str position, enabled;
+            std::getline(iline, position, ',');
+            std::getline(iline, enabled, ',');
+
+            // FogPass
+            if (parameter == "fog_pass")
+            {
+                vec3 fog_color = read_vec3(&iline, ',');
+                vec2 min_max = read_vec2(&iline, ',');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(FogPass))
+                    {
+                        auto* fog_pass = static_cast<FogPass*>(pass.pass);
+                        fog_pass->fog_color = fog_color;
+                        fog_pass->min_max = min_max;
+                        break;
+                    }
+                }
+            }
+
+            else
+                std::cout << "@TODO Other passes\n";
+        }
+    }
+
     vec3 SceneParser::read_vec3(std::istringstream* iline, char delimiter)
     {
         vec3 vec;
@@ -428,6 +482,21 @@ namespace bls
 
         // Read position
         for (u16 i = 0; i < 3; i++)
+        {
+            std::getline(*iline, buffer, delimiter);
+            vec[i] = stof(buffer);
+        }
+
+        return vec;
+    }
+
+    vec2 SceneParser::read_vec2(std::istringstream* iline, char delimiter)
+    {
+        vec2 vec;
+        str buffer;
+
+        // Read position
+        for (u16 i = 0; i < 2; i++)
         {
             std::getline(*iline, buffer, delimiter);
             vec[i] = stof(buffer);

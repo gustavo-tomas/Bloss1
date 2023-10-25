@@ -2,9 +2,18 @@
 
 // Format:
 [entity_name]
+{
     component_type1: component_arg1, component_arg2, component_arg3, ... ;
     component_type2: component_arg1, component_arg2, component_arg3, ... ;
     ...
+}
+
+// Configuration:
+<cfg_name>
+{
+    cfg_1: arg_1, arg_2, ... ;
+    cfg_2: arg_1, arg_2, ... ;
+}
 
 // Components:
 model: file, flip_uvs;
@@ -19,6 +28,12 @@ text: font, ~text~, color;
 sound: file, name, volume, play_now, looping;
 timer: time;
 transform_animation: number_of_transforms, transform1, duration1; transform2, duration2; ... ;
+
+// Post processing config:
+<post_processing>
+{
+    fog_pass: u32 position, bool enabled, vec3 fog_color, vec2 min_max;
+}
 
 // Example:
 [ball]

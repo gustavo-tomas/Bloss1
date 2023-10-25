@@ -345,7 +345,6 @@ namespace bls
                 );
 
                 // Update renderpass configs
-                auto& editor = Game::get().get_editor();
                 auto& render_passes = AppConfig::render_passes;
                 render_passes = { };
 

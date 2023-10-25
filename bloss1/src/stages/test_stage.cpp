@@ -39,6 +39,13 @@ namespace bls
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
 
+        auto& renderer = Game::get().get_renderer();
+        renderer.create_shadow_map(*ecs);
+        renderer.create_post_processing_passes();
+
+        // Load configurations from file
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
+
         const u32 player_id = 0;
         const u32 ophanim_id = 1;
 
