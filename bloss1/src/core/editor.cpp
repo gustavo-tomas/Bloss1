@@ -82,8 +82,8 @@ namespace bls
         }
 
         // Application status
-        app_stats.framerate = io.Framerate;
-        app_stats.ms_per_frame = 1000.0f / io.Framerate;
+        AppStats::framerate = io.Framerate;
+        AppStats::ms_per_frame = 1000.0f / io.Framerate;
         render_status();
 
         // Configuration parameters
@@ -107,20 +107,17 @@ namespace bls
         }
     }
 
-    void Editor::update_configs(Configs configs)
-    {
-        this->app_configs = configs;
-    }
-
     void Editor::render_status()
     {
         ImGui::Begin("Status");
-        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", app_stats.ms_per_frame, app_stats.framerate);
-        ImGui::Text("Vertices: %u", app_stats.vertices);
+        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", AppStats::ms_per_frame, AppStats::framerate);
+        ImGui::Text("Vertices: %u", AppStats::vertices);
         ImGui::End();
 
         // Reset stats
-        app_stats = { };
+        AppStats::framerate = { };
+        AppStats::ms_per_frame = { };
+        AppStats::vertices = { };
     }
 
     void Editor::render_config()
@@ -149,7 +146,8 @@ namespace bls
         ImGui::TableSetupColumn("Active");
 
         ImGui::TableHeadersRow();
-        for (auto& pass : app_configs.render_passes)
+        auto& post_processing = Game::get().get_renderer().get_post_processing();
+        for (auto& pass : AppConfig::render_passes)
         {
             ImGui::TableNextRow();
 
@@ -157,21 +155,27 @@ namespace bls
             ImGui::Text(to_str(pass.id).c_str());
 
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text(to_str(pass.position).c_str());
+            if (pass.id > 0)
+            {
+                if (!ImGui::InputInt(("position_" + to_str(pass.id)).c_str(), reinterpret_cast<i32*>(&pass.position)))
+                    pass.position = clamp(pass.position, 1U, static_cast<u32>(AppConfig::render_passes.size()));
+            }
+
+            else
+                ImGui::Text(("position_" + to_str(pass.id)).c_str());
 
             ImGui::TableSetColumnIndex(2);
             ImGui::Text(pass.name.c_str());
 
             ImGui::TableSetColumnIndex(3);
             if (pass.id > 0)
-            {
-                ImGui::Checkbox(to_str(pass.id).c_str(), &pass.enabled);
-                auto& post_processing = Game::get().get_renderer().get_post_processing();
-                post_processing->set_pass(pass.id, pass.enabled);
-            }
+                ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
 
             else
-                ImGui::Text("BasePass is always active");
+                ImGui::Text("BasePass is always enabled");
+
+            if (pass.id > 0)
+                post_processing->set_pass(pass.id, pass.enabled, pass.position);
         }
         ImGui::EndTable();
         ImGui::End();

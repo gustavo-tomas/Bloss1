@@ -1,5 +1,4 @@
 #include "ecs/ecs.hpp"
-#include "core/game.hpp"
 #include "renderer/model.hpp"
 
 #include "renderer/font.hpp"
@@ -13,6 +12,7 @@
 #include "core/input.hpp"
 #include "ecs/systems/particle_system.hpp"
 #include "tools/profiler.hpp"
+#include "config.hpp"
 
 namespace bls
 {
@@ -255,7 +255,7 @@ namespace bls
                 mesh->vao->unbind();
                 
                 // Update stats
-                Game::get().get_editor().app_stats.vertices += mesh->vertices.size();
+                AppStats::vertices += mesh->vertices.size();
             }
         }
     }

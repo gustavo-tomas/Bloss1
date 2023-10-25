@@ -3,6 +3,7 @@
 #include "renderer/shader.hpp"
 #include "renderer/primitives/quad.hpp"
 #include "core/game.hpp"
+#include "config.hpp"
 
 namespace bls
 {
@@ -283,16 +284,19 @@ namespace bls
                 sort_render_passes();
             }
 
-            void set_pass(u32 id, bool enabled)
+            void set_pass(u32 id, bool enabled, u32 position)
             {
                 for (auto& pass : passes)
                 {
                     if (pass.id == id)
                     {
+                        pass.position = position;
                         pass.enabled = enabled;
                         break;
                     }
                 }
+
+                sort_render_passes();
             }
 
             void begin()
@@ -342,13 +346,11 @@ namespace bls
 
                 // Update renderpass configs
                 auto& editor = Game::get().get_editor();
-                auto& configs = editor.app_configs;
-                configs.render_passes = { };
+                auto& render_passes = AppConfig::render_passes;
+                render_passes = { };
 
                 for (const auto& pass : passes)
-                    configs.render_passes.push_back({ pass.id, pass.position, pass.render_pass->get_name(), pass.enabled });
-
-                editor.update_configs(configs);
+                    render_passes.push_back({ pass.id, pass.position, pass.render_pass->get_name(), pass.enabled });
             }
 
             u32 get_id()
