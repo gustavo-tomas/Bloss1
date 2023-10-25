@@ -210,6 +210,18 @@ namespace bls
             ImGui::InputFloat("Sharpen Amount", &sharpen_pass->amount);
         }
 
+        else if (typeid(*pass.pass) == typeid(PosterizationPass))
+        {
+            auto* poster_pass = static_cast<PosterizationPass*>(pass.pass);
+            ImGui::InputFloat("Poster Levels", &poster_pass->levels);
+        }
+
+        else if (typeid(*pass.pass) == typeid(PixelizationPass))
+        {
+            auto* pixel_pass = static_cast<PixelizationPass*>(pass.pass);
+            ImGui::InputInt("Pixel Size", reinterpret_cast<i32*>(&pixel_pass->pixel_size));
+        }
+
         else
             ImGui::Text("-");
     }
