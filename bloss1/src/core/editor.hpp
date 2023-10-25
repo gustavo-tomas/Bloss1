@@ -19,6 +19,8 @@ namespace bls
             void render_status();
             void render_config();
 
+            void display_editable_params(PassConfig& pass);
+
             void push_style_vars();
             void pop_style_vars();
 

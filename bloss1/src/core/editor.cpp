@@ -135,14 +135,16 @@ namespace bls
                                 ImGuiTableFlags_BordersOuterV |
                                 ImGuiTableFlags_BordersInnerV |
                                 ImGuiTableFlags_BordersOuter |
-                                ImGuiTableFlags_BordersInner;
+                                ImGuiTableFlags_BordersInner |
+                                ImGuiTableFlags_Resizable;
                             //    ImGuiTableFlags_NoBordersInBody;
         
-        ImGui::BeginTable("render_passes_table", 4, flags);
+        ImGui::BeginTable("render_passes_table", 5, flags);
         
         ImGui::TableSetupColumn("ID");
         ImGui::TableSetupColumn("Position");
         ImGui::TableSetupColumn("Pass");
+        ImGui::TableSetupColumn("Parameters");
         ImGui::TableSetupColumn("Active");
 
         ImGui::TableHeadersRow();
@@ -168,6 +170,9 @@ namespace bls
             ImGui::Text(pass.name.c_str());
 
             ImGui::TableSetColumnIndex(3);
+            display_editable_params(pass);
+
+            ImGui::TableSetColumnIndex(4);
             if (pass.id > 0)
                 ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
 
@@ -179,6 +184,34 @@ namespace bls
         }
         ImGui::EndTable();
         ImGui::End();
+    }
+
+    void Editor::display_editable_params(PassConfig& pass)
+    {
+        if (typeid(*pass.pass) == typeid(FogPass))
+        {
+            auto* fog_pass = static_cast<FogPass*>(pass.pass);
+            ImGui::InputFloat3("Fog Color", value_ptr(fog_pass->fog_color));
+            ImGui::InputFloat3("Fog Min/Max Range", value_ptr(fog_pass->min_max));
+        }
+
+        else if (typeid(*pass.pass) == typeid(BloomPass))
+        {
+            auto* bloom_pass = static_cast<BloomPass*>(pass.pass);
+            ImGui::InputInt("Bloom Samples", reinterpret_cast<i32*>(&bloom_pass->samples));
+            ImGui::InputFloat("Bloom Spread", &bloom_pass->spread);
+            ImGui::InputFloat("Bloom Threshold", &bloom_pass->threshold);
+            ImGui::InputFloat("Bloom Amount", &bloom_pass->amount);
+        }
+
+        else if (typeid(*pass.pass) == typeid(SharpenPass))
+        {
+            auto* sharpen_pass = static_cast<SharpenPass*>(pass.pass);
+            ImGui::InputFloat("Sharpen Amount", &sharpen_pass->amount);
+        }
+
+        else
+            ImGui::Text("-");
     }
 
     void Editor::render_entities(ECS& ecs)

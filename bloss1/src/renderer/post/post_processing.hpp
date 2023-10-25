@@ -350,7 +350,7 @@ namespace bls
                 render_passes = { };
 
                 for (const auto& pass : passes)
-                    render_passes.push_back({ pass.id, pass.position, pass.render_pass->get_name(), pass.enabled });
+                    render_passes.push_back({ pass.id, pass.position, pass.render_pass->get_name(), pass.enabled, pass.render_pass });
             }
 
             u32 get_id()

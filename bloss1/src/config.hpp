@@ -8,12 +8,15 @@
 
 namespace bls
 {
+    class RenderPass;
     struct PassConfig
     {
         u32 id;
         u32 position;
         str name;
         bool enabled;
+
+        RenderPass* pass;
     };
 
     class AppConfig
