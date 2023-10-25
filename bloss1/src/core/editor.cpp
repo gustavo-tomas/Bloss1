@@ -66,7 +66,7 @@ namespace bls
             if (ImGui::BeginMenu("Options"))
             {
                 ImGui::InputTextWithHint("##", "file", save_file, 64); ImGui::SameLine();
-                if (ImGui::SmallButton("save"))
+                if (ImGui::SmallButton("Save to File"))
                     SceneParser::save_scene(ecs, save_file);
 
                 // if (ImGui::MenuItem("This is another menu item", "Hint", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0))
