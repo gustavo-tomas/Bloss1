@@ -448,7 +448,7 @@ namespace bls
             std::istringstream iline(line);
             std::getline(iline, parameter, ':');
             
-            str position, enabled;
+            str position, enabled; // @TODO: enabled
             std::getline(iline, position, ',');
             std::getline(iline, enabled, ',');
 
@@ -465,6 +465,29 @@ namespace bls
                         auto* fog_pass = static_cast<FogPass*>(pass.pass);
                         fog_pass->fog_color = fog_color;
                         fog_pass->min_max = min_max;
+                        break;
+                    }
+                }
+            }
+
+            // BloomPass
+            else if (parameter == "bloom_pass")
+            {
+                str samples, spread, threshold, amount;
+                std::getline(iline, samples, ',');
+                std::getline(iline, spread, ',');
+                std::getline(iline, threshold, ',');
+                std::getline(iline, amount, ';');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(BloomPass))
+                    {
+                        auto* bloom_pass = static_cast<BloomPass*>(pass.pass);
+                        bloom_pass->samples = std::stoul(samples);
+                        bloom_pass->spread = std::stof(spread);
+                        bloom_pass->threshold = std::stof(threshold);
+                        bloom_pass->amount = std::stof(amount);
                         break;
                     }
                 }

@@ -1,7 +1,7 @@
 <post_processing>
 {
 	fog_pass: 1, 1, (0.0, 0.0, 0.0), (100.0, 200.0);
-	bloom_pass: ;
+	bloom_pass: 2, 1, 5, 7.0, 0.4, 0.325;
 	sharpen_pass: ;
 	posterization_pass: ;
 	pixelization_pass: ;
