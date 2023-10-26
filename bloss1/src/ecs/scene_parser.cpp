@@ -246,7 +246,85 @@ namespace bls
         }
 
         scene.close();
-        LOG_SUCCESS("current scene saved to '%s'", file);
+        LOG_SUCCESS("current scene saved to '%s'", file.c_str());
+    }
+
+    void SceneParser::save_config(const str& file)
+    {
+        std::ofstream scene(file);
+       
+        scene << "<post_processing>\n";
+        scene << "{" << "\n";
+        for (const auto& pass : AppConfig::render_passes)
+        {
+            if (pass.name == "FogPass")
+            {
+                scene << "\tfog_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                write_vec3(&scene, static_cast<FogPass*>(pass.pass)->fog_color, ", ");
+                write_vec2(&scene, static_cast<FogPass*>(pass.pass)->min_max, "; ");
+                scene << "\n";
+            }
+
+            else if (pass.name == "BloomPass")
+            {
+                scene << "\tbloom_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<BloomPass*>(pass.pass)->samples) << ", ";
+                scene << to_str(static_cast<BloomPass*>(pass.pass)->spread) << ", ";
+                scene << to_str(static_cast<BloomPass*>(pass.pass)->threshold) << ", ";
+                scene << to_str(static_cast<BloomPass*>(pass.pass)->amount) << ", ";
+                scene << "\n";
+            }
+
+            else if (pass.name == "SharpenPass")
+            {
+                scene << "\tsharpen_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<SharpenPass*>(pass.pass)->amount) << "; ";
+                scene << "\n";
+            }
+
+            else if (pass.name == "PosterizationPass")
+            {
+                scene << "\tposterization_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<PosterizationPass*>(pass.pass)->levels) << "; ";
+                scene << "\n";
+            }
+
+            else if (pass.name == "PixelizationPass")
+            {
+                scene << "\tpixelization_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<PixelizationPass*>(pass.pass)->pixel_size) << "; ";
+                scene << "\n";
+            }
+
+            else if (pass.name == "FXAAPass")
+            {
+                scene << "\tfxaa_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << "; ";
+
+                scene << "\n";
+            }
+        }
+
+        scene << "}" << "\n\n";
+
+        scene.close();
+        LOG_SUCCESS("current configuration saved to '%s'", file.c_str());
     }
 
     void SceneParser::parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name)
@@ -630,6 +708,11 @@ namespace bls
     }
 
     void SceneParser::write_vec3(std::ofstream* scene, const vec3& vec, const str& end_str)
+    {
+        *scene << to_str(vec).substr(4) << end_str;
+    }
+
+    void SceneParser::write_vec2(std::ofstream* scene, const vec2& vec, const str& end_str)
     {
         *scene << to_str(vec).substr(4) << end_str;
     }
