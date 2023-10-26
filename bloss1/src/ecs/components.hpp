@@ -8,6 +8,7 @@
 #include "core/logger.hpp"
 #include "math/math.hpp"
 #include "ecs/state_machine.hpp"
+#include "ecs/systems/particle_system.hpp"
 
 namespace bls
 {
@@ -246,5 +247,18 @@ namespace bls
             f32 explosion_radius;
             f32 explosion_duration;
             f32 time_to_live;
+    };
+
+    class ParticleSystem : public Component
+    {
+        public:
+            ParticleSystem(Emitter* emitter)
+                : particles_to_be_emitted(0)
+            {
+                this->emitter = std::unique_ptr<Emitter>(emitter);
+            }
+
+            std::unique_ptr<Emitter> emitter;
+            u32 particles_to_be_emitted;
     };
 };

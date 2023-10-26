@@ -58,6 +58,9 @@ namespace bls
         // @TODO: add to scene
         ecs->hitpoints[player_id] = 100;
         ecs->hitpoints[ophanim_id] = 10000;
+
+        auto* box_emitter = new BoxEmitter(ecs->transforms[player_id]->position, vec3(10.0f));
+        ecs->particle_systems[player_id] = std::make_unique<ParticleSystem>(box_emitter);
     }
 
     void TestStage::update(f32 dt)

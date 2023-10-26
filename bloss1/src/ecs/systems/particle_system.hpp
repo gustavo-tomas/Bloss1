@@ -1,14 +1,21 @@
 #pragma once
 
 /**
- * @brief @TODO: this might not be a system suited for the ecs.
- *
+ * @brief Generic particle system. Can emit 2D texture or 3D objects on the surface of the specified shape.
  */
 
-#include "ecs/ecs.hpp"
+#include "core/core.hpp"
+#include "math/math.hpp"
+#include "renderer/shader.hpp"
+#include "renderer/model.hpp"
+#include "renderer/texture.hpp"
+#include "renderer/primitives/quad.hpp"
 
 namespace bls
 {
+    class ECS;
+    void particle_system(ECS& ecs, f32 dt);
+
     struct Particle
     {
         vec3 position = vec3(0.0f);
@@ -27,9 +34,26 @@ namespace bls
     class Emitter
     {
         public:
+            Emitter(const vec3& center, bool particle_2D = false);
             virtual ~Emitter() { }
 
             virtual void emit() = 0;
+            virtual void render_particle(ECS& ecs, f32 dt);
+            virtual void set_center(const vec3& new_center);
+
+        protected:
+            virtual void emit_particle(const Particle& particle_props);
+
+            std::vector<Particle> particle_pool;
+            u32 pool_index;
+
+            std::shared_ptr<Shader> particle_shader;
+            std::unique_ptr<Quad> quad;
+            std::shared_ptr<Texture> particle_texture;
+            std::shared_ptr<Model> model;
+
+            vec3 center;
+            bool particle_2D;
     };
 
     class SphereEmitter : public Emitter
@@ -38,12 +62,10 @@ namespace bls
             SphereEmitter(const vec3& center, f32 radius);
 
             void emit() override;
-            void set_center(const vec3& new_center);
 
         private:
             vec3 generate_random_point_on_surface();
 
-            vec3 center;
             f32 radius;
     };
 
@@ -53,15 +75,10 @@ namespace bls
             BoxEmitter(const vec3& center, const vec3& dimensions);
 
             void emit() override;
-            void set_center(const vec3& new_center);
 
         private:
             vec3 generate_random_point_on_surface();
 
-            vec3 center;
             vec3 dimensions;
     };
-
-    void particle_system(ECS& ecs, f32 dt);
-    void emit_particle(const Particle& particle_props);
 };

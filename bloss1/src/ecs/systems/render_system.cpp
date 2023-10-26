@@ -10,7 +10,7 @@
 #include "renderer/primitives/sphere.hpp"
 
 #include "core/input.hpp"
-#include "ecs/systems/particle_system.hpp"
+#include "core/game.hpp"
 #include "tools/profiler.hpp"
 #include "config.hpp"
 
@@ -20,7 +20,6 @@ namespace bls
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
     void render_texts(ECS& ecs);
 
-    BoxEmitter* emitter = nullptr;
     void render_system(ECS& ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("render_system");
@@ -148,16 +147,6 @@ namespace bls
         // -------------------------------------------------------------------------------------------------------------
         g_buffer->bind_and_blit(width, height);
         g_buffer->unbind();
-
-        // Create and emit particles
-        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_LEFT))
-        {
-            if (!emitter)
-                emitter = new BoxEmitter(ecs.transforms[0].get()->position, vec3(10.0f));
-
-            emitter->set_center(ecs.transforms[0].get()->position);
-            emitter->emit();
-        }
 
         // Draw the skybox last
         skybox->draw(view, projection);
