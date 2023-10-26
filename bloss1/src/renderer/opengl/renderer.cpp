@@ -58,8 +58,6 @@ namespace bls
         auto width = window.get_width();
         auto height = window.get_height();
 
-        auto& ecs = Game::get().get_curr_stage().ecs;
-
         // Create shaders
         // -------------------------------------------------------------------------------------------------------------
 

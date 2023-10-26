@@ -1,9 +1,9 @@
 <post_processing>
 {
-	fog_pass: 1, 1, (0.0, 0.0, 0.0), (100.0, 200.0);
+	fxaa_pass: 1, 1;
 	bloom_pass: 2, 1, 5, 7.0, 0.4, 0.325;
-	sharpen_pass: ;
-	posterization_pass: ;
-	pixelization_pass: ;
-	fxaa_pass: ;
+	fog_pass: 3, 1, (0.0, 0.0, 0.0), (100.0, 200.0);
+	sharpen_pass: 4, 0, 0.05;
+	posterization_pass: 5, 0, 18.0;
+	pixelization_pass: 6, 1, 5;
 }

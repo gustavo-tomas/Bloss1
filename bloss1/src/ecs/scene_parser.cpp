@@ -445,16 +445,19 @@ namespace bls
         if (config_name == "post_processing")
         {
             str parameter;
+            str position, enabled;
+            
             std::istringstream iline(line);
             std::getline(iline, parameter, ':');
             
-            str position, enabled; // @TODO: enabled
-            std::getline(iline, position, ',');
-            std::getline(iline, enabled, ',');
+            auto& post_processing = Game::get().get_renderer().get_post_processing();
 
             // FogPass
             if (parameter == "fog_pass")
             {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
                 vec3 fog_color = read_vec3(&iline, ',');
                 vec2 min_max = read_vec2(&iline, ',');
 
@@ -465,6 +468,10 @@ namespace bls
                         auto* fog_pass = static_cast<FogPass*>(pass.pass);
                         fog_pass->fog_color = fog_color;
                         fog_pass->min_max = min_max;
+
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
                         break;
                     }
                 }
@@ -473,6 +480,9 @@ namespace bls
             // BloomPass
             else if (parameter == "bloom_pass")
             {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
                 str samples, spread, threshold, amount;
                 std::getline(iline, samples, ',');
                 std::getline(iline, spread, ',');
@@ -488,13 +498,104 @@ namespace bls
                         bloom_pass->spread = std::stof(spread);
                         bloom_pass->threshold = std::stof(threshold);
                         bloom_pass->amount = std::stof(amount);
+
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
                         break;
                     }
                 }
             }
 
-            else
-                std::cout << "@TODO Other passes\n";
+            // SharpenPass
+            else if (parameter == "sharpen_pass")
+            {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                str amount;
+                std::getline(iline, amount, ';');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(SharpenPass))
+                    {
+                        auto* sharpen_pass = static_cast<SharpenPass*>(pass.pass);
+                        sharpen_pass->amount = std::stof(amount);
+
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
+                        break;
+                    }
+                }
+            }
+
+            // PosterizationPass
+            else if (parameter == "posterization_pass")
+            {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                str levels;
+                std::getline(iline, levels, ';');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(PosterizationPass))
+                    {
+                        auto* post_pass = static_cast<PosterizationPass*>(pass.pass);
+                        post_pass->levels = std::stof(levels);
+
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
+                        break;
+                    }
+                }
+            }
+
+            // PixelizationPass
+            else if (parameter == "pixelization_pass")
+            {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                str pixel_size;
+                std::getline(iline, pixel_size, ';');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(PixelizationPass))
+                    {
+                        auto* pixel_pass = static_cast<PixelizationPass*>(pass.pass);
+                        pixel_pass->pixel_size = std::stoul(pixel_size);
+
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
+                        break;
+                    }
+                }
+            }
+
+            // FXAAPass
+            else if (parameter == "fxaa_pass")
+            {
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ';');
+
+                for (auto& pass : AppConfig::render_passes)
+                {
+                    if (typeid(*pass.pass) == typeid(FXAAPass))
+                    {
+                        pass.enabled = std::stoul(enabled);
+                        pass.position = std::stoul(position);
+                        post_processing->set_pass(pass.id, pass.enabled, pass.position);
+                        break;
+                    }
+                }
+            }
         }
     }
 

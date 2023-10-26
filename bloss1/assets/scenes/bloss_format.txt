@@ -34,6 +34,10 @@ transform_animation: number_of_transforms, transform1, duration1; transform2, du
 {
     fog_pass: u32 position, bool enabled, vec3 fog_color, vec2 min_max;
     bloom_pass: u32 position, bool enabled, u32 samples, f32 spread, f32 threshold, f32 amount;
+    fxaa_pass: u32 position, bool enabled;
+	sharpen_pass: u32 position, bool enabled, f32 amount;
+	posterization_pass: u32 position, bool enabled, f32 levels;
+	pixelization_pass: u32 position, bool enabled, u32 pixel_size;
 }
 
 // Example:
