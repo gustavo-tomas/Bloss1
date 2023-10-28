@@ -10,4 +10,7 @@ uniform sampler2D screenTexture;
 
 void main() {
     fragColor = texture(screenTexture, fs_in.TexCoords);
+    if (fragColor.a < 0.5) {
+        discard;
+    }
 }

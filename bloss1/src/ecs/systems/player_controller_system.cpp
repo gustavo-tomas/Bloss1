@@ -16,8 +16,6 @@ namespace bls
     const f32 MIN_PLAYER_PITCH = 0.0f;
     const f32 MAX_PLAYER_PITCH = 25.0f;
 
-    const vec3 BULLET_OFFSET = vec3(7.0f, 3.0f, 10.0f);
-
     const f32 PLAYER_TIMER_JUMP = 2.0f;
     const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
     const f32 PLAYER_TIMER_SHOOT_COOLDOWN = 1.0f;
@@ -123,6 +121,8 @@ namespace bls
         auto camera = ecs.cameras[id].get();
         auto transform = ecs.transforms[id].get();
         auto model = ecs.models[id].get();
+
+        const vec3 BULLET_OFFSET = camera->target_offset;
 
         // Current state
         str player_state = PLAYER_STATE_IDLE;

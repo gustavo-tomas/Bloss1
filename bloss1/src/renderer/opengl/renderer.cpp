@@ -70,6 +70,9 @@ namespace bls
         // Debug shader
         shaders["color"] = Shader::create("color", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
 
+        // UI shader
+        shaders["ui"] = Shader::create("ui", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/base.fs");
+
         // Create g_buffer framebuffer
         g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
 
@@ -85,6 +88,10 @@ namespace bls
             g_buffer->attach_texture(texture.get());
         }
         g_buffer->draw();
+
+        // Create UI Texture
+        auto texture = Texture::create("ui_texture", "bloss1/assets/textures/crosshair.png", TextureType::Diffuse);
+        textures.push_back({ "ui", texture });
 
         // Create and attach depth buffer
         render_buffer = std::unique_ptr<RenderBuffer>(RenderBuffer::create(width, height, AttachmentType::Depth));

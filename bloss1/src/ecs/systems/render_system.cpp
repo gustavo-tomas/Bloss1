@@ -48,6 +48,7 @@ namespace bls
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
         auto pbr_shader = shaders["pbr"].get();
+        auto ui_shader = shaders["ui"].get();
 
         // Reset the viewport
         renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
@@ -127,8 +128,15 @@ namespace bls
 
         // Set texture attachments ---
         u32 tex_position = 0;
+        std::shared_ptr<bls::Texture> ui_texture;
         for (const auto& [name, texture] : textures)
         {
+            if (name == "ui")
+            {
+                ui_texture = texture;
+                continue;
+            }
+
             pbr_shader->set_uniform1("textures." + name, tex_position);
             texture->bind(tex_position);
             tex_position++;
@@ -150,6 +158,19 @@ namespace bls
 
         // Draw the skybox last
         skybox->draw(view, projection);
+
+        // Draw UI
+        {
+            auto tex_width = ui_texture->get_width();
+            auto tex_height = ui_texture->get_height();
+
+            renderer.set_viewport((width / 2) - (tex_width / 4), (height / 2) - (tex_height / 4), tex_width / 2, tex_height / 2);
+
+            ui_shader->bind();
+            ui_shader->set_uniform1("screenTexture", 0U);
+            ui_texture->bind(0);
+            quad->render();
+        }
 
         // Render debug lines
         #if !defined(_RELEASE)
@@ -262,8 +283,12 @@ namespace bls
 
     void render_colliders(ECS& ecs, const mat4& projection, const mat4& view)
     {
-        // Set debug mode
+        // Restore viewport
         auto& renderer = Game::get().get_renderer();
+        auto& window = Game::get().get_window();
+        renderer.set_viewport(0, 0, window.get_width(), window.get_height());
+
+        // Set debug mode
         renderer.set_debug_mode(true);
 
         auto color_shader = Shader::create("color", "", "");
