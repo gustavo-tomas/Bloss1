@@ -321,11 +321,13 @@ namespace bls
         // Render colliders
         for (const auto& [id, collider] : ecs.colliders)
         {
+            auto& transform = ecs.transforms[id];
+
             color_shader->set_uniform3("color", collider->color);
             if (collider->type == Collider::ColliderType::Sphere)
             {
                 auto collider_sphere = std::make_unique<Sphere>(renderer,
-                                       ecs.transforms[id]->position + collider->offset,
+                                       transform->position + collider->offset,
                                        static_cast<SphereCollider*>(collider.get())->radius);
 
                 collider_sphere->render();
@@ -333,11 +335,25 @@ namespace bls
 
             else if (collider->type == Collider::ColliderType::Box)
             {
-                auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position + collider->offset,
+                auto collider_box = std::make_unique<Box>(renderer, transform->position + collider->offset,
                                     static_cast<BoxCollider*>(collider.get())->dimensions);
 
                 collider_box->render();
             }
+
+            // Render orientation vector
+            auto pitch = transform->rotation.x;
+            auto yaw = transform->rotation.y;
+            auto front = vec3(cos(radians(yaw)) * cos(radians(pitch)),
+                              sin(radians(pitch)),
+                              sin(radians(yaw)) * cos(radians(pitch)));
+
+            auto orientation_line = std::make_unique<Line>(renderer,
+                                                           transform->position,
+                                                           transform->position + (front * 30.0f));
+
+            color_shader->set_uniform3("color", { 1.0f, 0.0f, 1.0f });
+            orientation_line->render();
         }
 
         // Unset debug mode
