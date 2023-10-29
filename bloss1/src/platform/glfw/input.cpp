@@ -34,6 +34,9 @@ namespace bls
     f32 GlfwInput::get_joystick_axis_value_native(i32 joystick, i32 axis)
     {
         f32 value = 0.0f;
+        if (axis == GAMEPAD_AXIS_LEFT_TRIGGER || axis == GAMEPAD_AXIS_RIGHT_TRIGGER)
+            value = -1.0f;
+
         if (glfwJoystickPresent(joystick))
         {
             i32 axes_count;
