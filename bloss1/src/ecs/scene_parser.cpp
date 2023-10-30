@@ -93,9 +93,9 @@ namespace bls
     {
         std::ofstream scene(file);
 
-        for (const auto &[id, name] : ecs.names)
+        for (const auto &[id, entity_name] : ecs.names)
         {
-            scene << "[" << name << "]"
+            scene << "[" << entity_name << "]"
                   << "\n";
             scene << "{"
                   << "\n";

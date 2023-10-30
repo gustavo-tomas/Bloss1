@@ -216,9 +216,9 @@ namespace bls
 
                 bullet_transform.scale = vec3(15.0f);
 
-                PhysicsObject object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 500'000.0f, 15.0f);
+                PhysicsObject bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 500'000.0f, 15.0f);
 
-                shoot(ecs, bullet_transform, object);
+                shoot(ecs, bullet_transform, bullet_object);
                 player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = 0.0f;
             }
         }
