@@ -90,14 +90,9 @@ namespace bls
             std::vector<char> error_message(log_length + 1);
             glGetProgramInfoLog(id, log_length, NULL, &error_message[0]);
 
-            str error = "";
-            for (auto c : error_message)
-            {
-                error += c;
-            }
             LOG_ERROR("linking program");
             LOG_ERROR("error when linking shader: '%s'", vertex_path.c_str());
-            LOG_ERROR("error when linking program: '%s'", error.c_str());
+            LOG_ERROR("error when linking program: '%s'", error_message.data());
 
             throw std::runtime_error(
                 "failed to link "
@@ -140,12 +135,7 @@ namespace bls
             std::vector<char> error_message(log_length + 1);
             glGetShaderInfoLog(ID, log_length, NULL, &error_message[0]);
 
-            str error = "";
-            for (auto c : error_message)
-            {
-                error += c;
-            }
-            LOG_ERROR("error when compiling '%s': %s", path.c_str(), error.c_str());
+            LOG_ERROR("error when compiling '%s': %s", path.c_str(), error_message.data());
         }
     }
 
