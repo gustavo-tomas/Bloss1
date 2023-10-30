@@ -17,7 +17,7 @@ namespace bls
     class ECS;
 
     // System: the logic bits
-    typedef void (*System) (ECS& ecs, f32 dt);
+    typedef void (*System)(ECS &ecs, f32 dt);
 
     // ECS: container of the systems and entities
     class ECS
@@ -25,20 +25,20 @@ namespace bls
         public:
             ECS(u32 max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
             {
-                for (u32 id = 0; id <= max_entity_id; id++)
-                    available_ids.insert(id);
+                for (u32 id = 0; id <= max_entity_id; id++) available_ids.insert(id);
             }
 
             ~ECS()
             {
-
             }
 
             // Return a new id (create a new entity)
             u32 get_id()
             {
                 if (available_ids.empty())
-                    throw std::runtime_error("no available ids left");
+                    throw std::runtime_error(
+                        "no available ids "
+                        "left");
 
                 u32 id = *available_ids.begin();
                 available_ids.erase(id);
@@ -55,8 +55,7 @@ namespace bls
             // Erase all the components of an entity (@TODO: this is not very efficient)
             void erase_entity(u32 id)
             {
-                if (id > max_entity_id)
-                    throw std::runtime_error("tried to delete invalid id: " + to_str(id));
+                if (id > max_entity_id) throw std::runtime_error("tried to delete invalid id: " + to_str(id));
 
                 names.erase(id);
                 transforms.erase(id);
@@ -106,4 +105,4 @@ namespace bls
             u32 max_entity_id;
             std::set<u32> available_ids;
     };
-};
+};  // namespace bls

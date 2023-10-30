@@ -1,8 +1,9 @@
 #include "renderer/opengl/buffers.hpp"
-#include "core/logger.hpp"
 
-#include <GL/glew.h> // Include glew before glfw
+#include <GL/glew.h>  // Include glew before glfw
+
 #include "GLFW/glfw3.h"
+#include "core/logger.hpp"
 
 namespace bls
 {
@@ -10,17 +11,21 @@ namespace bls
     {
         switch (type)
         {
-            case ShaderDataType::Float: return GL_FLOAT;
-            case ShaderDataType::Int:   return GL_INT;
-            case ShaderDataType::Bool:  return GL_BOOL;
-            default: throw std::runtime_error("unknown shader data type");
+            case ShaderDataType::Float:
+                return GL_FLOAT;
+            case ShaderDataType::Int:
+                return GL_INT;
+            case ShaderDataType::Bool:
+                return GL_BOOL;
+            default:
+                throw std::runtime_error("unknown shader data type");
         }
 
         return 0;
     }
 
     // Vertex Buffer ---------------------------------------------------------------------------------------------------
-    OpenGLVertexBuffer::OpenGLVertexBuffer(void* vertices, u32 size)
+    OpenGLVertexBuffer::OpenGLVertexBuffer(void *vertices, u32 size)
     {
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -43,7 +48,7 @@ namespace bls
     }
 
     // Index Buffer ----------------------------------------------------------------------------------------------------
-    OpenGLIndexBuffer::OpenGLIndexBuffer(const std::vector<u32>& indices, u32 count)
+    OpenGLIndexBuffer::OpenGLIndexBuffer(const std::vector<u32> &indices, u32 count)
     {
         glGenBuffers(1, &IBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -110,21 +115,21 @@ namespace bls
     void OpenGLFrameBuffer::bind_and_blit(u32 width, u32 height)
     {
         bind_read();
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // Draw to default framebuffer
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);  // Draw to default framebuffer
         blit(width, height);
     }
 
-    void OpenGLFrameBuffer::attach_texture(Texture* texture)
+    void OpenGLFrameBuffer::attach_texture(Texture *texture)
     {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachments.size(), GL_TEXTURE_2D, texture->get_id(), 0);
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachments.size(), GL_TEXTURE_2D, texture->get_id(), 0);
         attachments.push_back(texture);
     }
 
     void OpenGLFrameBuffer::draw()
     {
         u32 color_attachments[attachments.size()];
-        for (u32 i = 0; i < attachments.size(); i++)
-            color_attachments[i] = { GL_COLOR_ATTACHMENT0 + i };
+        for (u32 i = 0; i < attachments.size(); i++) color_attachments[i] = {GL_COLOR_ATTACHMENT0 + i};
 
         glDrawBuffers(attachments.size(), color_attachments);
     }
@@ -141,7 +146,7 @@ namespace bls
         return true;
     }
 
-    std::vector<Texture*>& OpenGLFrameBuffer::get_attachments()
+    std::vector<Texture *> &OpenGLFrameBuffer::get_attachments()
     {
         return attachments;
     }
@@ -204,7 +209,8 @@ namespace bls
         glBindVertexArray(0);
     }
 
-    void OpenGLVertexArray::add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer)
+    void OpenGLVertexArray::add_vertex_buffer(
+        u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void *pointer)
     {
         if (type == ShaderDataType::Float)
             glVertexAttribPointer(index, size, convert_to_opengl_data(type), normalized, stride, pointer);
@@ -214,4 +220,4 @@ namespace bls
 
         glEnableVertexAttribArray(index);
     }
-};
+};  // namespace bls

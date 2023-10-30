@@ -1,22 +1,21 @@
 #include "stages/test_stage.hpp"
+
 #include "core/game.hpp"
 #include "core/input.hpp"
-#include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
+#include "ecs/systems.hpp"
 #include "tools/profiler.hpp"
 
 namespace bls
 {
     TestStage::TestStage()
     {
-
     }
 
     TestStage::~TestStage()
     {
-
     }
 
     void TestStage::start()
@@ -39,7 +38,7 @@ namespace bls
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
 
-        auto& renderer = Game::get().get_renderer();
+        auto &renderer = Game::get().get_renderer();
         renderer.create_shadow_map(*ecs);
         renderer.create_post_processing_passes();
 
@@ -55,7 +54,7 @@ namespace bls
         ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
         ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
 
-        auto* box_emitter = new BoxEmitter(ecs->transforms[player_id]->position, vec3(10.0f));
+        auto *box_emitter = new BoxEmitter(ecs->transforms[player_id]->position, vec3(10.0f));
         ecs->particle_systems[player_id] = std::make_unique<ParticleSystem>(box_emitter);
     }
 
@@ -64,9 +63,8 @@ namespace bls
         BLS_PROFILE_SCOPE("update");
 
         // Update all systems in registration order
-        auto& systems = ecs->systems;
-        for (const auto& system : systems)
-            system(*ecs, dt);
+        auto &systems = ecs->systems;
+        for (const auto &system : systems) system(*ecs, dt);
 
         // @TODO: Player won
         if (ecs->hitpoints[1] <= 0.0f)
@@ -89,4 +87,4 @@ namespace bls
             return;
         }
     }
-};
+};  // namespace bls

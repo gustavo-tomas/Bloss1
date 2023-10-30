@@ -1,4 +1,5 @@
 #include "core/game.hpp"
+
 #include "core/logger.hpp"
 // #include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
@@ -6,13 +7,12 @@
 
 namespace bls
 {
-    Game* Game::instance = nullptr;
+    Game *Game::instance = nullptr;
 
-    Game::Game(const str& title, const u32& width, const u32& height)
+    Game::Game(const str &title, const u32 &width, const u32 &height)
     {
         // Create game instance
-        if (instance != nullptr)
-            throw std::runtime_error("there can be only one instance of game");
+        if (instance != nullptr) throw std::runtime_error("there can be only one instance of game");
 
         instance = this;
 
@@ -24,10 +24,10 @@ namespace bls
         renderer = std::unique_ptr<Renderer>(Renderer::create());
         renderer->initialize();
 
-        // Create the editor
-        #if !defined(_RELEASE)
+// Create the editor
+#if !defined(_RELEASE)
         editor = std::make_unique<Editor>(*window.get());
-        #endif
+#endif
 
         // Create the audio engine
         audio_engine = std::unique_ptr<AudioEngine>(AudioEngine::create());
@@ -44,7 +44,6 @@ namespace bls
 
     Game::~Game()
     {
-
     }
 
     void Game::run()
@@ -80,27 +79,25 @@ namespace bls
             // Update running stage
             stage->update(dt);
 
-            if (!stage)
-                break;
+            if (!stage) break;
 
-            // Update editor
-            #if !defined(_RELEASE)
+// Update editor
+#if !defined(_RELEASE)
             editor->update(*stage->ecs, dt);
-            #endif
+#endif
 
             // Update window
             window->update();
 
             // Sleep to match target spf
             f64 elapsed = window->get_time() - last_time;
-            if (target_spf - elapsed > 0.0)
-                window->sleep(target_spf - elapsed);
+            if (target_spf - elapsed > 0.0) window->sleep(target_spf - elapsed);
         }
 
         BLS_PROFILE_END_SESSION();
     }
 
-    void Game::change_stage(Stage* new_stage)
+    void Game::change_stage(Stage *new_stage)
     {
         stage.reset();
         if (new_stage)
@@ -110,61 +107,63 @@ namespace bls
         }
     }
 
-    void Game::on_event(Event& event)
+    void Game::on_event(Event &event)
     {
         if (typeid(event) == typeid(WindowCloseEvent))
-            EventSystem::fire_event(static_cast<const WindowCloseEvent&>(event));
+            EventSystem::fire_event(static_cast<const WindowCloseEvent &>(event));
 
         else if (typeid(event) == typeid(WindowResizeEvent))
-            EventSystem::fire_event(static_cast<const WindowResizeEvent&>(event));
+            EventSystem::fire_event(static_cast<const WindowResizeEvent &>(event));
 
         else if (typeid(event) == typeid(KeyPressEvent))
-            EventSystem::fire_event(static_cast<const KeyPressEvent&>(event));
+            EventSystem::fire_event(static_cast<const KeyPressEvent &>(event));
 
         else if (typeid(event) == typeid(MouseScrollEvent))
-            EventSystem::fire_event(static_cast<const MouseScrollEvent&>(event));
+            EventSystem::fire_event(static_cast<const MouseScrollEvent &>(event));
 
         else if (typeid(event) == typeid(MouseMoveEvent))
-            EventSystem::fire_event(static_cast<const MouseMoveEvent&>(event));
+            EventSystem::fire_event(static_cast<const MouseMoveEvent &>(event));
 
         else
             LOG_ERROR("invalid event type");
     }
 
-    Game& Game::get()
+    Game &Game::get()
     {
         if (instance == nullptr)
-            throw std::runtime_error("game instance is nullptr");
+            throw std::runtime_error(
+                "game instance is "
+                "nullptr");
 
         return *instance;
     }
 
-    Renderer& Game::get_renderer()
+    Renderer &Game::get_renderer()
     {
         return *renderer;
     }
 
-    Editor& Game::get_editor()
+    Editor &Game::get_editor()
     {
         return *editor;
     }
 
-    AudioEngine& Game::get_audio_engine()
+    AudioEngine &Game::get_audio_engine()
     {
         return *audio_engine;
     }
 
-    Window& Game::get_window()
+    Window &Game::get_window()
     {
         return *window;
     }
 
-    Random& Game::get_random_engine()
+    Random &Game::get_random_engine()
     {
         return *random_engine;
     }
 
-    Stage& Game::get_curr_stage()
+    Stage &Game::get_curr_stage()
     {
         return *stage;
     }
@@ -175,22 +174,20 @@ namespace bls
         target_spf = 1.0 / static_cast<f64>(fps);
     }
 
-    void Game::on_window_close(const WindowCloseEvent&)
+    void Game::on_window_close(const WindowCloseEvent &)
     {
         window_open = false;
     }
 
-    void Game::on_key_press(const KeyPressEvent&)
+    void Game::on_key_press(const KeyPressEvent &)
     {
-
     }
 
-    void Game::on_mouse_scroll(const MouseScrollEvent&)
+    void Game::on_mouse_scroll(const MouseScrollEvent &)
     {
-
     }
 
-    void Game::on_window_resize(const WindowResizeEvent& event)
+    void Game::on_window_resize(const WindowResizeEvent &event)
     {
         if (event.width <= 100 || event.height <= 100)
             minimized = true;
@@ -198,4 +195,4 @@ namespace bls
         else
             minimized = false;
     }
-};
+};  // namespace bls

@@ -11,10 +11,10 @@ namespace bls
     class Font
     {
         public:
-            virtual ~Font() { };
+            virtual ~Font(){};
 
             virtual void render(str text, f32 x, f32 y, f32 scale, vec3 color) = 0;
 
-            static std::shared_ptr<Font> create(const str& name, const str& path);
+            static std::shared_ptr<Font> create(const str &name, const str &path);
     };
-};
+};  // namespace bls

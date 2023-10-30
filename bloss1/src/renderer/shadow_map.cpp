@@ -1,24 +1,22 @@
 #include "renderer/shadow_map.hpp"
+
+#include <GL/glew.h>  // Include glew before glfw
+
+#include "GLFW/glfw3.h"
 #include "core/game.hpp"
 #include "core/input.hpp"
 
-#include <GL/glew.h> // Include glew before glfw
-#include "GLFW/glfw3.h"
-
 namespace bls
 {
-    ShadowMap::ShadowMap(Camera& camera, const vec3& light_dir) : camera(camera)
+    ShadowMap::ShadowMap(Camera &camera, const vec3 &light_dir) : camera(camera)
     {
         this->light_dir = light_dir;
 
         u32 zoom_factor = 10.0f;
-        shadow_cascade_levels =
-        {
-            camera.far / (5.0f * zoom_factor),
-            camera.far / (2.5f * zoom_factor),
-            camera.far / (1.0f * zoom_factor),
-            camera.far / (0.2f * zoom_factor)
-        };
+        shadow_cascade_levels = {camera.far / (5.0f * zoom_factor),
+                                 camera.far / (2.5f * zoom_factor),
+                                 camera.far / (1.0f * zoom_factor),
+                                 camera.far / (0.2f * zoom_factor)};
         depth_map_resolution = 4096;
 
         shadow_map_depth = Shader::create("shadow_map_depth",
@@ -26,9 +24,8 @@ namespace bls
                                           "bloss1/assets/shaders/shadow_map_depth.fs",
                                           "bloss1/assets/shaders/shadow_map_depth.gs");
 
-        debug_depth = Shader::create("debug_depth",
-                                     "bloss1/assets/shaders/test/debug_depth.vs",
-                                     "bloss1/assets/shaders/test/debug_depth.fs");
+        debug_depth = Shader::create(
+            "debug_depth", "bloss1/assets/shaders/test/debug_depth.vs", "bloss1/assets/shaders/test/debug_depth.fs");
 
         debug_depth->bind();
         debug_depth->set_uniform1("depthMap", 0U);
@@ -40,24 +37,23 @@ namespace bls
 
         glGenTextures(1, &light_depth_maps);
         glBindTexture(GL_TEXTURE_2D_ARRAY, light_depth_maps);
-        glTexImage3D(
-            GL_TEXTURE_2D_ARRAY,
-            0,
-            GL_DEPTH_COMPONENT32F,
-            depth_map_resolution,
-            depth_map_resolution,
-            (int) shadow_cascade_levels.size() + 1,
-            0,
-            GL_DEPTH_COMPONENT,
-            GL_FLOAT,
-            nullptr);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY,
+                     0,
+                     GL_DEPTH_COMPONENT32F,
+                     depth_map_resolution,
+                     depth_map_resolution,
+                     (int)shadow_cascade_levels.size() + 1,
+                     0,
+                     GL_DEPTH_COMPONENT,
+                     GL_FLOAT,
+                     nullptr);
 
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-        constexpr f32 bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+        constexpr f32 bordercolor[] = {1.0f, 1.0f, 1.0f, 1.0f};
         glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
 
         glBindFramebuffer(GL_FRAMEBUFFER, light_FBO);
@@ -67,7 +63,9 @@ namespace bls
 
         int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (status != GL_FRAMEBUFFER_COMPLETE)
-            throw std::runtime_error("lightFBO framebuffer is not complete");
+            throw std::runtime_error(
+                "lightFBO framebuffer "
+                "is not complete");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -112,7 +110,7 @@ namespace bls
         shadow_map_depth->unbind();
     }
 
-    void ShadowMap::bind_maps(Shader& shader, u32 slot)
+    void ShadowMap::bind_maps(Shader &shader, u32 slot)
     {
         // Set shadow map uniforms
         shader.set_uniform1("textures.shadowMap", slot);
@@ -135,8 +133,7 @@ namespace bls
             released = false;
         }
 
-        if (!Input::is_key_pressed(KEY_SPACE))
-            released = true;
+        if (!Input::is_key_pressed(KEY_SPACE)) released = true;
 
         // Render Depth map for visual debugging
         debug_depth->bind();
@@ -147,7 +144,7 @@ namespace bls
         debug_quad->render();
     }
 
-    void ShadowMap::set_light_dir(const vec3& light_dir)
+    void ShadowMap::set_light_dir(const vec3 &light_dir)
     {
         this->light_dir = light_dir;
     }
@@ -157,12 +154,12 @@ namespace bls
         return light_dir;
     }
 
-    Shader& ShadowMap::get_shadow_depth_shader() const
+    Shader &ShadowMap::get_shadow_depth_shader() const
     {
         return *shadow_map_depth;
     }
 
-    std::vector<vec4> ShadowMap::get_frustum_corners_world_space(const mat4& projview)
+    std::vector<vec4> ShadowMap::get_frustum_corners_world_space(const mat4 &projview)
     {
         const mat4 inv = inverse(projview);
 
@@ -182,14 +179,14 @@ namespace bls
         return frustum_corners;
     }
 
-    std::vector<vec4> ShadowMap::get_frustum_corners_world_space(const mat4& proj, const mat4& view)
+    std::vector<vec4> ShadowMap::get_frustum_corners_world_space(const mat4 &proj, const mat4 &view)
     {
         return get_frustum_corners_world_space(proj * view);
     }
 
     mat4 ShadowMap::get_light_space_matrix(f32 near, f32 far)
     {
-        auto& window = Game::get().get_window();
+        auto &window = Game::get().get_window();
         f32 width = window.get_width();
         f32 height = window.get_height();
 
@@ -198,8 +195,7 @@ namespace bls
         const auto corners = get_frustum_corners_world_space(proj, camera.view_matrix);
 
         vec3 center = vec3(0.0f);
-        for (const vec4& v : corners)
-            center += vec3(v);
+        for (const vec4 &v : corners) center += vec3(v);
 
         center /= corners.size();
 
@@ -212,7 +208,7 @@ namespace bls
         f32 minZ = std::numeric_limits<f32>::max();
         f32 maxZ = std::numeric_limits<f32>::lowest();
 
-        for (const vec4& v : corners)
+        for (const vec4 &v : corners)
         {
             const vec4 trf = lightView * v;
             minX = min(minX, trf.x);
@@ -257,4 +253,4 @@ namespace bls
         }
         return ret;
     }
-};
+};  // namespace bls

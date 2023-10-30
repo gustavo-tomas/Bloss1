@@ -12,31 +12,34 @@ namespace bls
 
     struct ProfileResult
     {
-        str name;
+            str name;
 
-        FloatingPointMicroseconds start;
-        std::chrono::microseconds elapsed_time;
-        std::thread::id thread_id;
+            FloatingPointMicroseconds start;
+            std::chrono::microseconds elapsed_time;
+            std::thread::id thread_id;
     };
 
     struct ProfilerSession
     {
-        str name;
+            str name;
     };
 
     class Profiler
     {
         public:
-            Profiler(const Profiler&) = delete;
-            Profiler(Profiler&&) = delete;
+            Profiler(const Profiler &) = delete;
+            Profiler(Profiler &&) = delete;
 
-            void begin_session(const str& name, const str& filepath = "results.json")
+            void begin_session(const str &name, const str &filepath = "results.json")
             {
                 std::lock_guard lock(mutex);
                 if (current_session)
                 {
-                    LOG_ERROR("begin_session('%s') when session '%s' already open.",
-                              name.c_str(), current_session->name.c_str());
+                    LOG_ERROR(
+                        "begin_session('%s') when "
+                        "session '%s' already open.",
+                        name.c_str(),
+                        current_session->name.c_str());
 
                     internal_end_session();
                 }
@@ -49,7 +52,10 @@ namespace bls
                 }
 
                 else
-                    LOG_ERROR("Profiler could not open results file '%s'.", filepath.c_str());
+                    LOG_ERROR(
+                        "Profiler could not open results "
+                        "file '%s'.",
+                        filepath.c_str());
             }
 
             void end_session()
@@ -58,7 +64,7 @@ namespace bls
                 internal_end_session();
             }
 
-            void write_profile(const ProfileResult& result)
+            void write_profile(const ProfileResult &result)
             {
                 std::stringstream json;
 
@@ -81,17 +87,21 @@ namespace bls
                 }
             }
 
-            static Profiler& get()
+            static Profiler &get()
             {
                 static Profiler instance;
                 return instance;
             }
 
         private:
-            Profiler()
-                : current_session(nullptr) { }
+            Profiler() : current_session(nullptr)
+            {
+            }
 
-            ~Profiler() { end_session(); }
+            ~Profiler()
+            {
+                end_session();
+            }
 
             void write_header()
             {
@@ -117,38 +127,38 @@ namespace bls
             }
 
             std::mutex mutex;
-            ProfilerSession* current_session;
+            ProfilerSession *current_session;
             std::ofstream output_stream;
     };
 
     class ProfilerTimer
     {
         public:
-            ProfilerTimer(const char* name)
-                : name(name), stopped(false)
+            ProfilerTimer(const char *name) : name(name), stopped(false)
             {
                 start_timepoint = std::chrono::steady_clock::now();
             }
 
             ~ProfilerTimer()
             {
-                if (!stopped)
-                    stop();
+                if (!stopped) stop();
             }
 
             void stop()
             {
                 auto end_timepoint = std::chrono::steady_clock::now();
-                auto high_res_start = FloatingPointMicroseconds{ start_timepoint.time_since_epoch() };
-                auto elapsed_time = std::chrono::time_point_cast<std::chrono::microseconds>(end_timepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(start_timepoint).time_since_epoch();
+                auto high_res_start = FloatingPointMicroseconds{start_timepoint.time_since_epoch()};
+                auto elapsed_time =
+                    std::chrono::time_point_cast<std::chrono::microseconds>(end_timepoint).time_since_epoch() -
+                    std::chrono::time_point_cast<std::chrono::microseconds>(start_timepoint).time_since_epoch();
 
-                Profiler::get().write_profile({ name, high_res_start, elapsed_time, std::this_thread::get_id() });
+                Profiler::get().write_profile({name, high_res_start, elapsed_time, std::this_thread::get_id()});
 
                 stopped = true;
             }
 
         private:
-            const char* name;
+            const char *name;
             std::chrono::time_point<std::chrono::steady_clock> start_timepoint;
             bool stopped;
     };
@@ -158,24 +168,24 @@ namespace bls
         template <size_t N>
         struct ChangeResult
         {
-            char data[N];
+                char data[N];
         };
 
         template <size_t N, size_t K>
-        constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
+        constexpr auto CleanupOutputString(const char (&expr)[N], const char (&remove)[K])
         {
-            ChangeResult<N> result = { };
+            ChangeResult<N> result = {};
 
             size_t src_index = 0;
             size_t dst_index = 0;
             while (src_index < N)
             {
                 size_t match_index = 0;
-                while (match_index < K - 1 && src_index + match_index < N - 1 && expr[src_index + match_index] == remove[match_index])
+                while (match_index < K - 1 && src_index + match_index < N - 1 &&
+                       expr[src_index + match_index] == remove[match_index])
                     match_index++;
 
-                if (match_index == K - 1)
-                    src_index += match_index;
+                if (match_index == K - 1) src_index += match_index;
 
                 result.data[dst_index++] = expr[src_index] == '"' ? '\'' : expr[src_index];
                 src_index++;
@@ -183,17 +193,17 @@ namespace bls
 
             return result;
         }
-    }
-}
+    }  // namespace profiler_utils
+}  // namespace bls
 
 #ifdef BLS_PROFILE
-    #define BLS_PROFILE_BEGIN_SESSION(name, filepath) bls::Profiler::get().begin_session(name, filepath)
-    #define BLS_PROFILE_END_SESSION()                 bls::Profiler::get().end_session()
-    #define BLS_PROFILE_SCOPE(name)                   bls::ProfilerTimer timer##__LINE__(name);
-    #define BLS_PROFILE_FUNCTION() BLS_PROFILE_SCOPE(__FUNCTION__)
+#define BLS_PROFILE_BEGIN_SESSION(name, filepath) bls::Profiler::get().begin_session(name, filepath)
+#define BLS_PROFILE_END_SESSION() bls::Profiler::get().end_session()
+#define BLS_PROFILE_SCOPE(name) bls::ProfilerTimer timer##__LINE__(name);
+#define BLS_PROFILE_FUNCTION() BLS_PROFILE_SCOPE(__FUNCTION__)
 #else
-    #define BLS_PROFILE_BEGIN_SESSION(name, filepath)
-    #define BLS_PROFILE_END_SESSION()
-    #define BLS_PROFILE_SCOPE(name)
-    #define BLS_PROFILE_FUNCTION()
+#define BLS_PROFILE_BEGIN_SESSION(name, filepath)
+#define BLS_PROFILE_END_SESSION()
+#define BLS_PROFILE_SCOPE(name)
+#define BLS_PROFILE_FUNCTION()
 #endif

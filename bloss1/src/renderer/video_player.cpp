@@ -1,18 +1,24 @@
 #include "renderer/video_player.hpp"
+
 #include "core/game.hpp"
 #include "core/input.hpp"
 
 namespace bls
 {
-    VideoPlayer::VideoPlayer(const str& file)
+    VideoPlayer::VideoPlayer(const str &file)
     {
         open_file(file);
 
-        shader = Shader::create("video_player_shader", "bloss1/assets/shaders/video_player.vs", "bloss1/assets/shaders/video_player.fs");
+        shader = Shader::create(
+            "video_player_shader", "bloss1/assets/shaders/video_player.vs", "bloss1/assets/shaders/video_player.fs");
 
-        curr_frame = Texture::create(frame_width, frame_height, ImageFormat::RGBA8,
-                                     TextureParameter::ClampToEdge, TextureParameter::ClampToEdge,
-                                     TextureParameter::Linear, TextureParameter::Linear);
+        curr_frame = Texture::create(frame_width,
+                                     frame_height,
+                                     ImageFormat::RGBA8,
+                                     TextureParameter::ClampToEdge,
+                                     TextureParameter::ClampToEdge,
+                                     TextureParameter::Linear,
+                                     TextureParameter::Linear);
 
         quad = std::make_unique<Quad>(Game::get().get_renderer(), true);
 
@@ -36,8 +42,8 @@ namespace bls
     {
         Game::get().set_target_fps(frame_rate);
 
-        auto& window = Game::get().get_window();
-        auto& renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
+        auto &renderer = Game::get().get_renderer();
 
         f64 last_time = window.get_time(), current_time = 0;
         f64 target_spf = (1.0 / static_cast<f64>(frame_rate));
@@ -56,24 +62,23 @@ namespace bls
             window.update();
 
             // Exit the stage
-            if (Input::is_key_pressed(KEY_SPACE))
-                read_frames = false;
+            if (Input::is_key_pressed(KEY_SPACE)) read_frames = false;
 
             f64 elapsed = window.get_time() - last_time;
-            if (target_spf - elapsed > 0.0)
-                window.sleep(target_spf - elapsed);
+            if (target_spf - elapsed > 0.0) window.sleep(target_spf - elapsed);
         }
 
         Game::get().set_target_fps(0);
     }
 
-    void VideoPlayer::open_file(const str& file)
+    void VideoPlayer::open_file(const str &file)
     {
         // Create format context for the file
         format_context = avformat_alloc_context();
         if (!format_context)
         {
-            std::cerr << "failed to allocate av format context\n";
+            std::cerr << "failed to allocate av format "
+                         "context\n";
             exit(1);
         }
 
@@ -90,8 +95,7 @@ namespace bls
             codec_params = format_context->streams[i]->codecpar;
             codec = avcodec_find_decoder(codec_params->codec_id);
 
-            if (!codec)
-                continue;
+            if (!codec) continue;
 
             if (codec_params->codec_type == AVMEDIA_TYPE_VIDEO)
             {
@@ -104,13 +108,15 @@ namespace bls
         codec_context = avcodec_alloc_context3(codec);
         if (!codec_context)
         {
-            std::cerr << "failed to allocate av codec context\n";
+            std::cerr << "failed to allocate av codec "
+                         "context\n";
             exit(1);
         }
 
         if (avcodec_parameters_to_context(codec_context, codec_params) < 0)
         {
-            std::cerr << "failed to initialize codec context\n";
+            std::cerr << "failed to initialize codec "
+                         "context\n";
             exit(1);
         }
 
@@ -160,7 +166,7 @@ namespace bls
     void VideoPlayer::read_frame()
     {
         i32 res;
-        char error[64] = { };
+        char error[64] = {};
 
         while (read_frames)
         {
@@ -203,15 +209,21 @@ namespace bls
         // Create scaler context
         if (!scaler_context)
         {
-            scaler_context = sws_getContext(frame->width, frame->height,
+            scaler_context = sws_getContext(frame->width,
+                                            frame->height,
                                             codec_context->pix_fmt,
-                                            frame->width, frame->height,
+                                            frame->width,
+                                            frame->height,
                                             AV_PIX_FMT_RGB0,
-                                            SWS_BILINEAR, NULL, NULL, NULL);
+                                            SWS_BILINEAR,
+                                            NULL,
+                                            NULL,
+                                            NULL);
 
             if (!scaler_context)
             {
-                std::cerr << "failed to initialize scaler context\n";
+                std::cerr << "failed to initialize "
+                             "scaler context\n";
                 exit(1);
             }
         }
@@ -229,4 +241,4 @@ namespace bls
         curr_frame->bind(0);
         quad->render();
     }
-};
+};  // namespace bls

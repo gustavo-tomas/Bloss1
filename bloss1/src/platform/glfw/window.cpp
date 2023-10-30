@@ -1,11 +1,12 @@
 #include "platform/glfw/window.hpp"
-#include "platform/glfw/extensions.hpp"
+
 #include "core/event.hpp"
 #include "core/logger.hpp"
+#include "platform/glfw/extensions.hpp"
 
 namespace bls
 {
-    GlfwWindow::GlfwWindow(const str& title, const u32& width, const u32& height)
+    GlfwWindow::GlfwWindow(const str &title, const u32 &width, const u32 &height)
     {
         window_data.title = title;
         window_data.width = width;
@@ -14,13 +15,15 @@ namespace bls
         // Initialize GLFW
         glewExperimental = true;
         if (!glfwInit())
-            throw std::runtime_error("failed to initialize GLFW");
+            throw std::runtime_error(
+                "failed to initialize "
+                "GLFW");
 
         // GLFW window hints
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL Version 4.6
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);  // OpenGL Version 4.6
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1); // Debug
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);  // Debug
         // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE); // Apple killed OpenGL support
 
         // GLFW window and context
@@ -35,13 +38,15 @@ namespace bls
         glfwMakeContextCurrent(native_window);
         glewExperimental = true;
         if (glewInit() != GLEW_OK)
-            throw std::runtime_error("failed to initialize GLEW");
+            throw std::runtime_error(
+                "failed to initialize "
+                "GLEW");
 
         // Get native_window dimensions
-        glfwGetWindowSize(native_window, (i32*) &width, (i32*) &height);
+        glfwGetWindowSize(native_window, (i32 *)&width, (i32 *)&height);
 
-        // Set debug callbacks
-        #if defined(_DEBUG)
+// Set debug callbacks
+#if defined(_DEBUG)
         if (GLEW_ARB_debug_output)
         {
             glDebugMessageCallbackARB(&debug_callback, NULL);
@@ -49,8 +54,10 @@ namespace bls
         }
 
         else
-            LOG_WARNING("ARB Debug extension not supported");
-        #endif
+            LOG_WARNING(
+                "ARB Debug extension not "
+                "supported");
+#endif
 
         // Disable sticky keys
         glfwSetInputMode(native_window, GLFW_STICKY_KEYS, GLFW_FALSE);
@@ -65,51 +72,56 @@ namespace bls
         glfwSetWindowUserPointer(native_window, &window_data);
 
         // Window close callback
-        glfwSetWindowCloseCallback(native_window, [](GLFWwindow * window)
-        {
-            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-            WindowCloseEvent event = { };
-            window_data.event_callback(event);
-        });
+        glfwSetWindowCloseCallback(native_window,
+                                   [](GLFWwindow *window)
+                                   {
+                                       auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                       WindowCloseEvent event = {};
+                                       window_data.event_callback(event);
+                                   });
 
         // Resize callback
-        glfwSetFramebufferSizeCallback(native_window, [](GLFWwindow * window, i32 width, i32 height)
-        {
-            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-            window_data.width = width;
-            window_data.height = height;
+        glfwSetFramebufferSizeCallback(native_window,
+                                       [](GLFWwindow *window, i32 width, i32 height)
+                                       {
+                                           auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                           window_data.width = width;
+                                           window_data.height = height;
 
-            WindowResizeEvent event = { (u32) width, (u32) height };
-            window_data.event_callback(event);
-        });
+                                           WindowResizeEvent event = {(u32)width, (u32)height};
+                                           window_data.event_callback(event);
+                                       });
 
         // Key callback
-        glfwSetKeyCallback(native_window, [](GLFWwindow * window, i32 key, i32, i32 action, i32)
-        {
-            // Key press
-            if (action == GLFW_PRESS || action == GLFW_REPEAT)
-            {
-                auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-                KeyPressEvent event = { (u32) key };
-                window_data.event_callback(event);
-            }
-        });
+        glfwSetKeyCallback(native_window,
+                           [](GLFWwindow *window, i32 key, i32, i32 action, i32)
+                           {
+                               // Key press
+                               if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                               {
+                                   auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                   KeyPressEvent event = {(u32)key};
+                                   window_data.event_callback(event);
+                               }
+                           });
 
         // Mouse callback
-        glfwSetCursorPosCallback(native_window, [](GLFWwindow * window, f64 x_position, f64 y_position)
-        {
-            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-            MouseMoveEvent event = { x_position, y_position };
-            window_data.event_callback(event);
-        });
+        glfwSetCursorPosCallback(native_window,
+                                 [](GLFWwindow *window, f64 x_position, f64 y_position)
+                                 {
+                                     auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                     MouseMoveEvent event = {x_position, y_position};
+                                     window_data.event_callback(event);
+                                 });
 
         // Scroll callback
-        glfwSetScrollCallback(native_window, [](GLFWwindow * window, f64 x_offset, f64 y_offset)
-        {
-            auto& window_data = *(WindowData*) glfwGetWindowUserPointer(window);
-            MouseScrollEvent event = { x_offset, y_offset };
-            window_data.event_callback(event);
-        });
+        glfwSetScrollCallback(native_window,
+                              [](GLFWwindow *window, f64 x_offset, f64 y_offset)
+                              {
+                                  auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                  MouseScrollEvent event = {x_offset, y_offset};
+                                  window_data.event_callback(event);
+                              });
     }
 
     GlfwWindow::~GlfwWindow()
@@ -131,7 +143,7 @@ namespace bls
         std::this_thread::sleep_for(std::chrono::microseconds(static_cast<i64>(seconds * 1'000'000)));
     }
 
-    void GlfwWindow::set_event_callback(const EventCallback& callback)
+    void GlfwWindow::set_event_callback(const EventCallback &callback)
     {
         window_data.event_callback = callback;
     }
@@ -151,8 +163,8 @@ namespace bls
         return glfwGetTime();
     }
 
-    void* GlfwWindow::get_native_window() const
+    void *GlfwWindow::get_native_window() const
     {
         return native_window;
     }
-};
+};  // namespace bls

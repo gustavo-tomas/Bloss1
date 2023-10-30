@@ -11,7 +11,7 @@ namespace bls
     class OpenGLVertexBuffer : public VertexBuffer
     {
         public:
-            OpenGLVertexBuffer(void* vertices, u32 size);
+            OpenGLVertexBuffer(void *vertices, u32 size);
             ~OpenGLVertexBuffer();
 
             void bind() override;
@@ -24,7 +24,7 @@ namespace bls
     class OpenGLIndexBuffer : public IndexBuffer
     {
         public:
-            OpenGLIndexBuffer(const std::vector<u32>& indices, u32 count);
+            OpenGLIndexBuffer(const std::vector<u32> &indices, u32 count);
             ~OpenGLIndexBuffer();
 
             void bind() override;
@@ -48,14 +48,14 @@ namespace bls
             void unbind() override;
             void blit(u32 width, u32 height) override;
             void bind_and_blit(u32 width, u32 height) override;
-            void attach_texture(Texture* texture) override;
+            void attach_texture(Texture *texture) override;
             void draw() override;
             bool check() override;
-            std::vector<Texture*>& get_attachments() override;
+            std::vector<Texture *> &get_attachments() override;
 
         private:
             u32 FBO;
-            std::vector<Texture*> attachments;
+            std::vector<Texture *> attachments;
     };
 
     class OpenGLRenderBuffer : public RenderBuffer
@@ -84,9 +84,10 @@ namespace bls
             void bind() override;
             void unbind() override;
 
-            void add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer) override;
+            void add_vertex_buffer(
+                u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void *pointer) override;
 
         private:
             u32 VAO;
     };
-};
+};  // namespace bls

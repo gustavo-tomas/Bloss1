@@ -9,7 +9,6 @@ namespace bls
 
     Random::~Random()
     {
-
     }
 
     f32 Random::get_float(f32 begin, f32 end)
@@ -17,7 +16,8 @@ namespace bls
         assert(begin <= end);
 
         // Number is a value between 0 and 1
-        f32 number = static_cast<f32>(distribution(random_engine)) / static_cast<f32>(std::numeric_limits<uint_fast32_t>::max());
+        f32 number =
+            static_cast<f32>(distribution(random_engine)) / static_cast<f32>(std::numeric_limits<uint_fast32_t>::max());
         return begin + (end - begin) * number;
     }
 
@@ -25,4 +25,4 @@ namespace bls
     {
         return static_cast<i32>(get_float(static_cast<f32>(begin), static_cast<f32>(end)));
     }
-};
+};  // namespace bls

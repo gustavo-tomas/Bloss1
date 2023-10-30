@@ -11,7 +11,9 @@ namespace bls
 {
     enum class ShaderDataType
     {
-        Float, Int, Bool
+        Float,
+        Int,
+        Bool
     };
 
     enum class AttachmentType
@@ -22,30 +24,30 @@ namespace bls
     class VertexBuffer
     {
         public:
-            virtual ~VertexBuffer() { };
+            virtual ~VertexBuffer(){};
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
 
-            static VertexBuffer* create(void* vertices, u32 size);
+            static VertexBuffer *create(void *vertices, u32 size);
     };
 
     class IndexBuffer
     {
         public:
-            virtual ~IndexBuffer() { };
+            virtual ~IndexBuffer(){};
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
             virtual u32 get_count() = 0;
 
-            static IndexBuffer* create(const std::vector<u32>& indices, u32 count);
+            static IndexBuffer *create(const std::vector<u32> &indices, u32 count);
     };
 
     class FrameBuffer
     {
         public:
-            virtual ~FrameBuffer() { };
+            virtual ~FrameBuffer(){};
 
             virtual void bind() = 0;
             virtual void bind_read() = 0;
@@ -53,36 +55,39 @@ namespace bls
             virtual void unbind() = 0;
             virtual void blit(u32 width, u32 height) = 0;
             virtual void bind_and_blit(u32 width, u32 height) = 0;
-            virtual void attach_texture(Texture* texture) = 0;
+            virtual void attach_texture(Texture *texture) = 0;
             virtual void draw() = 0;
             virtual bool check() = 0;
-            virtual std::vector<Texture*>& get_attachments() = 0;
+            virtual std::vector<Texture *> &get_attachments() = 0;
 
-            static FrameBuffer* create();
+            static FrameBuffer *create();
     };
 
     class RenderBuffer
     {
         public:
-            virtual ~RenderBuffer() { };
+            virtual ~RenderBuffer(){};
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
             virtual u32 get_width() = 0;
             virtual u32 get_height() = 0;
 
-            static RenderBuffer* create(u32 width, u32 height, AttachmentType type);
+            static RenderBuffer *create(u32 width, u32 height, AttachmentType type);
     };
 
     class VertexArray
     {
         public:
-            virtual ~VertexArray() { }
+            virtual ~VertexArray()
+            {
+            }
 
             virtual void bind() = 0;
             virtual void unbind() = 0;
-            virtual void add_vertex_buffer(u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void* pointer) = 0;
+            virtual void add_vertex_buffer(
+                u32 index, i32 size, ShaderDataType type, bool normalized, i32 stride, void *pointer) = 0;
 
-            static VertexArray* create();
+            static VertexArray *create();
     };
-};
+};  // namespace bls

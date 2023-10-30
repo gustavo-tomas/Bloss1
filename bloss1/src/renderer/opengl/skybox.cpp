@@ -1,13 +1,13 @@
 #include "renderer/opengl/skybox.hpp"
 
-#include "core/game.hpp"
-
 #include <GL/glew.h>
+
 #include "GLFW/glfw3.h"
+#include "core/game.hpp"
 
 namespace bls
 {
-    OpenGLSkybox::OpenGLSkybox(const str& path,
+    OpenGLSkybox::OpenGLSkybox(const str &path,
                                const u32 skybox_resolution,
                                const u32 irradiance_resolution,
                                const u32 brdf_resolution,
@@ -18,10 +18,15 @@ namespace bls
         glDisable(GL_CULL_FACE);
 
         // Shaders
-        hdr_to_cubemap_shader = Shader::create("hdr_to_cubemap", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.vs", "bloss1/assets/shaders/pbr/hdr_cubemap_converter.fs");
-        skybox_shader = Shader::create("skybox", "bloss1/assets/shaders/pbr/skybox.vs", "bloss1/assets/shaders/pbr/skybox.fs");
-        irradiance_shader = Shader::create("irradiance", "bloss1/assets/shaders/pbr/irradiance_map.vs", "bloss1/assets/shaders/pbr/irradiance_map.fs");
-        prefilter_shader = Shader::create("prefilter", "bloss1/assets/shaders/pbr/prefilter.vs", "bloss1/assets/shaders/pbr/prefilter.fs");
+        hdr_to_cubemap_shader = Shader::create("hdr_to_cubemap",
+                                               "bloss1/assets/shaders/pbr/hdr_cubemap_converter.vs",
+                                               "bloss1/assets/shaders/pbr/hdr_cubemap_converter.fs");
+        skybox_shader =
+            Shader::create("skybox", "bloss1/assets/shaders/pbr/skybox.vs", "bloss1/assets/shaders/pbr/skybox.fs");
+        irradiance_shader = Shader::create(
+            "irradiance", "bloss1/assets/shaders/pbr/irradiance_map.vs", "bloss1/assets/shaders/pbr/irradiance_map.fs");
+        prefilter_shader = Shader::create(
+            "prefilter", "bloss1/assets/shaders/pbr/prefilter.vs", "bloss1/assets/shaders/pbr/prefilter.fs");
         brdf_shader = Shader::create("brdf", "bloss1/assets/shaders/pbr/brdf.vs", "bloss1/assets/shaders/pbr/brdf.fs");
 
         skybox_shader->bind();
@@ -43,7 +48,15 @@ namespace bls
         glGenTextures(1, &env_cubemap);
         glBindTexture(GL_TEXTURE_CUBE_MAP, env_cubemap);
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, skybox_resolution, skybox_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                         0,
+                         GL_RGB32F,
+                         skybox_resolution,
+                         skybox_resolution,
+                         0,
+                         GL_RGB,
+                         GL_FLOAT,
+                         nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -54,15 +67,12 @@ namespace bls
         // Setup projection and view matrices for capturing data onto the 6 cubemap face directions
         // -------------------------------------------------------------------------------------------------------------
         const mat4 captureProjection = perspective(radians(90.0f), 1.0f, 0.1f, 10.0f);
-        const mat4 captureViews[] =
-        {
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)),
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(-1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)),
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f,  0.0f,  1.0f)),
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3( 0.0f, -1.0f,  0.0f), vec3(0.0f,  0.0f, -1.0f)),
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)),
-            lookAt(vec3(0.0f, 0.0f, 0.0f), vec3( 0.0f,  0.0f, -1.0f), vec3(0.0f, -1.0f,  0.0f))
-        };
+        const mat4 captureViews[] = {lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f)),
+                                     lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(-1.0f, 0.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f)),
+                                     lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f)),
+                                     lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, -1.0f, 0.0f), vec3(0.0f, 0.0f, -1.0f)),
+                                     lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, -1.0f, 0.0f)),
+                                     lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, -1.0f), vec3(0.0f, -1.0f, 0.0f))};
 
         // Convert HDR equirectangular environment map to cubemap equivalent
         // -------------------------------------------------------------------------------------------------------------
@@ -72,19 +82,25 @@ namespace bls
 
         glBindTextureUnit(0, hdr_texture->get_id());
 
-        glViewport(0, 0, skybox_resolution, skybox_resolution); // don't forget to configure the viewport to the capture skybox_resolution.
+        glViewport(0,
+                   0,
+                   skybox_resolution,
+                   skybox_resolution);  // don't forget to configure the viewport to the capture skybox_resolution.
         captureFBO->bind();
         for (u32 i = 0; i < 6; i++)
         {
             hdr_to_cubemap_shader->set_uniform4("view", captureViews[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, env_cubemap, 0);
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, env_cubemap, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             cube->render();
         }
 
         if (!captureFBO->check())
-            throw std::runtime_error("failed to generate framebuffer");
+            throw std::runtime_error(
+                "failed to generate "
+                "framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -93,7 +109,15 @@ namespace bls
         glGenTextures(1, &irradiance_map);
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradiance_map);
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, irradiance_resolution, irradiance_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                         0,
+                         GL_RGB32F,
+                         irradiance_resolution,
+                         irradiance_resolution,
+                         0,
+                         GL_RGB,
+                         GL_FLOAT,
+                         nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -113,19 +137,25 @@ namespace bls
 
         glBindTextureUnit(0, env_cubemap);
 
-        glViewport(0, 0, irradiance_resolution, irradiance_resolution); // don't forget to configure the viewport to the capture skybox_resolution.
+        glViewport(0,
+                   0,
+                   irradiance_resolution,
+                   irradiance_resolution);  // don't forget to configure the viewport to the capture skybox_resolution.
         captureFBO->bind();
         for (u32 i = 0; i < 6; i++)
         {
             irradiance_shader->set_uniform4("view", captureViews[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradiance_map, 0);
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradiance_map, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             cube->render();
         }
 
         if (!captureFBO->check())
-            throw std::runtime_error("failed to generate framebuffer");
+            throw std::runtime_error(
+                "failed to generate "
+                "framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -135,7 +165,15 @@ namespace bls
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilter_map);
 
         for (u32 i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F, prefilter_resolution, prefilter_resolution, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                         0,
+                         GL_RGB32F,
+                         prefilter_resolution,
+                         prefilter_resolution,
+                         0,
+                         GL_RGB,
+                         GL_FLOAT,
+                         nullptr);
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -154,7 +192,7 @@ namespace bls
         glBindTextureUnit(0, env_cubemap);
 
         captureFBO->bind();
-        for (u32 mip = 0; mip < max_mip_levels; mip++) // max mip levels must be < log2(prefilter_resolution)
+        for (u32 mip = 0; mip < max_mip_levels; mip++)  // max mip levels must be < log2(prefilter_resolution)
         {
             // Resize framebuffer according to mip-level size
             u32 mipWidth, mipHeight;
@@ -164,12 +202,13 @@ namespace bls
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
             glViewport(0, 0, mipWidth, mipHeight);
 
-            f32 roughness = (f32) mip / (f32) (max_mip_levels - 1);
+            f32 roughness = (f32)mip / (f32)(max_mip_levels - 1);
             prefilter_shader->set_uniform1("roughness", roughness);
             for (u32 i = 0; i < 6; i++)
             {
                 prefilter_shader->set_uniform4("view", captureViews[i]);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilter_map, mip);
+                glFramebufferTexture2D(
+                    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilter_map, mip);
 
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 cube->render();
@@ -177,7 +216,9 @@ namespace bls
         }
 
         if (!captureFBO->check())
-            throw std::runtime_error("failed to generate framebuffer");
+            throw std::runtime_error(
+                "failed to generate "
+                "framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -204,7 +245,9 @@ namespace bls
         quad->render();
 
         if (!captureFBO->check())
-            throw std::runtime_error("failed to generate framebuffer");
+            throw std::runtime_error(
+                "failed to generate "
+                "framebuffer");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -228,7 +271,7 @@ namespace bls
         glDeleteTextures(1, &brdf_texture);
     }
 
-    void OpenGLSkybox::bind(Shader& shader, u32 slot)
+    void OpenGLSkybox::bind(Shader &shader, u32 slot)
     {
         shader.bind();
 
@@ -243,7 +286,7 @@ namespace bls
         glBindTextureUnit(slot + 2, brdf_texture);
     }
 
-    void OpenGLSkybox::draw(const mat4& view, const mat4& projection)
+    void OpenGLSkybox::draw(const mat4 &view, const mat4 &projection)
     {
         // Disable face culling during drawing
         glDisable(GL_CULL_FACE);
@@ -261,4 +304,4 @@ namespace bls
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
     }
-};
+};  // namespace bls

@@ -10,7 +10,7 @@ int main()
         game.run();
     }
 
-    catch (std::exception& e)
+    catch (std::exception &e)
     {
         std::cerr << "runtime error: " << e.what() << "\n";
         return -1;

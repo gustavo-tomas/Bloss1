@@ -1,8 +1,8 @@
 #pragma once
 
 /**
- * @brief The input manager interface. Each platform must implement the methods accordingly
- * and initialize the Input instance.
+ * @brief The input manager interface. Each platform must implement the methods
+ * accordingly and initialize the Input instance.
  */
 
 #include "core/core.hpp"
@@ -61,6 +61,6 @@ namespace bls
             virtual f32 get_mouse_y_native() = 0;
 
         private:
-            static Input* instance;
+            static Input *instance;
     };
-};
+};  // namespace bls

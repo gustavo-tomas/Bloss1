@@ -9,7 +9,7 @@
 
 namespace bls
 {
-    template<typename T>
+    template <typename T>
     class Vec4
     {
         public:
@@ -21,9 +21,21 @@ namespace bls
                 this->w = w;
             }
 
-            union { T x, r, s; };
-            union { T y, g, t; };
-            union { T z, b, p; };
-            union { T w, a, q; };
+            union
+            {
+                    T x, r, s;
+            };
+            union
+            {
+                    T y, g, t;
+            };
+            union
+            {
+                    T z, b, p;
+            };
+            union
+            {
+                    T w, a, q;
+            };
     };
-};
+};  // namespace bls

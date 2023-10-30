@@ -1,20 +1,19 @@
 #include "core/editor.hpp"
-#include "core/logger.hpp"
-#include "core/game.hpp"
-#include "platform/glfw/window.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
+#include "core/game.hpp"
+#include "core/logger.hpp"
+#include "ecs/scene_parser.hpp"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
-
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "platform/glfw/window.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
-#include "ecs/scene_parser.hpp"
 
 namespace bls
 {
-    Editor::Editor(Window& window) 
+    Editor::Editor(Window &window)
         : window(window),
           save_file("bloss1/assets/scenes/test_stage2.bloss"),
           config_file("bloss1/assets/scenes/bloss_config2.bcfg")
@@ -22,7 +21,8 @@ namespace bls
         // Context creation
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        auto& io = ImGui::GetIO(); (void) io;
+        auto &io = ImGui::GetIO();
+        (void)io;
 
         // Nice font :)
         io.Fonts->AddFontFromFileTTF("bloss1/assets/fonts/JetBrainsMono-Regular.ttf", 15);
@@ -36,7 +36,7 @@ namespace bls
         ImGui::StyleColorsDark();
         // ImGui::StyleColorsClassic();
 
-        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window.get_native_window()), true);
+        ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(window.get_native_window()), true);
         ImGui_ImplOpenGL3_Init("#version 460");
     }
 
@@ -47,32 +47,39 @@ namespace bls
         ImGui::DestroyContext();
     }
 
-    void Editor::update(ECS& ecs, f32)
+    void Editor::update(ECS &ecs, f32)
     {
         // Create ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        auto& io = ImGui::GetIO(); (void) io;
+        auto &io = ImGui::GetIO();
+        (void)io;
 
         // Styles
         push_style_vars();
 
         // Dockspace
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton | ImGuiDockNodeFlags_NoCloseButton);
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),
+                                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoWindowMenuButton |
+                                         ImGuiDockNodeFlags_NoCloseButton);
 
         // Options
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("Options"))
             {
-                ImGui::InputTextWithHint("##", "file", save_file, 64); ImGui::SameLine();
-                if (ImGui::SmallButton("Save Scene"))
+                ImGui::InputTextWithHint("##", "file", save_file, 64);
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Save "
+                                       "Scene"))
                     SceneParser::save_scene(ecs, save_file);
 
-                ImGui::InputTextWithHint("##", "file", config_file, 64); ImGui::SameLine();
-                if (ImGui::SmallButton("Save Config"))
+                ImGui::InputTextWithHint("##", "file", config_file, 64);
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Save "
+                                       "Config"))
                     SceneParser::save_config(config_file);
 
                 ImGui::Separator();
@@ -101,7 +108,7 @@ namespace bls
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
-            GLFWwindow* backup_current_context = glfwGetCurrentContext();
+            GLFWwindow *backup_current_context = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
@@ -116,9 +123,9 @@ namespace bls
         ImGui::End();
 
         // Reset stats
-        AppStats::framerate = { };
-        AppStats::ms_per_frame = { };
-        AppStats::vertices = { };
+        AppStats::framerate = {};
+        AppStats::ms_per_frame = {};
+        AppStats::vertices = {};
     }
 
     void Editor::render_config()
@@ -126,21 +133,15 @@ namespace bls
         ImGui::Begin("Configuration");
         ImGui::Text("Post processing passes");
 
-        ImGuiTableFlags flags = ImGuiTableFlags_Borders |
-                                ImGuiTableFlags_RowBg |
-                                ImGuiTableFlags_BordersH |
-                                ImGuiTableFlags_BordersOuterH |
-                                ImGuiTableFlags_BordersInnerH |
-                                ImGuiTableFlags_BordersV |
-                                ImGuiTableFlags_BordersOuterV |
-                                ImGuiTableFlags_BordersInnerV |
-                                ImGuiTableFlags_BordersOuter |
-                                ImGuiTableFlags_BordersInner |
-                                ImGuiTableFlags_Resizable;
-                            //    ImGuiTableFlags_NoBordersInBody;
-        
+        ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersH |
+                                ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersInnerH |
+                                ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterV |
+                                ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuter |
+                                ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable;
+        //    ImGuiTableFlags_NoBordersInBody;
+
         ImGui::BeginTable("render_passes_table", 5, flags);
-        
+
         ImGui::TableSetupColumn("ID");
         ImGui::TableSetupColumn("Position");
         ImGui::TableSetupColumn("Pass");
@@ -148,8 +149,8 @@ namespace bls
         ImGui::TableSetupColumn("Active");
 
         ImGui::TableHeadersRow();
-        auto& post_processing = Game::get().get_renderer().get_post_processing();
-        for (auto& pass : AppConfig::render_passes)
+        auto &post_processing = Game::get().get_renderer().get_post_processing();
+        for (auto &pass : AppConfig::render_passes)
         {
             ImGui::TableNextRow();
 
@@ -159,7 +160,7 @@ namespace bls
             ImGui::TableSetColumnIndex(1);
             if (pass.id > 0)
             {
-                if (!ImGui::InputInt(("position_" + to_str(pass.id)).c_str(), reinterpret_cast<i32*>(&pass.position)))
+                if (!ImGui::InputInt(("position_" + to_str(pass.id)).c_str(), reinterpret_cast<i32 *>(&pass.position)))
                     pass.position = clamp(pass.position, 1U, static_cast<u32>(AppConfig::render_passes.size()));
             }
 
@@ -177,28 +178,29 @@ namespace bls
                 ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
 
             else
-                ImGui::Text("BasePass is always enabled");
+                ImGui::Text(
+                    "BasePass is always "
+                    "enabled");
 
-            if (pass.id > 0)
-                post_processing->set_pass(pass.id, pass.enabled, pass.position);
+            if (pass.id > 0) post_processing->set_pass(pass.id, pass.enabled, pass.position);
         }
         ImGui::EndTable();
         ImGui::End();
     }
 
-    void Editor::display_editable_params(PassConfig& pass)
+    void Editor::display_editable_params(PassConfig &pass)
     {
         if (typeid(*pass.pass) == typeid(FogPass))
         {
-            auto* fog_pass = static_cast<FogPass*>(pass.pass);
+            auto *fog_pass = static_cast<FogPass *>(pass.pass);
             ImGui::InputFloat3("Fog Color", value_ptr(fog_pass->fog_color));
             ImGui::InputFloat3("Fog Min/Max Range", value_ptr(fog_pass->min_max));
         }
 
         else if (typeid(*pass.pass) == typeid(BloomPass))
         {
-            auto* bloom_pass = static_cast<BloomPass*>(pass.pass);
-            ImGui::InputInt("Bloom Samples", reinterpret_cast<i32*>(&bloom_pass->samples));
+            auto *bloom_pass = static_cast<BloomPass *>(pass.pass);
+            ImGui::InputInt("Bloom Samples", reinterpret_cast<i32 *>(&bloom_pass->samples));
             ImGui::InputFloat("Bloom Spread", &bloom_pass->spread);
             ImGui::InputFloat("Bloom Threshold", &bloom_pass->threshold);
             ImGui::InputFloat("Bloom Amount", &bloom_pass->amount);
@@ -206,35 +208,34 @@ namespace bls
 
         else if (typeid(*pass.pass) == typeid(SharpenPass))
         {
-            auto* sharpen_pass = static_cast<SharpenPass*>(pass.pass);
+            auto *sharpen_pass = static_cast<SharpenPass *>(pass.pass);
             ImGui::InputFloat("Sharpen Amount", &sharpen_pass->amount);
         }
 
         else if (typeid(*pass.pass) == typeid(PosterizationPass))
         {
-            auto* poster_pass = static_cast<PosterizationPass*>(pass.pass);
+            auto *poster_pass = static_cast<PosterizationPass *>(pass.pass);
             ImGui::InputFloat("Poster Levels", &poster_pass->levels);
         }
 
         else if (typeid(*pass.pass) == typeid(PixelizationPass))
         {
-            auto* pixel_pass = static_cast<PixelizationPass*>(pass.pass);
-            ImGui::InputInt("Pixel Size", reinterpret_cast<i32*>(&pixel_pass->pixel_size));
+            auto *pixel_pass = static_cast<PixelizationPass *>(pass.pass);
+            ImGui::InputInt("Pixel Size", reinterpret_cast<i32 *>(&pixel_pass->pixel_size));
         }
 
         else
             ImGui::Text("-");
     }
 
-    void Editor::render_entities(ECS& ecs)
+    void Editor::render_entities(ECS &ecs)
     {
         // Scene entities
         ImGui::Begin("Entities");
 
-        for (const auto& [id, name] : ecs.names)
+        for (const auto &[id, name] : ecs.names)
         {
-            if (!ImGui::CollapsingHeader((name + "_" + to_str(id)).c_str()))
-                continue;
+            if (!ImGui::CollapsingHeader((name + "_" + to_str(id)).c_str())) continue;
 
             ImGui::Text("id: %d", id);
             ImGui::Separator();
@@ -256,7 +257,7 @@ namespace bls
                 ImGui::Separator();
                 ImGui::Text("path: %s", ecs.models[id]->model->path.c_str());
 
-                for (const auto& [animation_name, animation] : ecs.models[id]->model->animations)
+                for (const auto &[animation_name, animation] : ecs.models[id]->model->animations)
                     ImGui::Text("animation: %s", animation_name.c_str());
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
@@ -280,13 +281,13 @@ namespace bls
 
                 if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
                 {
-                    auto* radius = &static_cast<SphereCollider*>(ecs.colliders[id].get())->radius;
+                    auto *radius = &static_cast<SphereCollider *>(ecs.colliders[id].get())->radius;
                     ImGui::InputFloat("radius", radius);
                 }
 
                 else if (ecs.colliders[id]->type == Collider::ColliderType::Box)
                 {
-                    auto& dimensions = static_cast<BoxCollider*>(ecs.colliders[id].get())->dimensions;
+                    auto &dimensions = static_cast<BoxCollider *>(ecs.colliders[id].get())->dimensions;
                     ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 
@@ -299,8 +300,8 @@ namespace bls
             {
                 ImGui::Text("dir light");
                 ImGui::Separator();
-                ImGui::InputFloat3("ambient",  value_ptr(ecs.dir_lights[id]->ambient));
-                ImGui::InputFloat3("diffuse",  value_ptr(ecs.dir_lights[id]->diffuse));
+                ImGui::InputFloat3("ambient", value_ptr(ecs.dir_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse", value_ptr(ecs.dir_lights[id]->diffuse));
                 ImGui::InputFloat3("specular", value_ptr(ecs.dir_lights[id]->specular));
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
@@ -309,12 +310,12 @@ namespace bls
             {
                 ImGui::Text("point light");
                 ImGui::Separator();
-                ImGui::InputFloat3("ambient",  value_ptr(ecs.point_lights[id]->ambient));
-                ImGui::InputFloat3("diffuse",  value_ptr(ecs.point_lights[id]->diffuse));
+                ImGui::InputFloat3("ambient", value_ptr(ecs.point_lights[id]->ambient));
+                ImGui::InputFloat3("diffuse", value_ptr(ecs.point_lights[id]->diffuse));
                 ImGui::InputFloat3("specular", value_ptr(ecs.point_lights[id]->specular));
 
-                ImGui::InputFloat("constant",  &ecs.point_lights[id]->constant);
-                ImGui::InputFloat("linear",    &ecs.point_lights[id]->linear);
+                ImGui::InputFloat("constant", &ecs.point_lights[id]->constant);
+                ImGui::InputFloat("linear", &ecs.point_lights[id]->linear);
                 ImGui::InputFloat("quadratic", &ecs.point_lights[id]->quadratic);
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
@@ -329,7 +330,7 @@ namespace bls
 
                 ImGui::InputFloat("zoom", &ecs.cameras[id]->target_zoom);
                 ImGui::InputFloat("near", &ecs.cameras[id]->near);
-                ImGui::InputFloat("far",  &ecs.cameras[id]->far);
+                ImGui::InputFloat("far", &ecs.cameras[id]->far);
                 ImGui::InputFloat("lerp factor", &ecs.cameras[id]->lerp_factor);
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
@@ -348,7 +349,7 @@ namespace bls
             if (ecs.texts.count(id))
             {
                 auto font_file = ecs.texts[id]->font_file;
-                auto& text = ecs.texts[id]->text;
+                auto &text = ecs.texts[id]->text;
 
                 std::vector<char> text_c(text.c_str(), text.c_str() + text.size() + 1);
                 char buffer[512];
@@ -367,7 +368,7 @@ namespace bls
 
             if (ecs.sounds.count(id))
             {
-                for (auto& [sound_name, sound] : ecs.sounds[id])
+                for (auto &[sound_name, sound] : ecs.sounds[id])
                 {
                     ImGui::Text("sound");
                     ImGui::Separator();
@@ -383,7 +384,7 @@ namespace bls
 
             if (ecs.timers.count(id))
             {
-                auto& time = ecs.timers[id]->time;
+                auto &time = ecs.timers[id]->time;
 
                 ImGui::Text("timer");
                 ImGui::Separator();
@@ -394,13 +395,13 @@ namespace bls
 
             if (ecs.transform_animations.count(id))
             {
-                auto& key_frames = ecs.transform_animations[id]->key_frames;
+                auto &key_frames = ecs.transform_animations[id]->key_frames;
 
                 ImGui::Text("transform_animation");
                 ImGui::Separator();
                 for (u32 i = 0; i < key_frames.size(); i++)
                 {
-                    auto& key_frame = key_frames[i];
+                    auto &key_frame = key_frames[i];
 
                     ImGui::Text(("frame: " + to_str(i)).c_str());
                     ImGui::InputFloat3(("position_" + to_str(i)).c_str(), value_ptr(key_frame.transform.position));
@@ -415,7 +416,7 @@ namespace bls
 
             if (ecs.hitpoints.count(id))
             {
-                auto& hitpoints = ecs.hitpoints[id];
+                auto &hitpoints = ecs.hitpoints[id];
 
                 ImGui::Text("hitpoints");
                 ImGui::Separator();
@@ -430,10 +431,10 @@ namespace bls
     void Editor::push_style_vars()
     {
         // Styling
-        const ImVec4 fgColor          = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-        const ImVec4 bgColor          = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        const ImVec4 fgColor = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
+        const ImVec4 bgColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
         const ImVec4 bgSecondaryColor = ImVec4(0.2f, 0.4f, 0.4f, 1.0f);
-        const ImVec4 bgTertiaryColor  = ImVec4(0.2f, 0.7f, 0.7f, 1.0f);
+        const ImVec4 bgTertiaryColor = ImVec4(0.2f, 0.7f, 0.7f, 1.0f);
 
         // Colors
         ImGui::PushStyleColor(ImGuiCol_WindowBg, bgColor);
@@ -497,4 +498,4 @@ namespace bls
         ImGui::PopStyleColor(colorCounter);
         ImGui::PopStyleVar(varCounter);
     }
-};
+};  // namespace bls

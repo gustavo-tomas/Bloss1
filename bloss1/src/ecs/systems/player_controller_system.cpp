@@ -1,13 +1,13 @@
+#include "core/input.hpp"
 #include "ecs/ecs.hpp"
 #include "ecs/entities.hpp"
-#include "core/input.hpp"
 #include "renderer/model.hpp"
 #include "tools/profiler.hpp"
 
 namespace bls
 {
     // Constants
-    const f32 TOLERANCE = 0.2f; // Tolerance to better handle floating point fuckery
+    const f32 TOLERANCE = 0.2f;  // Tolerance to better handle floating point fuckery
     const vec3 WORLD_UP = vec3(0.0f, 1.0f, 0.0f);
 
     const f32 MIN_CAMERA_ZOOM = 45.0f;
@@ -25,49 +25,43 @@ namespace bls
     const str PLAYER_TIMER_STR_SHOOT_COOLDOWN = "shoot_cooldown";
     const str PLAYER_TIMER_STR_SHOOT_ANIMATION = "shoot_animation";
 
-    std::map<str, f32> player_timers =
-    {
-        { PLAYER_TIMER_STR_JUMP,           0.0f },
-        { PLAYER_TIMER_STR_JUMP_COOLDOWN,  0.0f },
-        { PLAYER_TIMER_STR_SHOOT_ANIMATION, 0.0f },
-        { PLAYER_TIMER_STR_SHOOT_COOLDOWN, PLAYER_TIMER_SHOOT_COOLDOWN }
-    };
+    std::map<str, f32> player_timers = {{PLAYER_TIMER_STR_JUMP, 0.0f},
+                                        {PLAYER_TIMER_STR_JUMP_COOLDOWN, 0.0f},
+                                        {PLAYER_TIMER_STR_SHOOT_ANIMATION, 0.0f},
+                                        {PLAYER_TIMER_STR_SHOOT_COOLDOWN, PLAYER_TIMER_SHOOT_COOLDOWN}};
 
     bool player_shooting = false;
 
-    void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
-    void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt);
-    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object);
+    void update_keyboard(ECS &ecs, u32 id, const vec3 &front, const vec3 &right, const vec3 &up, f32 dt);
+    void update_controller(ECS &ecs, u32 id, const vec3 &front, const vec3 &right, const vec3 &up, f32 dt);
+    void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object);
 
-    void player_controller_system(ECS& ecs, f32 dt)
+    void player_controller_system(ECS &ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("player_controller_system");
 
         // Update all controllers
-        auto& camera_controllers = ecs.camera_controllers;
-        auto& transforms = ecs.transforms;
-        for (const auto& [id, controller] : camera_controllers)
+        auto &camera_controllers = ecs.camera_controllers;
+        auto &transforms = ecs.transforms;
+        for (const auto &[id, controller] : camera_controllers)
         {
             auto transform = transforms[id].get();
 
             // Calculate target direction vectors without vertical influence
-            vec3 front =
-            {
-                cos(radians(transform->rotation.y))* cos(radians(transform->rotation.x)),
-                sin(radians(transform->rotation.x)),
-                sin(radians(transform->rotation.y))* cos(radians(transform->rotation.x))
-            };
+            vec3 front = {cos(radians(transform->rotation.y)) * cos(radians(transform->rotation.x)),
+                          sin(radians(transform->rotation.x)),
+                          sin(radians(transform->rotation.y)) * cos(radians(transform->rotation.x))};
             front = normalize(front);
 
-            vec3 right = normalize(cross(front, { 0.0f, 1.0f, 0.0f }));
-            vec3 up    = normalize(cross(right, front));
+            vec3 right = normalize(cross(front, {0.0f, 1.0f, 0.0f}));
+            vec3 up = normalize(cross(right, front));
 
             // update_keyboard(ecs, id, front, right, up, dt);   // Keyboard for debugging purposes
-            update_controller(ecs, id, front, right, up, dt); // Controller is the actual player controller
+            update_controller(ecs, id, front, right, up, dt);  // Controller is the actual player controller
         }
     }
 
-    void update_keyboard(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3&, f32)
+    void update_keyboard(ECS &ecs, u32 id, const vec3 &front, const vec3 &right, const vec3 &, f32)
     {
         auto object = ecs.physics_objects[id].get();
         auto controller = ecs.camera_controllers[id].get();
@@ -76,20 +70,16 @@ namespace bls
         // Position
         // -------------------------------------------------------------------------------------------------------------
         // Define movement mappings
-        std::map<u32, std::pair<vec3, f32>> movement_mappings =
-        {
-            { KEY_W,     {  front,    controller->speed.z } },
-            { KEY_S,     { -front,    controller->speed.z } },
-            { KEY_D,     {  right,    controller->speed.x } },
-            { KEY_A,     { -right,    controller->speed.x } },
-            { KEY_SPACE, {  WORLD_UP, controller->speed.y } }
-        };
+        std::map<u32, std::pair<vec3, f32>> movement_mappings = {{KEY_W, {front, controller->speed.z}},
+                                                                 {KEY_S, {-front, controller->speed.z}},
+                                                                 {KEY_D, {right, controller->speed.x}},
+                                                                 {KEY_A, {-right, controller->speed.x}},
+                                                                 {KEY_SPACE, {WORLD_UP, controller->speed.y}}};
 
         // Update speed based on input
         // Don't use dt here - the physics system will multiply the final force by dt on the same frame
-        for (const auto& [key, mapping] : movement_mappings)
-            if (Input::is_key_pressed(key))
-                object->force += mapping.first * mapping.second;
+        for (const auto &[key, mapping] : movement_mappings)
+            if (Input::is_key_pressed(key)) object->force += mapping.first * mapping.second;
 
         // Rotation
         // -------------------------------------------------------------------------------------------------------------
@@ -103,7 +93,7 @@ namespace bls
         f32 pitch = transform->rotation.x + y_offset * controller->sensitivity;
         f32 yaw = transform->rotation.y + x_offset * controller->sensitivity;
 
-        pitch = clamp(pitch, -89.0f, 89.0f); // Clamp pitch to avoid flipping
+        pitch = clamp(pitch, -89.0f, 89.0f);  // Clamp pitch to avoid flipping
 
         // Update last mouse values
         controller->mouse_x = curr_mouse_x;
@@ -114,7 +104,7 @@ namespace bls
         transform->rotation.y = yaw;
     }
 
-    void update_controller(ECS& ecs, u32 id, const vec3& front, const vec3& right, const vec3& up, f32 dt)
+    void update_controller(ECS &ecs, u32 id, const vec3 &front, const vec3 &right, const vec3 &up, f32 dt)
     {
         auto object = ecs.physics_objects[id].get();
         auto controller = ecs.camera_controllers[id].get();
@@ -134,18 +124,15 @@ namespace bls
 
         vec3 clamped_front = vec3(front.x, 0.0f, front.z);
 
-        if (fabs(left_y) >= TOLERANCE)
-            object->force += clamped_front * controller->speed * -left_y;
+        if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y;
 
-        if (fabs(left_x) >= TOLERANCE)
-            object->force += right * controller->speed * left_x;
+        if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x;
 
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
         {
             player_state = PLAYER_STATE_WALKING;
 
-            if (left_y >= TOLERANCE)
-                player_state = PLAYER_STATE_WALKING_BACK;
+            if (left_y >= TOLERANCE) player_state = PLAYER_STATE_WALKING_BACK;
         }
 
         // Turn
@@ -157,17 +144,15 @@ namespace bls
         f32 y_offset = 0.0f;
 
         // Calculate X and Y offsets
-        if (fabs(right_x) >= TOLERANCE)
-            x_offset = right_x * 10.0f;
+        if (fabs(right_x) >= TOLERANCE) x_offset = right_x * 10.0f;
 
-        if (fabs(right_y) >= TOLERANCE)
-            y_offset = -right_y * 10.0f;
+        if (fabs(right_y) >= TOLERANCE) y_offset = -right_y * 10.0f;
 
         // Calculate rotation
         f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt * 250.0f;
-        f32 yaw   = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
+        f32 yaw = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
 
-        pitch = clamp(pitch, MIN_PLAYER_PITCH, MAX_PLAYER_PITCH); // Clamp pitch to avoid flipping
+        pitch = clamp(pitch, MIN_PLAYER_PITCH, MAX_PLAYER_PITCH);  // Clamp pitch to avoid flipping
 
         // Update target rotation
         transform->rotation.x = pitch;
@@ -179,7 +164,7 @@ namespace bls
         {
             if (player_timers[PLAYER_TIMER_STR_JUMP] <= PLAYER_TIMER_JUMP)
             {
-                player_state = PLAYER_STATE_IDLE; // @TODO: finish jumping state
+                player_state = PLAYER_STATE_IDLE;  // @TODO: finish jumping state
                 object->force += WORLD_UP * controller->speed.y;
                 player_timers[PLAYER_TIMER_STR_JUMP] += dt;
             }
@@ -200,16 +185,15 @@ namespace bls
 
         // Shoot
         // -------------------------------------------------------------------------------------------------------------
-        auto trigger_left  = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_TRIGGER);
+        auto trigger_left = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_TRIGGER);
         auto trigger_right = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_RIGHT_TRIGGER);
 
         // Normalize trigger value between [0, 2]
-        trigger_left  += 1.0f;
+        trigger_left += 1.0f;
         trigger_right += 1.0f;
 
         // Zoom int
-        if (trigger_left >= TOLERANCE)
-            camera->target_zoom = MIN_CAMERA_ZOOM;
+        if (trigger_left >= TOLERANCE) camera->target_zoom = MIN_CAMERA_ZOOM;
 
         // Zoom out
         else
@@ -227,7 +211,7 @@ namespace bls
 
                 Transform bullet_transform = *transform;
                 bullet_transform.position = bullet_transform.position + right * BULLET_OFFSET.x;
-                bullet_transform.position = bullet_transform.position + up    * BULLET_OFFSET.y;
+                bullet_transform.position = bullet_transform.position + up * BULLET_OFFSET.y;
                 bullet_transform.position = bullet_transform.position + front * BULLET_OFFSET.z;
 
                 bullet_transform.scale = vec3(15.0f);
@@ -239,18 +223,16 @@ namespace bls
             }
         }
 
-        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] + dt,
-                                                               0.0f,
-                                                               PLAYER_TIMER_SHOOT_COOLDOWN);
-        
+        player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] =
+            clamp(player_timers[PLAYER_TIMER_STR_SHOOT_COOLDOWN] + dt, 0.0f, PLAYER_TIMER_SHOOT_COOLDOWN);
+
         // Wait for shooting animation to finish
         if (player_shooting)
         {
             auto animation_dur = model->model->animations[PLAYER_STATE_SHOOTING]->get_duration_seconds();
 
-            player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] = clamp(player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] + dt,
-                                                                    0.0f,
-                                                                    animation_dur);
+            player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] =
+                clamp(player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] + dt, 0.0f, animation_dur);
 
             // Animation is finished, proceed to next state
             if (player_timers[PLAYER_TIMER_STR_SHOOT_ANIMATION] >= animation_dur)
@@ -267,13 +249,13 @@ namespace bls
         update_state_machine(ecs, id, player_state, dt);
     }
 
-    void shoot(ECS& ecs, const Transform& transform, const PhysicsObject& object)
+    void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
         bullet(ecs, transform, object);
 
         // Create and emit particles
-        auto& player_particle_sys = ecs.particle_systems[0];
+        auto &player_particle_sys = ecs.particle_systems[0];
         player_particle_sys->emitter->set_center(transform.position);
         player_particle_sys->particles_to_be_emitted += 15;
     }
-};
+};  // namespace bls

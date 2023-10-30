@@ -10,7 +10,7 @@ set positional-arguments
   cppcheck --enable=all --std=c++20 bloss1/src/**
 
 @format:
-  find bloss1/src/ -iname *.hpp -o -iname *.cpp | xargs clang-format -i -style=GNU
+  find bloss1/src/ -iname *.hpp -o -iname *.cpp | xargs clang-format -i -style=file
 
 @build cfg:
   ./vendor/premake/premake5_linux gmake2 && make config=$1 -j4

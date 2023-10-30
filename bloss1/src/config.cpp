@@ -6,5 +6,5 @@ namespace bls
     f32 AppStats::framerate = 0.0f;
     f32 AppStats::ms_per_frame = 0.0f;
 
-    std::vector<PassConfig> AppConfig::render_passes = { };
-};
+    std::vector<PassConfig> AppConfig::render_passes = {};
+};  // namespace bls

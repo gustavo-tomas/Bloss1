@@ -1,22 +1,22 @@
 #include "renderer/opengl/shader.hpp"
-#include "core/logger.hpp"
 
-#include <GL/glew.h> // Include glew before glfw
+#include <GL/glew.h>  // Include glew before glfw
+
 #include "GLFW/glfw3.h"
+#include "core/logger.hpp"
 
 #define MAX_SHADER_ID 100000007
 
 namespace bls
 {
-    OpenGLShader::OpenGLShader(const str& vertex_path, const str& fragment_path, const str& geometry_path)
+    OpenGLShader::OpenGLShader(const str &vertex_path, const str &fragment_path, const str &geometry_path)
     {
         // Create the shaders
         GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
         GLuint geometry_shader_id = MAX_SHADER_ID;
 
-        if (geometry_path != "")
-            geometry_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
+        if (geometry_path != "") geometry_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
 
         str vertex_shader_code;
         str fragment_shader_code;
@@ -54,7 +54,11 @@ namespace bls
 
         catch (...)
         {
-            LOG_ERROR("error when reading files '%s' and '%s'", vertex_path, fragment_path);
+            LOG_ERROR(
+                "error when reading files '%s' "
+                "and '%s'",
+                vertex_path,
+                fragment_path);
         }
 
         // Compile shaders
@@ -71,8 +75,7 @@ namespace bls
         glAttachShader(id, vertex_shader_id);
         glAttachShader(id, fragment_shader_id);
 
-        if (geometry_path != "")
-            glAttachShader(id, geometry_shader_id);
+        if (geometry_path != "") glAttachShader(id, geometry_shader_id);
 
         glLinkProgram(id);
 
@@ -88,30 +91,35 @@ namespace bls
             glGetProgramInfoLog(id, log_length, NULL, &error_message[0]);
 
             str error = "";
-            for (auto c : error_message) { error += c; }
+            for (auto c : error_message)
+            {
+                error += c;
+            }
             LOG_ERROR("linking program");
             LOG_ERROR("error when linking shader: '%s'", vertex_path.c_str());
             LOG_ERROR("error when linking program: '%s'", error.c_str());
 
-            throw std::runtime_error("failed to link program");
+            throw std::runtime_error(
+                "failed to link "
+                "program");
         }
 
         glDetachShader(id, vertex_shader_id);
         glDetachShader(id, fragment_shader_id);
 
-        if (geometry_path != "")
-            glDetachShader(id, geometry_shader_id);
+        if (geometry_path != "") glDetachShader(id, geometry_shader_id);
 
         glDeleteShader(vertex_shader_id);
         glDeleteShader(fragment_shader_id);
 
-        if (geometry_path != "")
-            glDeleteShader(geometry_shader_id);
+        if (geometry_path != "") glDeleteShader(geometry_shader_id);
 
-        LOG_SUCCESS("shaders compiled & linked successfully");
+        LOG_SUCCESS(
+            "shaders compiled & linked "
+            "successfully");
     }
 
-    void OpenGLShader::compile_shader(const str& path, const str& code, u32 ID)
+    void OpenGLShader::compile_shader(const str &path, const str &code, u32 ID)
     {
         GLint result = GL_FALSE;
         int log_length = 0;
@@ -119,7 +127,7 @@ namespace bls
         // Compile shader
         LOG_INFO("compiling shader '%s'", path.c_str());
 
-        char const* sourcePtr = code.c_str();
+        char const *sourcePtr = code.c_str();
         glShaderSource(ID, 1, &sourcePtr, NULL);
         glCompileShader(ID);
 
@@ -133,7 +141,10 @@ namespace bls
             glGetShaderInfoLog(ID, log_length, NULL, &error_message[0]);
 
             str error = "";
-            for (auto c : error_message) { error += c; }
+            for (auto c : error_message)
+            {
+                error += c;
+            }
             LOG_ERROR("error when compiling '%s': %s", path.c_str(), error.c_str());
         }
     }
@@ -148,57 +159,57 @@ namespace bls
         glUseProgram(0);
     }
 
-    void OpenGLShader::set_uniform1(const str& name, bool value)
+    void OpenGLShader::set_uniform1(const str &name, bool value)
     {
-        glUniform1i(glGetUniformLocation(id, name.c_str()), (u32) value);
+        glUniform1i(glGetUniformLocation(id, name.c_str()), (u32)value);
     }
 
-    void OpenGLShader::set_uniform1(const str& name, u32 value)
+    void OpenGLShader::set_uniform1(const str &name, u32 value)
     {
         glUniform1i(glGetUniformLocation(id, name.c_str()), value);
     }
 
-    void OpenGLShader::set_uniform1(const str& name, f32 value)
+    void OpenGLShader::set_uniform1(const str &name, f32 value)
     {
         glUniform1f(glGetUniformLocation(id, name.c_str()), value);
     }
 
-    void OpenGLShader::set_uniform2(const str& name, const vec2& vector)
+    void OpenGLShader::set_uniform2(const str &name, const vec2 &vector)
     {
         glUniform2f(glGetUniformLocation(id, name.c_str()), vector.x, vector.y);
     }
 
-    void OpenGLShader::set_uniform3(const str& name, const vec3& vector)
+    void OpenGLShader::set_uniform3(const str &name, const vec3 &vector)
     {
         glUniform3f(glGetUniformLocation(id, name.c_str()), vector.x, vector.y, vector.z);
     }
 
-    void OpenGLShader::set_uniform3(const str& name, const mat3& matrix)
+    void OpenGLShader::set_uniform3(const str &name, const mat3 &matrix)
     {
         glUniformMatrix3fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, value_ptr(matrix));
     }
 
-    void OpenGLShader::set_uniform4(const str& name, const vec4& vector)
+    void OpenGLShader::set_uniform4(const str &name, const vec4 &vector)
     {
         glUniform4f(glGetUniformLocation(id, name.c_str()), vector.x, vector.y, vector.z, vector.w);
     }
 
-    void OpenGLShader::set_uniform4(const str& name, const mat4& matrix)
+    void OpenGLShader::set_uniform4(const str &name, const mat4 &matrix)
     {
         glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, value_ptr(matrix));
     }
 
-    vec3 OpenGLShader::get_uniform3(const str& name)
+    vec3 OpenGLShader::get_uniform3(const str &name)
     {
         vec3 vector;
         glGetUniformfv(id, glGetUniformLocation(id, name.c_str()), value_ptr(vector));
         return vector;
     }
 
-    mat4 OpenGLShader::get_uniform4(const str& name)
+    mat4 OpenGLShader::get_uniform4(const str &name)
     {
         mat4 matrix;
         glGetUniformfv(id, glGetUniformLocation(id, name.c_str()), value_ptr(matrix));
         return matrix;
     }
-};
+};  // namespace bls

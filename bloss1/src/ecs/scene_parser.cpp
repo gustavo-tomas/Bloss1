@@ -1,15 +1,16 @@
 #include "ecs/scene_parser.hpp"
-#include "ecs/entities.hpp"
-#include "renderer/model.hpp"
-#include "renderer/font.hpp"
-#include "renderer/post/post_processing.hpp"
+
+#include "config.hpp"
 #include "core/game.hpp"
 #include "core/logger.hpp"
-#include "config.hpp"
+#include "ecs/entities.hpp"
+#include "renderer/font.hpp"
+#include "renderer/model.hpp"
+#include "renderer/post/post_processing.hpp"
 
 namespace bls
 {
-    void SceneParser::parse_scene(ECS& ecs, const str& file)
+    void SceneParser::parse_scene(ECS &ecs, const str &file)
     {
         std::fstream scene(file);
 
@@ -37,8 +38,7 @@ namespace bls
                     continue;
                 }
 
-                if (!insideQuotes && std::isspace(c))
-                    continue;
+                if (!insideQuotes && std::isspace(c)) continue;
 
                 processed_line += c;
             }
@@ -89,20 +89,23 @@ namespace bls
         LOG_SUCCESS("scene loaded from '%s'", file.c_str());
     }
 
-    void SceneParser::save_scene(ECS& ecs, const str& file)
+    void SceneParser::save_scene(ECS &ecs, const str &file)
     {
         std::ofstream scene(file);
 
-        for (const auto& [id, name] : ecs.names)
+        for (const auto &[id, name] : ecs.names)
         {
-            scene << "[" << name << "]" << "\n";
-            scene << "{" << "\n";
+            scene << "[" << name << "]"
+                  << "\n";
+            scene << "{"
+                  << "\n";
 
             if (ecs.models.count(id))
             {
                 scene << "\tmodel: ";
                 scene << ecs.models[id]->model->path << ", ";
-                scene << ecs.models[id]->model->flip_uvs << ";" << "\n";
+                scene << ecs.models[id]->model->flip_uvs << ";"
+                      << "\n";
             }
 
             if (ecs.transforms.count(id))
@@ -119,7 +122,8 @@ namespace bls
                 write_vec3(&scene, ecs.physics_objects[id]->velocity, ", ");
                 write_vec3(&scene, ecs.physics_objects[id]->terminal_velocity, ", ");
                 write_vec3(&scene, ecs.physics_objects[id]->force, ", ");
-                scene << to_str(ecs.physics_objects[id]->mass) << ";" << "\n";
+                scene << to_str(ecs.physics_objects[id]->mass) << ";"
+                      << "\n";
             }
 
             if (ecs.colliders.count(id))
@@ -131,25 +135,26 @@ namespace bls
 
                 if (type == Collider::ColliderType::Sphere)
                 {
-                    auto collider = static_cast<SphereCollider*>(ecs.colliders[id].get());
+                    auto collider = static_cast<SphereCollider *>(ecs.colliders[id].get());
                     scene << to_str(collider->radius) << ", ";
                 }
 
                 else if (type == Collider::ColliderType::Box)
                 {
-                    auto collider = static_cast<BoxCollider*>(ecs.colliders[id].get());
+                    auto collider = static_cast<BoxCollider *>(ecs.colliders[id].get());
                     write_vec3(&scene, collider->dimensions, ", ");
                 }
 
                 write_vec3(&scene, ecs.colliders[id]->offset, ", ");
                 scene << to_str(ecs.colliders[id]->immovable) << ", ";
                 scene << to_str(ecs.colliders[id]->description_mask) << ", ";
-                scene << to_str(ecs.colliders[id]->interaction_mask) << ";" << "\n";
+                scene << to_str(ecs.colliders[id]->interaction_mask) << ";"
+                      << "\n";
             }
 
             if (ecs.dir_lights.count(id))
             {
-                auto& dir_light = *ecs.dir_lights[id];
+                auto &dir_light = *ecs.dir_lights[id];
 
                 scene << "\tdir_light: ";
                 write_vec3(&scene, dir_light.ambient, ", ");
@@ -159,7 +164,7 @@ namespace bls
 
             if (ecs.point_lights.count(id))
             {
-                auto& point_light = *ecs.point_lights[id];
+                auto &point_light = *ecs.point_lights[id];
 
                 scene << "\tpoint_light: ";
                 write_vec3(&scene, point_light.ambient, ", ");
@@ -168,12 +173,13 @@ namespace bls
 
                 scene << to_str(point_light.constant) << ", ";
                 scene << to_str(point_light.linear) << ", ";
-                scene << to_str(point_light.quadratic) << ";" << "\n";
+                scene << to_str(point_light.quadratic) << ";"
+                      << "\n";
             }
 
             if (ecs.cameras.count(id))
             {
-                auto& camera = *ecs.cameras[id];
+                auto &camera = *ecs.cameras[id];
 
                 scene << "\tcamera: ";
                 write_vec3(&scene, camera.target_offset, ", ");
@@ -182,33 +188,36 @@ namespace bls
                 scene << to_str(camera.zoom) << ", ";
                 scene << to_str(camera.near) << ", ";
                 scene << to_str(camera.far) << ", ";
-                scene << to_str(camera.lerp_factor) << ";" << "\n";
+                scene << to_str(camera.lerp_factor) << ";"
+                      << "\n";
             }
 
             if (ecs.camera_controllers.count(id))
             {
-                auto& controller = *ecs.camera_controllers[id];
+                auto &controller = *ecs.camera_controllers[id];
 
                 scene << "\tcamera_controller: ";
 
                 write_vec3(&scene, controller.speed, ", ");
-                scene << to_str(controller.sensitivity) << ";" << "\n";
+                scene << to_str(controller.sensitivity) << ";"
+                      << "\n";
             }
 
             if (ecs.texts.count(id))
             {
-                auto& text = *ecs.texts[id];
+                auto &text = *ecs.texts[id];
 
                 scene << "\ttext: ";
 
                 scene << text.font_file << ", ";
-                scene << "~" << text.text << "~" << ", ";
+                scene << "~" << text.text << "~"
+                      << ", ";
                 write_vec3(&scene, text.color, ";\n");
             }
 
             if (ecs.sounds.count(id))
             {
-                for (const auto& [name, sound] : ecs.sounds[id])
+                for (const auto &[name, sound] : ecs.sounds[id])
                 {
                     scene << "\tsound: ";
 
@@ -217,23 +226,25 @@ namespace bls
 
                     scene << to_str(sound->volume) << ", ";
                     scene << to_str(sound->play_now) << ", ";
-                    scene << to_str(sound->looping) << ";" << "\n";
+                    scene << to_str(sound->looping) << ";"
+                          << "\n";
                 }
             }
 
             if (ecs.timers.count(id))
             {
                 scene << "\ttimer: ";
-                scene << to_str(0.0) << ";" << "\n";
+                scene << to_str(0.0) << ";"
+                      << "\n";
             }
 
             if (ecs.transform_animations.count(id))
             {
-                auto& key_frames = ecs.transform_animations[id]->key_frames;
+                auto &key_frames = ecs.transform_animations[id]->key_frames;
                 scene << "\ttransform_animation: ";
                 scene << to_str(key_frames.size()) << ", ";
 
-                for (auto& key_frame : key_frames)
+                for (auto &key_frame : key_frames)
                 {
                     write_vec3(&scene, key_frame.transform.position, ", ");
                     write_vec3(&scene, key_frame.transform.rotation, ", ");
@@ -246,26 +257,28 @@ namespace bls
 
             if (ecs.hitpoints.count(id))
             {
-                auto& hitpoints = ecs.hitpoints[id];
+                auto &hitpoints = ecs.hitpoints[id];
                 scene << "\thitpoints: ";
                 scene << to_str(hitpoints) << "; ";
                 scene << "\n";
             }
 
-            scene << "}" << "\n\n";
+            scene << "}"
+                  << "\n\n";
         }
 
         scene.close();
         LOG_SUCCESS("current scene saved to '%s'", file.c_str());
     }
 
-    void SceneParser::save_config(const str& file)
+    void SceneParser::save_config(const str &file)
     {
         std::ofstream scene(file);
-       
+
         scene << "<post_processing>\n";
-        scene << "{" << "\n";
-        for (const auto& pass : AppConfig::render_passes)
+        scene << "{"
+              << "\n";
+        for (const auto &pass : AppConfig::render_passes)
         {
             if (pass.name == "FogPass")
             {
@@ -273,8 +286,8 @@ namespace bls
                 scene << to_str(pass.position) << ", ";
                 scene << to_str(pass.enabled) << ", ";
 
-                write_vec3(&scene, static_cast<FogPass*>(pass.pass)->fog_color, ", ");
-                write_vec2(&scene, static_cast<FogPass*>(pass.pass)->min_max, "; ");
+                write_vec3(&scene, static_cast<FogPass *>(pass.pass)->fog_color, ", ");
+                write_vec2(&scene, static_cast<FogPass *>(pass.pass)->min_max, "; ");
                 scene << "\n";
             }
 
@@ -284,10 +297,10 @@ namespace bls
                 scene << to_str(pass.position) << ", ";
                 scene << to_str(pass.enabled) << ", ";
 
-                scene << to_str(static_cast<BloomPass*>(pass.pass)->samples) << ", ";
-                scene << to_str(static_cast<BloomPass*>(pass.pass)->spread) << ", ";
-                scene << to_str(static_cast<BloomPass*>(pass.pass)->threshold) << ", ";
-                scene << to_str(static_cast<BloomPass*>(pass.pass)->amount) << ", ";
+                scene << to_str(static_cast<BloomPass *>(pass.pass)->samples) << ", ";
+                scene << to_str(static_cast<BloomPass *>(pass.pass)->spread) << ", ";
+                scene << to_str(static_cast<BloomPass *>(pass.pass)->threshold) << ", ";
+                scene << to_str(static_cast<BloomPass *>(pass.pass)->amount) << ", ";
                 scene << "\n";
             }
 
@@ -297,27 +310,31 @@ namespace bls
                 scene << to_str(pass.position) << ", ";
                 scene << to_str(pass.enabled) << ", ";
 
-                scene << to_str(static_cast<SharpenPass*>(pass.pass)->amount) << "; ";
+                scene << to_str(static_cast<SharpenPass *>(pass.pass)->amount) << "; ";
                 scene << "\n";
             }
 
-            else if (pass.name == "PosterizationPass")
+            else if (pass.name ==
+                     "PosterizationPas"
+                     "s")
             {
                 scene << "\tposterization_pass: ";
                 scene << to_str(pass.position) << ", ";
                 scene << to_str(pass.enabled) << ", ";
 
-                scene << to_str(static_cast<PosterizationPass*>(pass.pass)->levels) << "; ";
+                scene << to_str(static_cast<PosterizationPass *>(pass.pass)->levels) << "; ";
                 scene << "\n";
             }
 
-            else if (pass.name == "PixelizationPass")
+            else if (pass.name ==
+                     "PixelizationPas"
+                     "s")
             {
                 scene << "\tpixelization_pass: ";
                 scene << to_str(pass.position) << ", ";
                 scene << to_str(pass.enabled) << ", ";
 
-                scene << to_str(static_cast<PixelizationPass*>(pass.pass)->pixel_size) << "; ";
+                scene << to_str(static_cast<PixelizationPass *>(pass.pass)->pixel_size) << "; ";
                 scene << "\n";
             }
 
@@ -331,13 +348,14 @@ namespace bls
             }
         }
 
-        scene << "}" << "\n\n";
+        scene << "}"
+              << "\n\n";
 
         scene.close();
         LOG_SUCCESS("current configuration saved to '%s'", file.c_str());
     }
 
-    void SceneParser::parse_component(ECS& ecs, const str& line, u32 entity_id, const str& entity_name)
+    void SceneParser::parse_component(ECS &ecs, const str &line, u32 entity_id, const str &entity_name)
     {
         // Parse component
         str component_name;
@@ -379,7 +397,8 @@ namespace bls
             force = read_vec3(&iline, ',');
             std::getline(iline, mass, ';');
 
-            ecs.physics_objects[entity_id] = std::make_unique<PhysicsObject>(PhysicsObject(velocity, terminal_velocity, force, stof(mass)));
+            ecs.physics_objects[entity_id] =
+                std::make_unique<PhysicsObject>(PhysicsObject(velocity, terminal_velocity, force, stof(mass)));
         }
 
         else if (component_name == "collider")
@@ -399,11 +418,8 @@ namespace bls
                 std::getline(iline, description_mask, ',');
                 std::getline(iline, interaction_mask, ';');
 
-                ecs.colliders[entity_id] = std::make_unique<SphereCollider>(stof(radius),
-                                                                            offset,
-                                                                            stoi(immovable),
-                                                                            std::stoul(description_mask),
-                                                                            std::stoul(interaction_mask));
+                ecs.colliders[entity_id] = std::make_unique<SphereCollider>(
+                    stof(radius), offset, stoi(immovable), std::stoul(description_mask), std::stoul(interaction_mask));
             }
 
             else if (type == "box")
@@ -416,11 +432,8 @@ namespace bls
                 std::getline(iline, description_mask, ',');
                 std::getline(iline, interaction_mask, ';');
 
-                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(dimensions,
-                                                                         offset,
-                                                                         stoi(immovable),
-                                                                         std::stoul(description_mask),
-                                                                         std::stoul(interaction_mask));
+                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(
+                    dimensions, offset, stoi(immovable), std::stoul(description_mask), std::stoul(interaction_mask));
             }
 
             else
@@ -435,7 +448,8 @@ namespace bls
             diffuse = read_vec3(&iline, ',');
             specular = read_vec3(&iline, ',');
 
-            ecs.dir_lights[entity_id] = std::make_unique<DirectionalLight>(DirectionalLight(ambient, diffuse, specular));
+            ecs.dir_lights[entity_id] =
+                std::make_unique<DirectionalLight>(DirectionalLight(ambient, diffuse, specular));
         }
 
         else if (component_name == "point_light")
@@ -451,8 +465,8 @@ namespace bls
             std::getline(iline, linear, ',');
             std::getline(iline, quadratic, ';');
 
-            ecs.point_lights[entity_id] = std::make_unique<PointLight>(PointLight(ambient, diffuse, specular,
-                                          stof(constant), stof(linear), stof(quadratic)));
+            ecs.point_lights[entity_id] = std::make_unique<PointLight>(
+                PointLight(ambient, diffuse, specular, stof(constant), stof(linear), stof(quadratic)));
         }
 
         else if (component_name == "camera")
@@ -468,11 +482,13 @@ namespace bls
             std::getline(iline, far, ',');
             std::getline(iline, lerp_factor, ';');
 
-            ecs.cameras[entity_id] = std::make_unique<Camera>(Camera(offset, world_up,
-                                     stof(zoom), stof(near), stof(far), stof(lerp_factor)));
+            ecs.cameras[entity_id] = std::make_unique<Camera>(
+                Camera(offset, world_up, stof(zoom), stof(near), stof(far), stof(lerp_factor)));
         }
 
-        else if (component_name == "camera_controller")
+        else if (component_name ==
+                 "camera_"
+                 "controller")
         {
             str sensitivity;
             vec3 speed;
@@ -480,7 +496,8 @@ namespace bls
             speed = read_vec3(&iline, ',');
             std::getline(iline, sensitivity, ';');
 
-            ecs.camera_controllers[entity_id] = std::make_unique<CameraController>(CameraController(speed, stof(sensitivity)));
+            ecs.camera_controllers[entity_id] =
+                std::make_unique<CameraController>(CameraController(speed, stof(sensitivity)));
         }
 
         else if (component_name == "text")
@@ -507,7 +524,8 @@ namespace bls
             std::getline(iline, looping, ';');
 
             Game::get().get_audio_engine().load(sound_name, sound_file, stoi(looping));
-            ecs.sounds[entity_id][sound_name] = std::make_unique<Sound>(Sound(sound_file, sound_name, stof(volume), stoi(play_now), stoi(looping)));
+            ecs.sounds[entity_id][sound_name] =
+                std::make_unique<Sound>(Sound(sound_file, sound_name, stof(volume), stoi(play_now), stoi(looping)));
         }
 
         else if (component_name == "timer")
@@ -517,7 +535,9 @@ namespace bls
             ecs.timers[entity_id] = std::make_unique<Timer>(Timer(stof(time)));
         }
 
-        else if (component_name == "transform_animation")
+        else if (component_name ==
+                 "transform_"
+                 "animation")
         {
             vec3 position, rotation, scale;
             str size, duration;
@@ -532,8 +552,8 @@ namespace bls
                 scale = read_vec3(&iline, ',');
                 std::getline(iline, duration, ';');
 
-                Transform transform = { position, rotation, scale };
-                key_frames[i] = { transform, stof(duration) };
+                Transform transform = {position, rotation, scale};
+                key_frames[i] = {transform, stof(duration)};
             }
 
             ecs.transform_animations[entity_id] = std::make_unique<TransformAnimation>(key_frames);
@@ -548,17 +568,17 @@ namespace bls
         }
     }
 
-    void SceneParser::parse_config(const str& line, const str& config_name)
+    void SceneParser::parse_config(const str &line, const str &config_name)
     {
         if (config_name == "post_processing")
         {
             str parameter;
             str position, enabled;
-            
+
             std::istringstream iline(line);
             std::getline(iline, parameter, ':');
-            
-            auto& post_processing = Game::get().get_renderer().get_post_processing();
+
+            auto &post_processing = Game::get().get_renderer().get_post_processing();
 
             // FogPass
             if (parameter == "fog_pass")
@@ -569,11 +589,11 @@ namespace bls
                 vec3 fog_color = read_vec3(&iline, ',');
                 vec2 min_max = read_vec2(&iline, ',');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(FogPass))
                     {
-                        auto* fog_pass = static_cast<FogPass*>(pass.pass);
+                        auto *fog_pass = static_cast<FogPass *>(pass.pass);
                         fog_pass->fog_color = fog_color;
                         fog_pass->min_max = min_max;
 
@@ -597,11 +617,11 @@ namespace bls
                 std::getline(iline, threshold, ',');
                 std::getline(iline, amount, ';');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(BloomPass))
                     {
-                        auto* bloom_pass = static_cast<BloomPass*>(pass.pass);
+                        auto *bloom_pass = static_cast<BloomPass *>(pass.pass);
                         bloom_pass->samples = std::stoul(samples);
                         bloom_pass->spread = std::stof(spread);
                         bloom_pass->threshold = std::stof(threshold);
@@ -624,11 +644,11 @@ namespace bls
                 str amount;
                 std::getline(iline, amount, ';');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(SharpenPass))
                     {
-                        auto* sharpen_pass = static_cast<SharpenPass*>(pass.pass);
+                        auto *sharpen_pass = static_cast<SharpenPass *>(pass.pass);
                         sharpen_pass->amount = std::stof(amount);
 
                         pass.enabled = std::stoul(enabled);
@@ -640,7 +660,9 @@ namespace bls
             }
 
             // PosterizationPass
-            else if (parameter == "posterization_pass")
+            else if (parameter ==
+                     "posterization_"
+                     "pass")
             {
                 std::getline(iline, position, ',');
                 std::getline(iline, enabled, ',');
@@ -648,11 +670,11 @@ namespace bls
                 str levels;
                 std::getline(iline, levels, ';');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(PosterizationPass))
                     {
-                        auto* post_pass = static_cast<PosterizationPass*>(pass.pass);
+                        auto *post_pass = static_cast<PosterizationPass *>(pass.pass);
                         post_pass->levels = std::stof(levels);
 
                         pass.enabled = std::stoul(enabled);
@@ -664,7 +686,9 @@ namespace bls
             }
 
             // PixelizationPass
-            else if (parameter == "pixelization_pass")
+            else if (parameter ==
+                     "pixelization_"
+                     "pass")
             {
                 std::getline(iline, position, ',');
                 std::getline(iline, enabled, ',');
@@ -672,11 +696,11 @@ namespace bls
                 str pixel_size;
                 std::getline(iline, pixel_size, ';');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(PixelizationPass))
                     {
-                        auto* pixel_pass = static_cast<PixelizationPass*>(pass.pass);
+                        auto *pixel_pass = static_cast<PixelizationPass *>(pass.pass);
                         pixel_pass->pixel_size = std::stoul(pixel_size);
 
                         pass.enabled = std::stoul(enabled);
@@ -693,7 +717,7 @@ namespace bls
                 std::getline(iline, position, ',');
                 std::getline(iline, enabled, ';');
 
-                for (auto& pass : AppConfig::render_passes)
+                for (auto &pass : AppConfig::render_passes)
                 {
                     if (typeid(*pass.pass) == typeid(FXAAPass))
                     {
@@ -707,7 +731,7 @@ namespace bls
         }
     }
 
-    vec3 SceneParser::read_vec3(std::istringstream* iline, char delimiter)
+    vec3 SceneParser::read_vec3(std::istringstream *iline, char delimiter)
     {
         vec3 vec;
         str buffer;
@@ -722,7 +746,7 @@ namespace bls
         return vec;
     }
 
-    vec2 SceneParser::read_vec2(std::istringstream* iline, char delimiter)
+    vec2 SceneParser::read_vec2(std::istringstream *iline, char delimiter)
     {
         vec2 vec;
         str buffer;
@@ -737,13 +761,13 @@ namespace bls
         return vec;
     }
 
-    void SceneParser::write_vec3(std::ofstream* scene, const vec3& vec, const str& end_str)
+    void SceneParser::write_vec3(std::ofstream *scene, const vec3 &vec, const str &end_str)
     {
         *scene << to_str(vec).substr(4) << end_str;
     }
 
-    void SceneParser::write_vec2(std::ofstream* scene, const vec2& vec, const str& end_str)
+    void SceneParser::write_vec2(std::ofstream *scene, const vec2 &vec, const str &end_str)
     {
         *scene << to_str(vec).substr(4) << end_str;
     }
-};
+};  // namespace bls

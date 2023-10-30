@@ -11,11 +11,13 @@ namespace bls
     class Stage
     {
         public:
-            virtual ~Stage() { }
+            virtual ~Stage()
+            {
+            }
 
             virtual void start() = 0;
             virtual void update(f32 dt) = 0;
 
             std::unique_ptr<ECS> ecs;
     };
-};
+};  // namespace bls

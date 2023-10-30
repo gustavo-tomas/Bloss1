@@ -1,16 +1,17 @@
 #include "ecs/entities.hpp"
+
 #include "core/game.hpp"
-#include "renderer/model.hpp"
 #include "renderer/font.hpp"
+#include "renderer/model.hpp"
 
 namespace bls
 {
-    u32 empty_entity(ECS& ecs)
+    u32 empty_entity(ECS &ecs)
     {
         return ecs.get_id();
     }
 
-    u32 player(ECS& ecs, const Transform& transform)
+    u32 player(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();
 
@@ -21,7 +22,8 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x);
-        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f, transform.scale.z * 0.95f);
+        // ecs.colliders[id] = std::make_unique<BoxCollider>(transform.scale.x * 0.95f, transform.scale.y * 0.95f,
+        // transform.scale.z * 0.95f);
 
         ecs.cameras[id] = std::make_unique<Camera>(vec3(15.0f, 7.0f, 50.0f));
         ecs.camera_controllers[id] = std::make_unique<CameraController>();
@@ -33,7 +35,7 @@ namespace bls
         return id;
     }
 
-    u32 bullet(ECS& ecs, const Transform& transform, const PhysicsObject& object)
+    u32 bullet(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
         auto id = ecs.get_id();
         auto model = Model::create("bullet", "bloss1/assets/models/bullet/bullet.fbx", false);
@@ -42,20 +44,20 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>(object);
-        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x / 5.0f,
-                                                             vec3(0.0f),
-                                                             false,
-                                                             Collider::ColliderMask::Projectile, // description
-                                                             Collider::ColliderMask::World |     // interaction
-                                                             Collider::ColliderMask::Player |
-                                                             Collider::ColliderMask::Enemy);
+        ecs.colliders[id] =
+            std::make_unique<SphereCollider>(transform.scale.x / 5.0f,
+                                             vec3(0.0f),
+                                             false,
+                                             Collider::ColliderMask::Projectile,  // description
+                                             Collider::ColliderMask::World |      // interaction
+                                                 Collider::ColliderMask::Player | Collider::ColliderMask::Enemy);
         ecs.projectiles[id] = std::make_unique<Projectile>();
         ecs.timers[id] = std::make_unique<Timer>();
 
         return id;
     }
 
-    u32 ball(ECS& ecs, const Transform& transform)
+    u32 ball(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();
 
@@ -70,7 +72,7 @@ namespace bls
         return id;
     }
 
-    u32 vampire(ECS& ecs, const Transform& transform)
+    u32 vampire(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();
 
@@ -80,14 +82,12 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
-        ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                vec3(5.0f, 5.0f, 5.0f),
-                                vec3(0.0f, 5.0f, 0.0f));
+        ecs.colliders[id] = std::make_unique<BoxCollider>(vec3(5.0f, 5.0f, 5.0f), vec3(0.0f, 5.0f, 0.0f));
 
         return id;
     }
 
-    u32 abomination(ECS& ecs, const Transform& transform)
+    u32 abomination(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();
 
@@ -100,15 +100,18 @@ namespace bls
         ecs.timers[id] = std::make_unique<Timer>();
 
         std::vector<KeyFrame> key_frames;
-        key_frames.push_back({ transform, 3.0f });
-        key_frames.push_back({ Transform(transform.position + vec3(0.0f, 20.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), transform.scale / 2.0f), 2.0f });
-        key_frames.push_back({ Transform(transform.position - vec3(0.0f, 20.0f, 0.0f), vec3(0.0f), transform.scale), 1.0f });
+        key_frames.push_back({transform, 3.0f});
+        key_frames.push_back(
+            {Transform(transform.position + vec3(0.0f, 20.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), transform.scale / 2.0f),
+             2.0f});
+        key_frames.push_back(
+            {Transform(transform.position - vec3(0.0f, 20.0f, 0.0f), vec3(0.0f), transform.scale), 1.0f});
         ecs.transform_animations[id] = std::make_unique<TransformAnimation>(key_frames);
 
         return id;
     }
 
-    u32 floor(ECS& ecs, const Transform& transform)
+    u32 floor(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();
 
@@ -119,14 +122,14 @@ namespace bls
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>();
         ecs.colliders[id] = std::make_unique<BoxCollider>(
-                                vec3(transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f),
-                                vec3(0.0f, -transform.scale.y * 20.0f, 0.0f),
-                                true);
+            vec3(transform.scale.x * 10.0f, transform.scale.y * 20.0f, transform.scale.z * 10.0f),
+            vec3(0.0f, -transform.scale.y * 20.0f, 0.0f),
+            true);
 
         return id;
     }
 
-    u32 directional_light(ECS& ecs, const Transform& transform, const DirectionalLight& light)
+    u32 directional_light(ECS &ecs, const Transform &transform, const DirectionalLight &light)
     {
         u32 id = ecs.get_id();
 
@@ -137,7 +140,7 @@ namespace bls
         return id;
     }
 
-    u32 point_light(ECS& ecs, const Transform& transform, const PointLight& light)
+    u32 point_light(ECS &ecs, const Transform &transform, const PointLight &light)
     {
         u32 id = ecs.get_id();
 
@@ -148,7 +151,7 @@ namespace bls
         return id;
     }
 
-    u32 text(ECS& ecs, const Transform& transform, const str& text, const vec3& color)
+    u32 text(ECS &ecs, const Transform &transform, const str &text, const vec3 &color)
     {
         u32 id = ecs.get_id();
 
@@ -161,11 +164,11 @@ namespace bls
         return id;
     }
 
-    u32 background_music(ECS& ecs, const Transform& transform, const Sound& sound, const str& file, bool looping)
+    u32 background_music(ECS &ecs, const Transform &transform, const Sound &sound, const str &file, bool looping)
     {
         u32 id = ecs.get_id();
 
-        auto& audio_engine = Game::get().get_audio_engine();
+        auto &audio_engine = Game::get().get_audio_engine();
         audio_engine.load(sound.name, file, looping);
 
         ecs.names[id] = "background_music";
@@ -174,4 +177,4 @@ namespace bls
 
         return id;
     }
-};
+};  // namespace bls

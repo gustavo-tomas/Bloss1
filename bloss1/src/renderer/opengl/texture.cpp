@@ -1,9 +1,10 @@
 #include "renderer/opengl/texture.hpp"
+
+#include <GL/glew.h>  // Include glew before glfw
+
+#include "GLFW/glfw3.h"
 #include "core/logger.hpp"
 #include "math/math.hpp"
-
-#include <GL/glew.h> // Include glew before glfw
-#include "GLFW/glfw3.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
@@ -14,11 +15,16 @@ namespace bls
     {
         switch (format)
         {
-            case ImageFormat::RGB8:  return GL_RGB8;
-            case ImageFormat::RGBA8: return GL_RGBA8;
-            case ImageFormat::RGB32F: return GL_RGB32F;
-            case ImageFormat::RGBA32F: return GL_RGBA32F;
-            default: throw std::runtime_error("invalid image format\n");
+            case ImageFormat::RGB8:
+                return GL_RGB8;
+            case ImageFormat::RGBA8:
+                return GL_RGBA8;
+            case ImageFormat::RGB32F:
+                return GL_RGB32F;
+            case ImageFormat::RGBA32F:
+                return GL_RGBA32F;
+            default:
+                throw std::runtime_error("invalid image format\n");
         }
 
         return 0;
@@ -28,19 +34,28 @@ namespace bls
     {
         switch (parameter)
         {
-            case TextureParameter::Repeat:  return GL_REPEAT;
-            case TextureParameter::ClampToEdge: return GL_CLAMP_TO_EDGE;
-            case TextureParameter::Nearest: return GL_NEAREST;
-            case TextureParameter::Linear: return GL_LINEAR;
-            default: throw std::runtime_error("invalid texture parameter\n");
+            case TextureParameter::Repeat:
+                return GL_REPEAT;
+            case TextureParameter::ClampToEdge:
+                return GL_CLAMP_TO_EDGE;
+            case TextureParameter::Nearest:
+                return GL_NEAREST;
+            case TextureParameter::Linear:
+                return GL_LINEAR;
+            default:
+                throw std::runtime_error("invalid texture parameter\n");
         }
 
         return 0;
     }
 
-    OpenGLTexture::OpenGLTexture(u32 width, u32 height, ImageFormat format,
-                                 TextureParameter wrap_s, TextureParameter wrap_t,
-                                 TextureParameter min_filter, TextureParameter mag_filter)
+    OpenGLTexture::OpenGLTexture(u32 width,
+                                 u32 height,
+                                 ImageFormat format,
+                                 TextureParameter wrap_s,
+                                 TextureParameter wrap_t,
+                                 TextureParameter min_filter,
+                                 TextureParameter mag_filter)
     {
         auto internal_format = convert_to_opengl_internal_format(format);
         auto internal_wrap_s = convert_to_opengl_parameter_format(wrap_s);
@@ -57,12 +72,12 @@ namespace bls
         glTextureParameteri(texture_id, GL_TEXTURE_MIN_FILTER, internal_min_filter);
         glTextureParameteri(texture_id, GL_TEXTURE_MAG_FILTER, internal_mag_filter);
 
-        this->type = TextureType::None; // Type doesn't really matter for this kind of texture
+        this->type = TextureType::None;  // Type doesn't really matter for this kind of texture
         this->width = width;
         this->height = height;
     }
 
-    OpenGLTexture::OpenGLTexture(const str& path, TextureType texture_type)
+    OpenGLTexture::OpenGLTexture(const str &path, TextureType texture_type)
     {
         stbi_set_flip_vertically_on_load(true);
 
@@ -70,7 +85,7 @@ namespace bls
 
         if (extension == ".hdr")
         {
-            f32* data = stbi_loadf(path.c_str(), &width, &height, &num_components, 0);
+            f32 *data = stbi_loadf(path.c_str(), &width, &height, &num_components, 0);
             if (data)
             {
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
@@ -94,7 +109,7 @@ namespace bls
 
         else
         {
-            unsigned char* data = stbi_load(path.c_str(), &width, &height, &num_components, 0);
+            unsigned char *data = stbi_load(path.c_str(), &width, &height, &num_components, 0);
 
             if (data)
             {
@@ -103,19 +118,24 @@ namespace bls
                 if (num_components == 4)
                 {
                     internal_format = (texture_type == TextureType::Diffuse || texture_type == TextureType::Emissive)
-                                      ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+                                          ? GL_SRGB8_ALPHA8
+                                          : GL_RGBA8;
                     data_format = GL_RGBA;
                 }
 
                 else if (num_components == 3)
                 {
                     internal_format = (texture_type == TextureType::Diffuse || texture_type == TextureType::Emissive)
-                                      ? GL_SRGB8 : GL_RGB8;
+                                          ? GL_SRGB8
+                                          : GL_RGB8;
                     data_format = GL_RGB;
                 }
 
                 else
-                    throw std::runtime_error("unsupported number of channels: '" + to_str(num_components) + "'");
+                    throw std::runtime_error(
+                        "unsupported number of "
+                        "channels: '" +
+                        to_str(num_components) + "'");
 
                 // Create texture
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
@@ -133,7 +153,7 @@ namespace bls
 
             else
             {
-                const char* failure_reason = stbi_failure_reason();
+                const char *failure_reason = stbi_failure_reason();
                 if (failure_reason)
                 {
                     LOG_ERROR("failure reason '%s'", failure_reason);
@@ -159,7 +179,7 @@ namespace bls
         glBindTextureUnit(slot, texture_id);
     }
 
-    void OpenGLTexture::set_data(void* pixels)
+    void OpenGLTexture::set_data(void *pixels)
     {
         glTextureSubImage2D(texture_id, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     }
@@ -183,4 +203,4 @@ namespace bls
     {
         return type;
     }
-};
+};  // namespace bls

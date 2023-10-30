@@ -1,31 +1,29 @@
+#include "config.hpp"
+#include "core/game.hpp"
+#include "core/input.hpp"
 #include "ecs/ecs.hpp"
-#include "renderer/model.hpp"
-
 #include "renderer/font.hpp"
-#include "renderer/shadow_map.hpp"
-#include "renderer/skybox.hpp"
+#include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
 #include "renderer/primitives/box.hpp"
 #include "renderer/primitives/line.hpp"
 #include "renderer/primitives/sphere.hpp"
-
-#include "core/input.hpp"
-#include "core/game.hpp"
+#include "renderer/shadow_map.hpp"
+#include "renderer/skybox.hpp"
 #include "tools/profiler.hpp"
-#include "config.hpp"
 
 namespace bls
 {
-    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer);
-    void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
-    void render_texts(ECS& ecs);
+    void render_scene(ECS &ecs, Shader &shader, Renderer &renderer);
+    void render_colliders(ECS &ecs, const mat4 &projection, const mat4 &view);
+    void render_texts(ECS &ecs);
 
-    void render_system(ECS& ecs, f32 dt)
+    void render_system(ECS &ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("render_system");
 
-        auto& window = Game::get().get_window();
-        auto& renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
+        auto &renderer = Game::get().get_renderer();
 
         auto width = window.get_width();
         auto height = window.get_height();
@@ -37,13 +35,13 @@ namespace bls
         auto near = camera->near;
         auto far = camera->far;
 
-        auto& shaders = renderer.get_shaders();
-        auto& textures = renderer.get_textures();
-        auto& g_buffer = renderer.get_gbuffer();
-        auto& skybox = renderer.get_skybox();
-        auto& quad = renderer.get_rendering_quad();
-        auto& shadow_map = renderer.get_shadow_map();
-        auto& post_processing = renderer.get_post_processing();
+        auto &shaders = renderer.get_shaders();
+        auto &textures = renderer.get_textures();
+        auto &g_buffer = renderer.get_gbuffer();
+        auto &skybox = renderer.get_skybox();
+        auto &quad = renderer.get_rendering_quad();
+        auto &shadow_map = renderer.get_shadow_map();
+        auto &post_processing = renderer.get_post_processing();
 
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
@@ -51,7 +49,7 @@ namespace bls
         auto ui_shader = shaders["ui"].get();
 
         // Reset the viewport
-        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
+        renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});
         renderer.clear();
         renderer.set_viewport(0, 0, width, height);
 
@@ -61,7 +59,7 @@ namespace bls
         shadow_map->unbind();
 
         // Reset the viewport
-        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
+        renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});
         renderer.clear();
         renderer.set_viewport(0, 0, width, height);
 
@@ -101,9 +99,9 @@ namespace bls
         u32 light_counter = 0;
 
         // Point lights
-        auto& point_lights = ecs.point_lights;
-        auto& transforms = ecs.transforms;
-        for (auto& [id, light] : point_lights)
+        auto &point_lights = ecs.point_lights;
+        auto &transforms = ecs.transforms;
+        for (auto &[id, light] : point_lights)
         {
             auto transform = transforms[id].get();
 
@@ -115,8 +113,8 @@ namespace bls
 
         // Directional lights
         light_counter = 0;
-        auto& dir_lights = ecs.dir_lights;
-        for (auto& [id, light] : dir_lights)
+        auto &dir_lights = ecs.dir_lights;
+        for (auto &[id, light] : dir_lights)
         {
             auto transform = transforms[id].get();
 
@@ -129,7 +127,7 @@ namespace bls
         // Set texture attachments ---
         u32 tex_position = 0;
         std::shared_ptr<bls::Texture> ui_texture;
-        for (const auto& [name, texture] : textures)
+        for (const auto &[name, texture] : textures)
         {
             if (name == "ui")
             {
@@ -143,12 +141,12 @@ namespace bls
         }
 
         // Bind maps
-        skybox->bind(*pbr_shader, 12);          // IBL maps
-        shadow_map->bind_maps(*pbr_shader, 15); // Shadow map
+        skybox->bind(*pbr_shader, 12);           // IBL maps
+        shadow_map->bind_maps(*pbr_shader, 15);  // Shadow map
 
         // Begin post processing process
         post_processing->begin();
-        quad->render();      // Render light quad
+        quad->render();  // Render light quad
         post_processing->end();
 
         // Copy content of geometry's depth buffer to default framebuffer's depth buffer
@@ -164,7 +162,8 @@ namespace bls
             auto tex_width = ui_texture->get_width();
             auto tex_height = ui_texture->get_height();
 
-            renderer.set_viewport((width / 2) - (tex_width / 4), (height / 2) - (tex_height / 4), tex_width / 2, tex_height / 2);
+            renderer.set_viewport(
+                (width / 2) - (tex_width / 4), (height / 2) - (tex_height / 4), tex_width / 2, tex_height / 2);
 
             ui_shader->bind();
             ui_shader->set_uniform1("screenTexture", 0U);
@@ -172,19 +171,19 @@ namespace bls
             quad->render();
         }
 
-        // Render debug lines
-        #if !defined(_RELEASE)
+// Render debug lines
+#if !defined(_RELEASE)
         render_colliders(ecs, projection, view);
-        #endif
+#endif
 
         // Render texts
         render_texts(ecs);
     }
 
-    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer)
+    void render_scene(ECS &ecs, Shader &shader, Renderer &renderer)
     {
         // Render all entities
-        for (const auto& [id, model] : ecs.models)
+        for (const auto &[id, model] : ecs.models)
         {
             // Reset bone matrices
             for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
@@ -231,7 +230,7 @@ namespace bls
             shader.set_uniform4("model", model_matrix);
 
             // Render the model
-            for (auto& mesh : model->model->meshes)
+            for (auto &mesh : model->model->meshes)
             {
                 // Bind textures
                 for (u32 i = 0; i < mesh->textures.size(); i++)
@@ -243,19 +242,38 @@ namespace bls
 
                     switch (type)
                     {
-                        case TextureType::Diffuse:          type_name = "diffuse";   break;
-                        case TextureType::Specular:         type_name = "specular";  break;
-                        case TextureType::Normal:           type_name = "normal";    break;
-                        case TextureType::Metalness:        type_name = "metalness"; break;
-                        case TextureType::Roughness:        type_name = "roughness"; break;
-                        case TextureType::AmbientOcclusion: type_name = "ao";        break;
-                        case TextureType::Emissive:         type_name = "emissive";  break;
+                        case TextureType::Diffuse:
+                            type_name = "diffuse";
+                            break;
+                        case TextureType::Specular:
+                            type_name = "specular";
+                            break;
+                        case TextureType::Normal:
+                            type_name = "normal";
+                            break;
+                        case TextureType::Metalness:
+                            type_name = "metalness";
+                            break;
+                        case TextureType::Roughness:
+                            type_name = "roughness";
+                            break;
+                        case TextureType::AmbientOcclusion:
+                            type_name = "ao";
+                            break;
+                        case TextureType::Emissive:
+                            type_name = "emissive";
+                            break;
 
-                        default: LOG_ERROR("invalid texture type"); break;
+                        default:
+                            LOG_ERROR(
+                                "invalid "
+                                "texture "
+                                "type");
+                            break;
                     }
 
                     shader.set_uniform1("material." + type_name, i);
-                    texture->bind(i); // Offset the active samplers in the frag shader
+                    texture->bind(i);  // Offset the active samplers in the frag shader
                 }
 
                 mesh->vao->bind();
@@ -263,29 +281,30 @@ namespace bls
 
                 // Reset
                 mesh->vao->unbind();
-                
+
                 // Update stats
                 AppStats::vertices += mesh->vertices.size();
             }
         }
     }
 
-    void render_texts(ECS& ecs)
+    void render_texts(ECS &ecs)
     {
-        auto& texts = ecs.texts;
-        auto& transforms = ecs.transforms;
-        for (const auto& [id, text] : texts)
+        auto &texts = ecs.texts;
+        auto &transforms = ecs.transforms;
+        for (const auto &[id, text] : texts)
         {
             auto transform = transforms[id].get();
-            text->font->render(text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
+            text->font->render(
+                text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
         }
     }
 
-    void render_colliders(ECS& ecs, const mat4& projection, const mat4& view)
+    void render_colliders(ECS &ecs, const mat4 &projection, const mat4 &view)
     {
         // Restore viewport
-        auto& renderer = Game::get().get_renderer();
-        auto& window = Game::get().get_window();
+        auto &renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
         renderer.set_viewport(0, 0, window.get_width(), window.get_height());
 
         // Set debug mode
@@ -297,46 +316,47 @@ namespace bls
         color_shader->set_uniform4("projection", projection);
         color_shader->set_uniform4("view", view);
         color_shader->set_uniform4("model", mat4(1.0f));
-        color_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
+        color_shader->set_uniform3("color", {1.0f, 0.0f, 0.0f});
 
         // Create axes lines for debugging              // Start    // End
         std::vector<std::unique_ptr<Line>> axes;
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f)));  // x
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f)));  // y
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f)));  // z
 
         // Render axes lines
         for (u64 i = 0; i < axes.size(); i++)
         {
             vec3 color;
 
-            if (i == 0) color = { 1.0f, 0.0f, 0.0f }; // x axis is red
-            if (i == 1) color = { 0.0f, 1.0f, 0.0f }; // y axis is green
-            if (i == 2) color = { 0.0f, 0.0f, 1.0f }; // z axis is blue
+            if (i == 0) color = {1.0f, 0.0f, 0.0f};  // x axis is red
+            if (i == 1) color = {0.0f, 1.0f, 0.0f};  // y axis is green
+            if (i == 2) color = {0.0f, 0.0f, 1.0f};  // z axis is blue
 
             color_shader->set_uniform3("color", color);
             axes[i]->render();
         }
 
         // Render colliders
-        for (const auto& [id, collider] : ecs.colliders)
+        for (const auto &[id, collider] : ecs.colliders)
         {
-            auto& transform = ecs.transforms[id];
+            auto &transform = ecs.transforms[id];
 
             color_shader->set_uniform3("color", collider->color);
             if (collider->type == Collider::ColliderType::Sphere)
             {
                 auto collider_sphere = std::make_unique<Sphere>(renderer,
-                                       transform->position + collider->offset,
-                                       static_cast<SphereCollider*>(collider.get())->radius);
+                                                                transform->position + collider->offset,
+                                                                static_cast<SphereCollider *>(collider.get())->radius);
 
                 collider_sphere->render();
             }
 
             else if (collider->type == Collider::ColliderType::Box)
             {
-                auto collider_box = std::make_unique<Box>(renderer, transform->position + collider->offset,
-                                    static_cast<BoxCollider*>(collider.get())->dimensions);
+                auto collider_box = std::make_unique<Box>(renderer,
+                                                          transform->position + collider->offset,
+                                                          static_cast<BoxCollider *>(collider.get())->dimensions);
 
                 collider_box->render();
             }
@@ -344,15 +364,13 @@ namespace bls
             // Render orientation vector
             auto pitch = transform->rotation.x;
             auto yaw = transform->rotation.y;
-            auto front = vec3(cos(radians(yaw)) * cos(radians(pitch)),
-                              sin(radians(pitch)),
-                              sin(radians(yaw)) * cos(radians(pitch)));
+            auto front = vec3(
+                cos(radians(yaw)) * cos(radians(pitch)), sin(radians(pitch)), sin(radians(yaw)) * cos(radians(pitch)));
 
-            auto orientation_line = std::make_unique<Line>(renderer,
-                                                           transform->position,
-                                                           transform->position + (front * 30.0f));
+            auto orientation_line =
+                std::make_unique<Line>(renderer, transform->position, transform->position + (front * 30.0f));
 
-            color_shader->set_uniform3("color", { 1.0f, 0.0f, 1.0f });
+            color_shader->set_uniform3("color", {1.0f, 0.0f, 1.0f});
             orientation_line->render();
         }
 
@@ -360,4 +378,4 @@ namespace bls
         color_shader->unbind();
         renderer.set_debug_mode(false);
     }
-};
+};  // namespace bls
