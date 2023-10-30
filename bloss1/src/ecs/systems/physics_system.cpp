@@ -100,16 +100,17 @@ namespace bls
                 // Test only unique pairs
                 if (id_a == id_b)
                     break;
+                
+                // Check for masks compatibility
+                if (!(collider_a->description_mask & collider_b->interaction_mask) ||
+                    !(collider_b->description_mask & collider_a->interaction_mask))
+                    continue;
 
                 // Solve collision
                 auto collision = test_collision(ecs, id_a, id_b);
                 if (collision.has_collision)
                 {
                     collider_a->color = collider_b->color = { 1.0f, 0.0f, 0.0f };
-
-                    // Don't collide two projectiles
-                    if (ecs.projectiles.count(id_a) && ecs.projectiles.count(id_b))
-                        continue;
 
                     // Projectile collision (destroy projectile)
                     if (ecs.projectiles.count(id_a))

@@ -142,7 +142,9 @@ namespace bls
                 }
 
                 write_vec3(&scene, ecs.colliders[id]->offset, ", ");
-                scene << to_str(ecs.colliders[id]->immovable) << ";" << "\n";
+                scene << to_str(ecs.colliders[id]->immovable) << ", ";
+                scene << to_str(ecs.colliders[id]->description_mask) << ", ";
+                scene << to_str(ecs.colliders[id]->interaction_mask) << ";" << "\n";
             }
 
             if (ecs.dir_lights.count(id))
@@ -382,7 +384,7 @@ namespace bls
 
         else if (component_name == "collider")
         {
-            str type, immovable;
+            str type, immovable, description_mask, interaction_mask;
             vec3 offset;
 
             std::getline(iline, type, ',');
@@ -393,9 +395,15 @@ namespace bls
 
                 std::getline(iline, radius, ',');
                 offset = read_vec3(&iline, ',');
-                std::getline(iline, immovable, ';');
+                std::getline(iline, immovable, ',');
+                std::getline(iline, description_mask, ',');
+                std::getline(iline, interaction_mask, ';');
 
-                ecs.colliders[entity_id] = std::make_unique<SphereCollider>(stof(radius), offset, stoi(immovable));
+                ecs.colliders[entity_id] = std::make_unique<SphereCollider>(stof(radius),
+                                                                            offset,
+                                                                            stoi(immovable),
+                                                                            std::stoul(description_mask),
+                                                                            std::stoul(interaction_mask));
             }
 
             else if (type == "box")
@@ -404,9 +412,15 @@ namespace bls
                 vec3 dimensions = read_vec3(&iline, ',');
 
                 offset = read_vec3(&iline, ',');
-                std::getline(iline, immovable, ';');
+                std::getline(iline, immovable, ',');
+                std::getline(iline, description_mask, ',');
+                std::getline(iline, interaction_mask, ';');
 
-                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(dimensions, offset, stoi(immovable));
+                ecs.colliders[entity_id] = std::make_unique<BoxCollider>(dimensions,
+                                                                         offset,
+                                                                         stoi(immovable),
+                                                                         std::stoul(description_mask),
+                                                                         std::stoul(interaction_mask));
             }
 
             else

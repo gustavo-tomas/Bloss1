@@ -120,6 +120,14 @@ namespace bls
                 Box, Sphere
             };
 
+            enum ColliderMask
+            {
+                World      = 0x01, 
+                Player     = 0x02, 
+                Enemy      = 0x04, 
+                Projectile = 0x08
+            };
+
             static str get_collider_str(ColliderType type)
             {
                 switch (type)
@@ -139,8 +147,9 @@ namespace bls
                 }
             }
 
-            Collider(ColliderType type, const vec3& offset, bool immovable)
-                : type(type), offset(offset), immovable(immovable) { }
+            Collider(ColliderType type, const vec3& offset, bool immovable, u32 description_mask, u32 interaction_mask)
+                : type(type), offset(offset), immovable(immovable),
+                  description_mask(description_mask), interaction_mask(interaction_mask) { }
 
             virtual ~Collider() { }
 
@@ -148,13 +157,15 @@ namespace bls
             vec3 offset; // Offset to the component position
             vec3 color;
             bool immovable;
+            u32 description_mask, interaction_mask;
     };
 
     class BoxCollider : public Collider
     {
         public:
-            BoxCollider(const vec3& dimensions, const vec3& offset = vec3(0.0f), bool immovable = false)
-                : Collider(ColliderType::Box, offset, immovable), dimensions(dimensions) { }
+            BoxCollider(const vec3& dimensions, const vec3& offset = vec3(0.0f), bool immovable = false, 
+                        u32 description_mask = ColliderMask::World, u32 interaction_mask = ColliderMask::World)
+                : Collider(ColliderType::Box, offset, immovable, description_mask, interaction_mask), dimensions(dimensions) { }
 
             vec3 dimensions; // width, height, depth
     };
@@ -162,8 +173,9 @@ namespace bls
     class SphereCollider : public Collider
     {
         public:
-            SphereCollider(f32 radius, const vec3& offset = vec3(0.0f), bool immovable = false)
-                : Collider(ColliderType::Sphere, offset, immovable), radius(radius) { }
+            SphereCollider(f32 radius, const vec3& offset = vec3(0.0f), bool immovable = false,
+                           u32 description_mask = ColliderMask::World, u32 interaction_mask = ColliderMask::World)
+                : Collider(ColliderType::Sphere, offset, immovable, description_mask, interaction_mask), radius(radius) { }
 
             f32 radius;
     };

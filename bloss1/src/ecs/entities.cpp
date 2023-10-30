@@ -42,7 +42,13 @@ namespace bls
         ecs.models[id] = std::make_unique<ModelComponent>(model.get());
         ecs.transforms[id] = std::make_unique<Transform>(transform);
         ecs.physics_objects[id] = std::make_unique<PhysicsObject>(object);
-        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x / 5.0f);
+        ecs.colliders[id] = std::make_unique<SphereCollider>(transform.scale.x / 5.0f,
+                                                             vec3(0.0f),
+                                                             false,
+                                                             Collider::ColliderMask::Projectile, // description
+                                                             Collider::ColliderMask::World |     // interaction
+                                                             Collider::ColliderMask::Player |
+                                                             Collider::ColliderMask::Enemy);
         ecs.projectiles[id] = std::make_unique<Projectile>();
         ecs.timers[id] = std::make_unique<Timer>();
 
