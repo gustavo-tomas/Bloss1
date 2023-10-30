@@ -412,6 +412,16 @@ namespace bls
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
+
+            if (ecs.hitpoints.count(id))
+            {
+                auto& hitpoints = ecs.hitpoints[id];
+
+                ImGui::Text("hitpoints");
+                ImGui::Separator();
+                ImGui::InputFloat(("hitpoints_" + to_str(id)).c_str(), &hitpoints);
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();

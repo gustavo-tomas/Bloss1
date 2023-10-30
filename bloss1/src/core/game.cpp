@@ -103,9 +103,11 @@ namespace bls
     void Game::change_stage(Stage* new_stage)
     {
         stage.reset();
-        stage = std::unique_ptr<Stage>(new_stage);
-        if (stage)
+        if (new_stage)
+        {
+            stage = std::unique_ptr<Stage>(new_stage);
             stage->start();
+        }
     }
 
     void Game::on_event(Event& event)

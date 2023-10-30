@@ -55,10 +55,6 @@ namespace bls
         ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
         ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
 
-        // @TODO: add to scene
-        ecs->hitpoints[player_id] = 100;
-        ecs->hitpoints[ophanim_id] = 10000;
-
         auto* box_emitter = new BoxEmitter(ecs->transforms[player_id]->position, vec3(10.0f));
         ecs->particle_systems[player_id] = std::make_unique<ParticleSystem>(box_emitter);
     }
@@ -74,14 +70,23 @@ namespace bls
 
         // @TODO: Player won
         if (ecs->hitpoints[1] <= 0.0f)
+        {
             Game::get().change_stage(nullptr);
+            return;
+        }
 
         // @TODO: Player lost
         if (ecs->hitpoints[0] <= 0.0f)
+        {
             Game::get().change_stage(nullptr);
+            return;
+        }
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
+        {
             Game::get().change_stage(nullptr);
+            return;
+        }
     }
 };

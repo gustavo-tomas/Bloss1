@@ -242,6 +242,14 @@ namespace bls
                 scene << "\n";
             }
 
+            if (ecs.hitpoints.count(id))
+            {
+                auto& hitpoints = ecs.hitpoints[id];
+                scene << "\thitpoints: ";
+                scene << to_str(hitpoints) << "; ";
+                scene << "\n";
+            }
+
             scene << "}" << "\n\n";
         }
 
@@ -515,6 +523,14 @@ namespace bls
             }
 
             ecs.transform_animations[entity_id] = std::make_unique<TransformAnimation>(key_frames);
+        }
+
+        else if (component_name == "hitpoints")
+        {
+            str hitpoint;
+            std::getline(iline, hitpoint, ';');
+
+            ecs.hitpoints[entity_id] = std::stof(hitpoint);
         }
     }
 
