@@ -239,8 +239,8 @@ namespace bls
         // Box v. Box
         else if (collider_a->type == Collider::ColliderType::Box && collider_b->type == Collider::ColliderType::Box)
         {
-            auto col_a = static_cast<BoxCollider*>(collider_a);
-            auto col_b = static_cast<BoxCollider*>(collider_b);
+            const auto* col_a = static_cast<BoxCollider*>(collider_a);
+            const auto* col_b = static_cast<BoxCollider*>(collider_b);
 
             // Point where the box 'begins'
             vec3 min_aabb_a = trans_a.position - col_a->dimensions;

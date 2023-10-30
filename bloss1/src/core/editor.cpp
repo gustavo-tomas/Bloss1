@@ -128,7 +128,6 @@ namespace bls
 
         ImGuiTableFlags flags = ImGuiTableFlags_Borders |
                                 ImGuiTableFlags_RowBg |
-                                ImGuiTableFlags_Borders |
                                 ImGuiTableFlags_BordersH |
                                 ImGuiTableFlags_BordersOuterH |
                                 ImGuiTableFlags_BordersInnerH |

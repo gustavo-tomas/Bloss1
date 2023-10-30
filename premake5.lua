@@ -3,7 +3,7 @@ workspace "bloss1"
     architecture "x86_64"
     toolset "gcc"
     language "C++"
-    cppdialect "C++17"
+    cppdialect "C++20"
     configurations { "debug", "profile", "release" }
 
     -- Change backends here

@@ -69,7 +69,7 @@ namespace bls
 
         // Update all systems in registration order
         auto& systems = ecs->systems;
-        for (auto& system : systems)
+        for (const auto& system : systems)
             system(*ecs, dt);
 
         // @TODO: Player won

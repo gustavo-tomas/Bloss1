@@ -31,7 +31,7 @@ namespace bls
 
         auto res = wav->load(path.c_str());
         if (res != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
-            std::runtime_error("failed to load audio: '" + path + "'");
+            throw std::runtime_error("failed to load audio: '" + path + "'");
 
         wav->setLooping(looping);
 
