@@ -43,7 +43,9 @@ namespace bls
                 "GLEW");
 
         // Get native_window dimensions
-        glfwGetWindowSize(native_window, (i32 *)&width, (i32 *)&height);
+        glfwGetWindowSize(native_window,
+                          const_cast<i32 *>(reinterpret_cast<const i32 *>(&width)),
+                          const_cast<i32 *>(reinterpret_cast<const i32 *>(&height)));
 
 // Set debug callbacks
 #if defined(_DEBUG)
@@ -75,7 +77,8 @@ namespace bls
         glfwSetWindowCloseCallback(native_window,
                                    [](GLFWwindow *window)
                                    {
-                                       auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                       auto &window_data =
+                                           *reinterpret_cast<WindowData *>(glfwGetWindowUserPointer(window));
                                        WindowCloseEvent event = {};
                                        window_data.event_callback(event);
                                    });
@@ -84,7 +87,8 @@ namespace bls
         glfwSetFramebufferSizeCallback(native_window,
                                        [](GLFWwindow *window, i32 width, i32 height)
                                        {
-                                           auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                           auto &window_data =
+                                               *reinterpret_cast<WindowData *>(glfwGetWindowUserPointer(window));
                                            window_data.width = width;
                                            window_data.height = height;
 
@@ -99,7 +103,8 @@ namespace bls
                                // Key press
                                if (action == GLFW_PRESS || action == GLFW_REPEAT)
                                {
-                                   auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                   auto &window_data =
+                                       *reinterpret_cast<WindowData *>(glfwGetWindowUserPointer(window));
                                    KeyPressEvent event = {(u32)key};
                                    window_data.event_callback(event);
                                }
@@ -109,7 +114,8 @@ namespace bls
         glfwSetCursorPosCallback(native_window,
                                  [](GLFWwindow *window, f64 x_position, f64 y_position)
                                  {
-                                     auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                     auto &window_data =
+                                         *reinterpret_cast<WindowData *>(glfwGetWindowUserPointer(window));
                                      MouseMoveEvent event = {x_position, y_position};
                                      window_data.event_callback(event);
                                  });
@@ -118,7 +124,7 @@ namespace bls
         glfwSetScrollCallback(native_window,
                               [](GLFWwindow *window, f64 x_offset, f64 y_offset)
                               {
-                                  auto &window_data = *(WindowData *)glfwGetWindowUserPointer(window);
+                                  auto &window_data = *reinterpret_cast<WindowData *>(glfwGetWindowUserPointer(window));
                                   MouseScrollEvent event = {x_offset, y_offset};
                                   window_data.event_callback(event);
                               });

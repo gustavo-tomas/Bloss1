@@ -52,7 +52,7 @@ namespace bls
     Model::~Model()
     {
         delete importer;
-        for (auto &mesh : meshes) delete mesh;
+        for (const auto &mesh : meshes) delete mesh;
     }
 
     void Model::process_node(aiNode *node, const aiScene *scene)
@@ -166,32 +166,60 @@ namespace bls
         auto ebo = IndexBuffer::create(indices, indices.size());
 
         // Position
-        vao->add_vertex_buffer(
-            0, 3, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::position));
+        vao->add_vertex_buffer(0,
+                               3,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::position)));
 
         // Normals
-        vao->add_vertex_buffer(
-            1, 3, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::normal));
+        vao->add_vertex_buffer(1,
+                               3,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::normal)));
 
         // Texture coords
-        vao->add_vertex_buffer(
-            2, 2, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::tex_coords));
+        vao->add_vertex_buffer(2,
+                               2,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::tex_coords)));
 
         // Tangent
-        vao->add_vertex_buffer(
-            3, 3, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::tangent));
+        vao->add_vertex_buffer(3,
+                               3,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::tangent)));
 
         // Bitangent
-        vao->add_vertex_buffer(
-            4, 3, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::bitangent));
+        vao->add_vertex_buffer(4,
+                               3,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::bitangent)));
 
         // Bone ids
-        vao->add_vertex_buffer(
-            5, 4, ShaderDataType::Int, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::bone_ids));
+        vao->add_vertex_buffer(5,
+                               4,
+                               ShaderDataType::Int,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::bone_ids)));
 
         // Weights
-        vao->add_vertex_buffer(
-            6, 4, ShaderDataType::Float, false, sizeof(Vertex), (void *)offsetof(Vertex, Vertex::weights));
+        vao->add_vertex_buffer(6,
+                               4,
+                               ShaderDataType::Float,
+                               false,
+                               sizeof(Vertex),
+                               reinterpret_cast<void *>(offsetof(Vertex, Vertex::weights)));
 
         return new Mesh(vao, vbo, ebo, vertices, indices, textures);
     }

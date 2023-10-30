@@ -170,8 +170,8 @@ namespace bls
         // Box v. Sphere
         if (collider_a->type == Collider::ColliderType::Box && collider_b->type == Collider::ColliderType::Sphere)
         {
-            auto col_a = static_cast<BoxCollider *>(collider_a);
-            auto col_b = static_cast<SphereCollider *>(collider_b);
+            const auto *col_a = static_cast<BoxCollider *>(collider_a);
+            const auto *col_b = static_cast<SphereCollider *>(collider_b);
 
             // Point where the box 'begins'
             vec3 min_aabb = trans_a.position - col_a->dimensions;
@@ -209,8 +209,8 @@ namespace bls
         else if (collider_a->type == Collider::ColliderType::Sphere &&
                  collider_b->type == Collider::ColliderType::Sphere)
         {
-            auto col_a = static_cast<SphereCollider *>(collider_a);
-            auto col_b = static_cast<SphereCollider *>(collider_b);
+            const auto *col_a = static_cast<SphereCollider *>(collider_a);
+            const auto *col_b = static_cast<SphereCollider *>(collider_b);
 
             // Insert tolerance to avoid equal points
             const f32 TOL = 0.002;

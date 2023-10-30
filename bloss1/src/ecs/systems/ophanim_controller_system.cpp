@@ -2,7 +2,7 @@
 
 namespace bls
 {
-    const f32 OPHANIM_MAX_HP = 10000;
+    const f32 OPHANIM_MAX_HP = 1000;
 
     void ophanim_controller_system(ECS &ecs, f32 dt)
     {

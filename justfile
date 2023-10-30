@@ -7,7 +7,7 @@ set positional-arguments
 @release: (build "release") (run "release")
 
 @lint:
-  cppcheck --enable=all --std=c++20 bloss1/src/**
+  cppcheck --enable=warning,performance,portability,unusedFunction,style,information --disable=missingInclude --std=c++20 bloss1/src/**
 
 @format:
   find bloss1/src/ -iname *.hpp -o -iname *.cpp | xargs clang-format -i -style=file

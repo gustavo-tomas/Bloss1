@@ -230,7 +230,7 @@ namespace bls
             shader.set_uniform4("model", model_matrix);
 
             // Render the model
-            for (auto &mesh : model->model->meshes)
+            for (const auto &mesh : model->model->meshes)
             {
                 // Bind textures
                 for (u32 i = 0; i < mesh->textures.size(); i++)
