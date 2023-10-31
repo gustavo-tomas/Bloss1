@@ -39,16 +39,11 @@ project "bloss1"
         "/usr/include/freetype2"
     }
 
-    linkoptions
+    links
     {
-        "-lGL", "-lGLEW",
-        "-lfreetype",
-        "-lavcodec", "-lavformat", "-lavutil", "-lswscale",
-        "-lasound" -- linux only
+        "soloud", "glfw", "assimp", "imgui",
+        "GL", "GLEW", "freetype", "avcodec", "avformat", "avutil", "swscale", "asound"
     }
-
-    -- Links vendor libraries here
-    links { "soloud", "glfw", "assimp", "imgui" }
 
     filter "system:linux"
         pic "On"
