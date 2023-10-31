@@ -34,14 +34,22 @@ namespace bls
     class Emitter
     {
         public:
-            Emitter(const vec3 &center, bool particle_2D = false);
-            virtual ~Emitter()
+            enum class EmitterType
             {
-            }
+                Box,
+                Sphere
+            };
+
+            Emitter(const vec3 &center, EmitterType type, bool particle_2D = false);
+            virtual ~Emitter() = default;
 
             virtual void emit() = 0;
             virtual void render_particle(ECS &ecs, f32 dt);
             virtual void set_center(const vec3 &new_center);
+
+            const EmitterType type;
+            bool particle_2D;
+            vec3 center;
 
         protected:
             virtual void emit_particle(const Particle &particle_props);
@@ -53,9 +61,6 @@ namespace bls
             std::unique_ptr<Quad> quad;
             std::shared_ptr<Texture> particle_texture;
             std::shared_ptr<Model> model;
-
-            vec3 center;
-            bool particle_2D;
     };
 
     class SphereEmitter : public Emitter
@@ -65,10 +70,10 @@ namespace bls
 
             void emit() override;
 
+            f32 radius;
+
         private:
             vec3 generate_random_point_on_surface();
-
-            f32 radius;
     };
 
     class BoxEmitter : public Emitter
@@ -78,9 +83,9 @@ namespace bls
 
             void emit() override;
 
+            vec3 dimensions;
+
         private:
             vec3 generate_random_point_on_surface();
-
-            vec3 dimensions;
     };
 };  // namespace bls

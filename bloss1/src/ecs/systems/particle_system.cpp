@@ -28,7 +28,7 @@ namespace bls
 
     // Emitter
     // -----------------------------------------------------------------------------------------------------------------
-    Emitter::Emitter(const vec3 &center, bool particle_2D)
+    Emitter::Emitter(const vec3 &center, EmitterType type, bool particle_2D) : type(type)
     {
         auto &renderer = Game::get().get_renderer();
 
@@ -152,7 +152,8 @@ namespace bls
 
     // SphereEmitter
     // -----------------------------------------------------------------------------------------------------------------
-    SphereEmitter::SphereEmitter(const vec3 &center, bool particle_2D, f32 radius) : Emitter(center, particle_2D)
+    SphereEmitter::SphereEmitter(const vec3 &center, bool particle_2D, f32 radius)
+        : Emitter(center, EmitterType::Sphere, particle_2D)
     {
         this->center = center;
         this->radius = radius;
@@ -190,7 +191,8 @@ namespace bls
 
     // BoxEmitter
     // -----------------------------------------------------------------------------------------------------------------
-    BoxEmitter::BoxEmitter(const vec3 &center, bool particle_2D, const vec3 &dimensions) : Emitter(center, particle_2D)
+    BoxEmitter::BoxEmitter(const vec3 &center, bool particle_2D, const vec3 &dimensions)
+        : Emitter(center, EmitterType::Box, particle_2D)
     {
         this->center = center;
         this->dimensions = dimensions;

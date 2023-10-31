@@ -423,6 +423,36 @@ namespace bls
                 ImGui::InputFloat(("hitpoints_" + to_str(id)).c_str(), &hitpoints);
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
+
+            if (ecs.particle_systems.count(id))
+            {
+                ImGui::Text("particle_system");
+                ImGui::Separator();
+
+                const auto &particle_sys = ecs.particle_systems[id];
+                if (particle_sys->emitter->type == Emitter::EmitterType::Box)
+                {
+                    const auto &emitter = particle_sys->emitter;
+
+                    ImGui::Text("type: %s", "box");
+                    auto &dimensions = static_cast<BoxEmitter *>(emitter.get())->dimensions;
+                    ImGui::InputFloat3("dimensions", value_ptr(dimensions));
+                }
+
+                else if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
+                {
+                    const auto &emitter = particle_sys->emitter;
+
+                    ImGui::Text("type: %s", "sphere");
+                    auto *radius = &static_cast<SphereEmitter *>(emitter.get())->radius;
+                    ImGui::InputFloat("radius", radius);
+                }
+
+                ImGui::Checkbox("particle_2D", &particle_sys->emitter->particle_2D);
+                ImGui::InputFloat3("center", value_ptr(particle_sys->emitter->center));
+
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            }
         }
 
         ImGui::End();

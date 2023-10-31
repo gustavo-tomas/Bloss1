@@ -53,9 +53,6 @@ namespace bls
 
         ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
         ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
-
-        auto *box_emitter = new BoxEmitter(ecs->transforms[player_id]->position, false, vec3(10.0f));
-        ecs->particle_systems[player_id] = std::make_unique<ParticleSystem>(box_emitter);
     }
 
     void TestStage::update(f32 dt)

@@ -263,6 +263,36 @@ namespace bls
                 scene << "\n";
             }
 
+            if (ecs.particle_systems.count(id))
+            {
+                const auto &particle_sys = ecs.particle_systems[id];
+
+                scene << "\tparticle_system: ";
+                if (particle_sys->emitter->type == Emitter::EmitterType::Box)
+                {
+                    const auto emitter = reinterpret_cast<BoxEmitter *>(particle_sys->emitter.get());
+
+                    scene << "box"
+                          << ", ";
+                    scene << to_str(particle_sys->emitter->particle_2D) << ", ";
+                    write_vec3(&scene, particle_sys->emitter->center, ", ");
+                    write_vec3(&scene, emitter->dimensions, ";");
+                }
+
+                else if (particle_sys->emitter->type == Emitter::EmitterType::Sphere)
+                {
+                    const auto emitter = reinterpret_cast<SphereEmitter *>(particle_sys->emitter.get());
+
+                    scene << "sphere"
+                          << ", ";
+                    scene << to_str(particle_sys->emitter->particle_2D) << ", ";
+                    write_vec3(&scene, particle_sys->emitter->center, ", ");
+                    scene << to_str(emitter->radius) << ";";
+                }
+
+                scene << "\n";
+            }
+
             scene << "}"
                   << "\n\n";
         }
@@ -565,6 +595,36 @@ namespace bls
             std::getline(iline, hitpoint, ';');
 
             ecs.hitpoints[entity_id] = std::stof(hitpoint);
+        }
+
+        else if (component_name == "particle_system")
+        {
+            str type, particle_2D;
+            vec3 center;
+
+            std::getline(iline, type, ',');
+            std::getline(iline, particle_2D, ',');
+            center = read_vec3(&iline, ',');
+
+            if (type == "sphere")
+            {
+                str radius;
+                std::getline(iline, radius, ';');
+
+                auto *emitter = new SphereEmitter(center, std::stoi(particle_2D), std::stof(radius));
+                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(emitter);
+            }
+
+            else if (type == "box")
+            {
+                vec3 dimensions = read_vec3(&iline, ',');
+
+                auto *emitter = new BoxEmitter(center, std::stoi(particle_2D), dimensions);
+                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(emitter);
+            }
+
+            else
+                LOG_ERROR("invalid particle system type");
         }
     }
 
