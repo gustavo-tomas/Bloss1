@@ -152,7 +152,7 @@ namespace bls
 
     // SphereEmitter
     // -----------------------------------------------------------------------------------------------------------------
-    SphereEmitter::SphereEmitter(const vec3 &center, f32 radius) : Emitter(center)
+    SphereEmitter::SphereEmitter(const vec3 &center, bool particle_2D, f32 radius) : Emitter(center, particle_2D)
     {
         this->center = center;
         this->radius = radius;
@@ -190,7 +190,7 @@ namespace bls
 
     // BoxEmitter
     // -----------------------------------------------------------------------------------------------------------------
-    BoxEmitter::BoxEmitter(const vec3 &center, const vec3 &dimensions) : Emitter(center)
+    BoxEmitter::BoxEmitter(const vec3 &center, bool particle_2D, const vec3 &dimensions) : Emitter(center, particle_2D)
     {
         this->center = center;
         this->dimensions = dimensions;

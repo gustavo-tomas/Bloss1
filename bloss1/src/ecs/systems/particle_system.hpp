@@ -61,7 +61,7 @@ namespace bls
     class SphereEmitter : public Emitter
     {
         public:
-            SphereEmitter(const vec3 &center, f32 radius);
+            SphereEmitter(const vec3 &center, bool particle_2D, f32 radius);
 
             void emit() override;
 
@@ -74,7 +74,7 @@ namespace bls
     class BoxEmitter : public Emitter
     {
         public:
-            BoxEmitter(const vec3 &center, const vec3 &dimensions);
+            BoxEmitter(const vec3 &center, bool particle_2D, const vec3 &dimensions);
 
             void emit() override;
 
