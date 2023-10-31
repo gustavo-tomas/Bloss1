@@ -1,8 +1,7 @@
 #pragma once
 
 /**
- * @brief @TODO
- *
+ * @brief Helper functions for string conversions.
  */
 
 #include "core/core.hpp"

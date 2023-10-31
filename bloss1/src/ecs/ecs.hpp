@@ -52,7 +52,7 @@ namespace bls
                 systems.push_back(system);
             }
 
-            // Erase all the components of an entity (@TODO: this is not very efficient)
+            // Erase all the components of an entity
             void erase_entity(u32 id)
             {
                 if (id > max_entity_id) throw std::runtime_error("tried to delete invalid id: " + to_str(id));
