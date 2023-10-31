@@ -4,12 +4,11 @@
  * @brief The maths library. For now, just a wrapper for glm.
  */
 
+#include "core/core.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/quaternion.hpp"
-#include "math/mat.hpp"
 #include "math/to_str.hpp"
-#include "math/vec.hpp"
 
 namespace bls
 {

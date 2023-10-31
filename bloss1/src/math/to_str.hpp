@@ -5,8 +5,8 @@
  *
  */
 
+#include "core/core.hpp"
 #include "glm/gtx/string_cast.hpp"
-#include "math/vec.hpp"
 
 namespace bls
 {
