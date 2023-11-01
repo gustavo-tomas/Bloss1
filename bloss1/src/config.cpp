@@ -7,4 +7,5 @@ namespace bls
     f32 AppStats::ms_per_frame = 0.0f;
 
     std::vector<PassConfig> AppConfig::render_passes = {};
+    bool AppConfig::render_colliders = true;
 };  // namespace bls

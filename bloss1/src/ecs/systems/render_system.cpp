@@ -173,7 +173,7 @@ namespace bls
 
 // Render debug lines
 #if !defined(_RELEASE)
-        render_colliders(ecs, projection, view);
+        if (AppConfig::render_colliders) render_colliders(ecs, projection, view);
 #endif
 
         // Render texts

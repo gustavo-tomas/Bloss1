@@ -23,6 +23,7 @@ namespace bls
     {
         public:
             static std::vector<PassConfig> render_passes;
+            static bool render_colliders;
     };
 
     class AppStats

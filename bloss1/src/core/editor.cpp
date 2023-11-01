@@ -72,15 +72,11 @@ namespace bls
             {
                 ImGui::InputTextWithHint("##", "file", save_file, 64);
                 ImGui::SameLine();
-                if (ImGui::SmallButton("Save "
-                                       "Scene"))
-                    SceneParser::save_scene(ecs, save_file);
+                if (ImGui::SmallButton("Save Scene")) SceneParser::save_scene(ecs, save_file);
 
                 ImGui::InputTextWithHint("##", "file", config_file, 64);
                 ImGui::SameLine();
-                if (ImGui::SmallButton("Save "
-                                       "Config"))
-                    SceneParser::save_config(config_file);
+                if (ImGui::SmallButton("Save Config")) SceneParser::save_config(config_file);
 
                 ImGui::Separator();
                 ImGui::EndMenu();
@@ -131,7 +127,17 @@ namespace bls
     void Editor::render_config()
     {
         ImGui::Begin("Configuration");
+
+        ImGui::Text("Debug options");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::Checkbox("Colliders", &AppConfig::render_colliders);
+
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
         ImGui::Text("Post processing passes");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
         ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersH |
                                 ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersInnerH |
