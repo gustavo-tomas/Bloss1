@@ -308,17 +308,20 @@ namespace bls
     class Projectile : public Component
     {
         public:
-            Projectile(f32 damage = 5.0f,
+            Projectile(u32 sender_id,
+                       f32 damage = 5.0f,
                        f32 explosion_radius = 10.0f,
                        f32 explosion_duration = 1.0f,
                        f32 time_to_live = 5.0f)
-                : damage(damage),
+                : sender_id(sender_id),
+                  damage(damage),
                   explosion_radius(explosion_radius),
                   explosion_duration(explosion_duration),
                   time_to_live(time_to_live)
             {
             }
 
+            u32 sender_id;
             f32 damage;
             f32 explosion_radius;
             f32 explosion_duration;

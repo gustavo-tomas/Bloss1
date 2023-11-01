@@ -207,12 +207,43 @@ namespace bls
             model_matrix = translate(model_matrix, transform->position);
 
             // Player model matrix
-            if (ecs.names[id] == "player" || ecs.names[id] == "bullet")
+            if (ecs.names[id] == "player")
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
                 model_matrix = rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
                 model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            }
+
+            // Bullet model matrix
+            else if (ecs.names[id] == "bullet")
+            {
+                // Player bullet
+                if (ecs.projectiles[id]->sender_id == 0)
+                {
+                    model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                    model_matrix =
+                        rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                    model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                }
+
+                // Enemy bullet
+                else
+                {
+                    // Rotate
+                    model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                    model_matrix = rotate(model_matrix, radians(transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                    model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                }
+            }
+
+            // Ophanim model matrix
+            else if (ecs.names[id] == "ophanim")
+            {
+                // Compensate for model rotation
+                model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
             }
 
             else

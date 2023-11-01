@@ -35,7 +35,7 @@ namespace bls
         return id;
     }
 
-    u32 bullet(ECS &ecs, const Transform &transform, const PhysicsObject &object)
+    u32 bullet(ECS &ecs, const Transform &transform, const PhysicsObject &object, u32 sender_id)
     {
         auto id = ecs.get_id();
         auto model = Model::create("bullet", "bloss1/assets/models/bullet/bullet.fbx", false);
@@ -51,7 +51,7 @@ namespace bls
                                              Collider::ColliderMask::Projectile,  // description
                                              Collider::ColliderMask::World |      // interaction
                                                  Collider::ColliderMask::Player | Collider::ColliderMask::Enemy);
-        ecs.projectiles[id] = std::make_unique<Projectile>();
+        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id);
         ecs.timers[id] = std::make_unique<Timer>();
 
         return id;

@@ -251,7 +251,7 @@ namespace bls
 
     void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
-        bullet(ecs, transform, object);
+        bullet(ecs, transform, object, 0);
 
         // Create and emit particles
         const auto &player_particle_sys = ecs.particle_systems[0];
