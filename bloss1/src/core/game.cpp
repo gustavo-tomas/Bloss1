@@ -54,7 +54,9 @@ namespace bls
         change_stage(new TestStage());
 
         // Time variation
-        f64 last_time = window->get_time(), current_time = 0, dt = 0;
+        last_time = window->get_time();
+        current_time = 0;
+        dt = 0;
 
         set_target_fps(0);
 
@@ -73,7 +75,7 @@ namespace bls
 
             // Calculate dt
             current_time = window->get_time();
-            dt = current_time - last_time;
+            dt = clamp(static_cast<f32>(current_time - last_time), 0.0f, 0.1f);
             last_time = current_time;
 
             // Update running stage
