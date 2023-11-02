@@ -9,14 +9,14 @@ namespace bls
 
     void ophanim_controller_system(ECS &ecs, f32 dt)
     {
-        auto &player_transform = ecs.transforms[0];
-        auto &ophanim_transform = ecs.transforms[1];
-
         str ophanim_state = OPHANIM_STATE_IDLE;
 
         if (ecs.hitpoints[1] < OPHANIM_MAX_HP)
         {
             ophanim_state = OPHANIM_STATE_ALERT;
+
+            const auto &player_transform = ecs.transforms[0];
+            const auto &ophanim_transform = ecs.transforms[1];
 
             // Rotates towards player @TODO: fix alignment
             auto rotationMatrix =
@@ -24,7 +24,7 @@ namespace bls
             auto aligned_rot = degrees(eulerAngles(quat_cast(rotationMatrix)));
             ophanim_transform->rotation = aligned_rot + vec3(0.0f, -90.0f, 0.0f);  // Compensate for model rotation
 
-            auto &timer = ecs.timers[1];
+            const auto &timer = ecs.timers[1];
             timer->time += dt;
             if (timer->time >= 1.0f)
             {

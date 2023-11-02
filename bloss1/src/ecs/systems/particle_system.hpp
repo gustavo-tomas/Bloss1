@@ -46,6 +46,8 @@ namespace bls
             virtual void emit() = 0;
             virtual void render_particle(ECS &ecs, f32 dt);
             virtual void set_center(const vec3 &new_center);
+            virtual void set_particle(const Particle &particle);
+            virtual Particle get_particle();
 
             const EmitterType type;
             bool particle_2D;
@@ -61,6 +63,7 @@ namespace bls
             std::unique_ptr<Quad> quad;
             std::shared_ptr<Texture> particle_texture;
             std::shared_ptr<Model> model;
+            Particle particle_to_emit;
     };
 
     class SphereEmitter : public Emitter

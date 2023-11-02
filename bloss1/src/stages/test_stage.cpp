@@ -33,6 +33,7 @@ namespace bls
         ecs->add_system(animation_system);
         ecs->add_system(render_system);
         ecs->add_system(sound_system);
+        ecs->add_system(cleanup_system);
 
         // Load entities from file
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");

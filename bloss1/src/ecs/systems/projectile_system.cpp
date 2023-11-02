@@ -32,7 +32,7 @@ namespace bls
             if (explosion_timers.count(id) && explosion_timers[id].time >= projectile->explosion_duration)
             {
                 explosion_timers.erase(id);
-                ecs.erase_entity(id);
+                ecs.mark_for_deletion(id);
             }
         }
     }
