@@ -54,6 +54,18 @@ namespace bls
         ecs.projectiles[id] = std::make_unique<Projectile>(sender_id);
         ecs.timers[id] = std::make_unique<Timer>();
 
+        auto *emitter = new SphereEmitter(transform.position, false, transform.scale.x / 6.25f);
+        // auto *emitter = new BoxEmitter(transform.position, false, vec3(transform.scale.x / 5.0f));
+
+        auto particle = emitter->get_particle();
+        particle.color_begin = vec4(0.0f, 0.8f, 0.81f, 1.0f);
+        particle.color_end = vec4(0.68f, 0.93f, 0.93f, 1.0f);
+        particle.life_time = 0.75f;
+        emitter->set_particle(particle);
+
+        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 0.01f);
+        ecs.particle_systems[id]->particles_to_be_emitted = 40;
+
         return id;
     }
 

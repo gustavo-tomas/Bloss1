@@ -10,15 +10,42 @@
 
 namespace bls
 {
+    std::map<u32, Timer> emission_timers;
+
     void particle_system(ECS &ecs, f32 dt)
     {
         // Emit particles
         for (auto &[id, particle_sys] : ecs.particle_systems)
         {
-            while (particle_sys->particles_to_be_emitted > 0)
+            // Emit particles along the way
+            if (ecs.names[id] == "bullet")
             {
-                particle_sys->emitter->emit();
-                particle_sys->particles_to_be_emitted--;
+                if (!emission_timers.count(id)) emission_timers[id] = Timer();
+
+                particle_sys->emitter->set_center(ecs.transforms[id]->position);
+
+                // Only emit at certain intervals
+                if (emission_timers[id].time == 0.0f)
+                {
+                    auto particles_remaining = particle_sys->particles_to_be_emitted;
+                    while (particles_remaining > 0)
+                    {
+                        particle_sys->emitter->emit();
+                        particles_remaining--;
+                    }
+                }
+
+                emission_timers[id].time += dt;
+                if (emission_timers[id].time >= particle_sys->time_to_emit) emission_timers[id].time = 0.0f;
+            }
+
+            else
+            {
+                while (particle_sys->particles_to_be_emitted > 0)
+                {
+                    particle_sys->emitter->emit();
+                    particle_sys->particles_to_be_emitted--;
+                }
             }
 
             // Render particle
@@ -36,7 +63,7 @@ namespace bls
                                          "bloss1/assets/shaders/particles/particle.vs",
                                          "bloss1/assets/shaders/particles/particle_texture.fs");
         quad = std::make_unique<Quad>(renderer);
-        pool_index = 999;
+        pool_index = 9999;
         particle_pool.resize(pool_index + 1);
         particle_texture =
             Texture::create("particle", "bloss1/assets/textures/particles/particle_black.png", TextureType::Diffuse);
