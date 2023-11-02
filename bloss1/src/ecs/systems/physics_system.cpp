@@ -27,9 +27,6 @@ namespace bls
     {
         BLS_PROFILE_SCOPE("physics_system");
 
-        // Clamp dt to a higher bound
-        dt = clamp(static_cast<f64>(dt), 0.0, 0.1);
-
         auto &transforms = ecs.transforms;
         auto &objects = ecs.physics_objects;
         auto &colliders = ecs.colliders;
