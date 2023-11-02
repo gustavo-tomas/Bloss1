@@ -49,8 +49,8 @@ namespace bls
             auto &view_matrix = camera->view_matrix;
             auto &projection_matrix = camera->projection_matrix;
 
-            // Update camera values
-            f32 delta_lerp = clamp(camera->lerp_factor * dt, 0.0f, 1.0f);
+            // Update camera values @TODO: fix lerp
+            f32 delta_lerp = clamp(camera->lerp_factor * dt, 1.0f, 1.0f);
             cam_position = mix(cam_position, target_position, delta_lerp);
             cam_front = mix(cam_front, target_front, delta_lerp);
             cam_up = mix(cam_up, target_up, delta_lerp);

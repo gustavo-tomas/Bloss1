@@ -23,32 +23,19 @@ namespace bls
     void hit_entity(ECS &ecs, u32 projectile_id, u32 hp_id);
 
     f64 accumulator = 0.0;
+    const f32 fixed_dt = 0.01f;
+
     void physics_system(ECS &ecs, f32 dt)
     {
         BLS_PROFILE_SCOPE("physics_system");
 
-        auto &transforms = ecs.transforms;
-        auto &objects = ecs.physics_objects;
-        auto &colliders = ecs.colliders;
-
-        std::map<u32, Transform *> previous_transforms;
-
         // Run physics integration in a fixed dt
         accumulator += dt;
-        while (accumulator >= dt)
+        while (accumulator >= fixed_dt)
         {
-            // Save previous state
-            for (const auto &[id, object] : objects) previous_transforms[id] = transforms[id].get();
-
-            update_physics(ecs, dt);
-            accumulator -= dt;
+            update_physics(ecs, fixed_dt);
+            accumulator -= fixed_dt;
         }
-
-        // Interpolate previous and current state
-        const f64 alpha = accumulator / dt;
-        for (const auto &[id, object] : objects)
-            if (!colliders[id]->immovable)
-                transforms[id]->position = mix(transforms[id]->position, previous_transforms[id]->position, alpha);
     }
 
     void update_physics(ECS &ecs, f32 dt)
