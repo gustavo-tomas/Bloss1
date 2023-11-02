@@ -63,8 +63,7 @@ namespace bls
         particle.life_time = 0.75f;
         emitter->set_particle(particle);
 
-        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 0.01f);
-        ecs.particle_systems[id]->particles_to_be_emitted = 40;
+        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 40, 0.01f);
 
         return id;
     }

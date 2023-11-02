@@ -18,35 +18,23 @@ namespace bls
         for (auto &[id, particle_sys] : ecs.particle_systems)
         {
             // Emit particles along the way
-            if (ecs.names[id] == "bullet")
+            if (ecs.names[id] == "bullet") particle_sys->emitter->set_center(ecs.transforms[id]->position);
+
+            if (!emission_timers.count(id)) emission_timers[id] = Timer();
+
+            // Only emit at certain intervals
+            if (emission_timers[id].time == 0.0f)
             {
-                if (!emission_timers.count(id)) emission_timers[id] = Timer();
-
-                particle_sys->emitter->set_center(ecs.transforms[id]->position);
-
-                // Only emit at certain intervals
-                if (emission_timers[id].time == 0.0f)
-                {
-                    auto particles_remaining = particle_sys->particles_to_be_emitted;
-                    while (particles_remaining > 0)
-                    {
-                        particle_sys->emitter->emit();
-                        particles_remaining--;
-                    }
-                }
-
-                emission_timers[id].time += dt;
-                if (emission_timers[id].time >= particle_sys->time_to_emit) emission_timers[id].time = 0.0f;
-            }
-
-            else
-            {
-                while (particle_sys->particles_to_be_emitted > 0)
+                auto particles_remaining = particle_sys->particles_to_be_emitted;
+                while (particles_remaining > 0)
                 {
                     particle_sys->emitter->emit();
-                    particle_sys->particles_to_be_emitted--;
+                    particles_remaining--;
                 }
             }
+
+            emission_timers[id].time += dt;
+            if (emission_timers[id].time >= particle_sys->time_to_emit) emission_timers[id].time = 0.0f;
 
             // Render particle
             particle_sys->emitter->render_particle(ecs, dt);

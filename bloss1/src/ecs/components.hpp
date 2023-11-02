@@ -331,8 +331,8 @@ namespace bls
     class ParticleSystem : public Component
     {
         public:
-            ParticleSystem(Emitter *emitter, f32 time_to_emit = 0.1f)
-                : particles_to_be_emitted(0), time_to_emit(time_to_emit)
+            ParticleSystem(Emitter *emitter, u32 particles_to_be_emitted = 50, f32 time_to_emit = 0.1f)
+                : particles_to_be_emitted(particles_to_be_emitted), time_to_emit(time_to_emit)
             {
                 this->emitter = std::unique_ptr<Emitter>(emitter);
             }

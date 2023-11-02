@@ -456,6 +456,9 @@ namespace bls
 
                 ImGui::Checkbox("particle_2D", &particle_sys->emitter->particle_2D);
                 ImGui::InputFloat3("center", value_ptr(particle_sys->emitter->center));
+                ImGui::InputInt("particles to be emitted",
+                                reinterpret_cast<i32 *>(&particle_sys->particles_to_be_emitted));
+                ImGui::InputFloat("time to emit", &particle_sys->time_to_emit);
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
