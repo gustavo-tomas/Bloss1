@@ -124,9 +124,9 @@ namespace bls
 
         vec3 clamped_front = vec3(front.x, 0.0f, front.z);
 
-        if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y;
+        if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y * dt;
 
-        if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x;
+        if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x * dt;
 
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
         {
@@ -149,8 +149,8 @@ namespace bls
         if (fabs(right_y) >= TOLERANCE) y_offset = -right_y * 10.0f;
 
         // Calculate rotation
-        f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt * 250.0f;
-        f32 yaw = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
+        f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt;
+        f32 yaw = transform->rotation.y + x_offset * controller->sensitivity * dt;
 
         pitch = clamp(pitch, MIN_PLAYER_PITCH, MAX_PLAYER_PITCH);  // Clamp pitch to avoid flipping
 
@@ -165,7 +165,7 @@ namespace bls
             if (player_timers[PLAYER_TIMER_STR_JUMP] <= PLAYER_TIMER_JUMP)
             {
                 player_state = PLAYER_STATE_IDLE;  // @TODO: finish jumping state
-                object->force += WORLD_UP * controller->speed.y;
+                object->force += WORLD_UP * controller->speed.y * dt;
                 player_timers[PLAYER_TIMER_STR_JUMP] += dt;
             }
         }
