@@ -35,7 +35,13 @@ namespace bls
         return id;
     }
 
-    u32 bullet(ECS &ecs, const Transform &transform, const PhysicsObject &object, u32 sender_id)
+    u32 bullet(ECS &ecs,
+               const Transform &transform,
+               const PhysicsObject &object,
+               u32 sender_id,
+               f32 damage,
+               f32 explosion_radius,
+               f32 explosion_duration)
     {
         auto id = ecs.get_id();
         auto model = Model::create("bullet", "bloss1/assets/models/bullet/bullet.fbx", false);
@@ -51,16 +57,29 @@ namespace bls
                                              Collider::ColliderMask::Projectile,  // description
                                              Collider::ColliderMask::World |      // interaction
                                                  Collider::ColliderMask::Player | Collider::ColliderMask::Enemy);
-        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id);
+        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id, damage, explosion_radius, explosion_duration);
         ecs.timers[id] = std::make_unique<Timer>();
 
         auto *emitter = new SphereEmitter(transform.position, false, transform.scale.x / 6.25f);
         // auto *emitter = new BoxEmitter(transform.position, false, vec3(transform.scale.x / 5.0f));
 
         auto particle = emitter->get_particle();
-        particle.color_begin = vec4(0.0f, 0.8f, 0.81f, 1.0f);
-        particle.color_end = vec4(0.68f, 0.93f, 0.93f, 1.0f);
-        particle.life_time = 0.75f;
+
+        // Player bullet
+        if (sender_id == 0)
+        {
+            particle.color_begin = vec4(0.0f, 0.8f, 0.81f, 1.0f);
+            particle.color_end = vec4(0.68f, 0.93f, 0.93f, 1.0f);
+            particle.life_time = 0.75f;
+        }
+
+        // Enemy bullet
+        else
+        {
+            particle.color_begin = vec4(0.95f, 0.0f, 0.0f, 1.0f);
+            particle.color_end = vec4(0.95f, 0.93f, 0.0f, 1.0f);
+            particle.life_time = 0.75f;
+        }
         emitter->set_particle(particle);
 
         ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 40, 0.01f);

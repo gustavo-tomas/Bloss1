@@ -3,15 +3,17 @@
 
 namespace bls
 {
-    const f32 OPHANIM_MAX_HP = 1000;
-
     void shoot_player(ECS &ecs);
+    void rain_on_player(ECS &ecs);
 
+    f32 ophanim_initial_hp = -1;
     void ophanim_controller_system(ECS &ecs, f32 dt)
     {
+        if (ophanim_initial_hp < 0) ophanim_initial_hp = ecs.hitpoints[1];
+
         str ophanim_state = OPHANIM_STATE_IDLE;
 
-        if (ecs.hitpoints[1] < OPHANIM_MAX_HP)
+        if (ecs.hitpoints[1] < ophanim_initial_hp)
         {
             ophanim_state = OPHANIM_STATE_ALERT;
 
@@ -26,9 +28,10 @@ namespace bls
 
             const auto &timer = ecs.timers[1];
             timer->time += dt;
-            if (timer->time >= 1.0f)
+            if (timer->time >= 0.75f)
             {
-                shoot_player(ecs);
+                // shoot_player(ecs);
+                rain_on_player(ecs);
                 timer->time = 0.0f;
             }
         }
@@ -55,6 +58,21 @@ namespace bls
 
         PhysicsObject bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), front * 500'000.0f, 15.0f);
 
-        bullet(ecs, bullet_transform, bullet_object, 1);
+        bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 15.0f, 1.0f);
+    }
+
+    void rain_on_player(ECS &ecs)
+    {
+        const auto &player_transform = ecs.transforms[0];
+
+        Transform bullet_transform = *player_transform;
+        bullet_transform.position = bullet_transform.position + vec3(0.0f, 100.0f, 0.0f);
+        bullet_transform.rotation = vec3(90.0f, 0.0f, 0.0f);
+        bullet_transform.scale = vec3(20.0f);
+
+        PhysicsObject bullet_object =
+            PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
+
+        bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 15.0f, 1.0f);
     }
 };  // namespace bls

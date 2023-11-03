@@ -25,6 +25,18 @@ namespace bls
 
                 if (!explosion_timers.count(id)) explosion_timers[id] = Timer();
 
+                const auto &particle_sys = ecs.particle_systems[id];
+                const auto &emitter_type = particle_sys->emitter->type;
+                if (emitter_type == Emitter::EmitterType::Sphere)
+                {
+                    const auto &emitter = static_cast<SphereEmitter *>(ecs.particle_systems[id]->emitter.get());
+                    emitter->radius = projectile->explosion_radius;
+
+                    auto particle = emitter->get_particle();
+                    particle.life_time = projectile->explosion_duration - explosion_timers[id].time;
+                    emitter->set_particle(particle);
+                }
+
                 explosion_timers[id].time += dt;
             }
 

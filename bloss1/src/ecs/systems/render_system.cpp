@@ -215,26 +215,12 @@ namespace bls
                 model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
             }
 
-            // Bullet model matrix
-            else if (ecs.names[id] == "bullet")
+            // Player bullet model matrix
+            else if (ecs.names[id] == "bullet" && ecs.projectiles[id]->sender_id == 0)
             {
-                // Player bullet
-                if (ecs.projectiles[id]->sender_id == 0)
-                {
-                    model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-                    model_matrix =
-                        rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
-                    model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-                }
-
-                // Enemy bullet
-                else
-                {
-                    // Rotate
-                    model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
-                    model_matrix = rotate(model_matrix, radians(transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
-                    model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-                }
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
             }
 
             // Ophanim model matrix

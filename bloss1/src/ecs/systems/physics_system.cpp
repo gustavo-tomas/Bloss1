@@ -371,7 +371,6 @@ namespace bls
         auto projectile = ecs.projectiles[projectile_id].get();
 
         *entity_hp = clamp(*entity_hp - projectile->damage, 0.0f, *entity_hp);
-        projectile->explosion_duration = 0.0f;
 
         std::cout << "ID: " << hp_id << " ENTT HP: " << *entity_hp << "\n";
     }

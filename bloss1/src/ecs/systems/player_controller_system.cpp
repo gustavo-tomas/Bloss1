@@ -251,6 +251,6 @@ namespace bls
 
     void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
-        bullet(ecs, transform, object, 0);
+        bullet(ecs, transform, object, 0, 5.0f, 12.0f, 0.75f);
     }
 };  // namespace bls
