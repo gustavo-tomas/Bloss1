@@ -122,17 +122,14 @@ namespace bls
         auto left_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_X);
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
-        vec3 clamped_front = vec3(front.x, 0.0f, front.z);
-
-        if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y * dt;
-
-        if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x * dt;
-
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
         {
             player_state = PLAYER_STATE_WALKING;
-
             if (left_y >= TOLERANCE) player_state = PLAYER_STATE_WALKING_BACK;
+
+            vec3 clamped_front = vec3(front.x, 0.0f, front.z);
+            if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y * dt;
+            if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x * dt;
         }
 
         // Turn
