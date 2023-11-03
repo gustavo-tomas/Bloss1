@@ -5,6 +5,7 @@ namespace bls
 {
     void shoot_player(ECS &ecs);
     void rain_on_player(ECS &ecs);
+    void cage_on_player(ECS &ecs);
 
     f32 ophanim_initial_hp = -1;
     void ophanim_controller_system(ECS &ecs, f32 dt)
@@ -31,7 +32,8 @@ namespace bls
             if (timer->time >= 0.75f)
             {
                 // shoot_player(ecs);
-                rain_on_player(ecs);
+                // rain_on_player(ecs);
+                cage_on_player(ecs);
                 timer->time = 0.0f;
             }
         }
@@ -74,5 +76,31 @@ namespace bls
             PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
 
         bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 15.0f, 1.0f);
+    }
+
+    void cage_on_player(ECS &ecs)
+    {
+        const auto &player_transform = ecs.transforms[0];
+        const vec3 offset = vec3(25.0f, 120.0f, 25.0f);
+        const u16 num_of_bullets = 7;
+
+        for (u16 i = 0; i < num_of_bullets; i++)
+        {
+            mat4 model_mat = mat4(1.0f);
+
+            const f32 angle = glm::radians(360.0f / static_cast<f32>(num_of_bullets)) * static_cast<f32>(i);
+            model_mat = glm::translate(model_mat, player_transform->position);
+            model_mat = glm::rotate(model_mat, angle, vec3(0.0f, 1.0f, 0.0f));
+            model_mat = glm::translate(model_mat, offset);
+
+            Transform bullet_transform;
+            bullet_transform.position = vec3(model_mat[3]);
+            bullet_transform.rotation = vec3(90.0f, 0.0f, 0.0f);
+            bullet_transform.scale = vec3(20.0f);
+
+            auto bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
+
+            bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 10.0f, 1.0f);
+        }
     }
 };  // namespace bls
