@@ -62,6 +62,7 @@ namespace bls
 
         auto *emitter = new SphereEmitter(transform.position, false, transform.scale.x / 6.25f);
         // auto *emitter = new BoxEmitter(transform.position, false, vec3(transform.scale.x / 5.0f));
+        // auto *emitter = new PointEmitter(transform.position, false);
 
         auto particle = emitter->get_particle();
 

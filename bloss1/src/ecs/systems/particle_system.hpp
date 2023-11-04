@@ -36,6 +36,7 @@ namespace bls
         public:
             enum class EmitterType
             {
+                Point,
                 Box,
                 Sphere
             };
@@ -64,6 +65,17 @@ namespace bls
             std::shared_ptr<Texture> particle_texture;
             std::shared_ptr<Model> model;
             Particle particle_to_emit;
+    };
+
+    class PointEmitter : public Emitter
+    {
+        public:
+            PointEmitter(const vec3 &center, bool particle_2D);
+
+            void emit() override;
+
+        private:
+            vec3 generate_random_point_on_surface();
     };
 
     class SphereEmitter : public Emitter

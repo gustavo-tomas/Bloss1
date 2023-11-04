@@ -187,6 +187,26 @@ namespace bls
         return particle_to_emit;
     }
 
+    // PointEmitter
+    // -----------------------------------------------------------------------------------------------------------------
+    PointEmitter::PointEmitter(const vec3 &center, bool particle_2D) : Emitter(center, EmitterType::Point, particle_2D)
+    {
+        this->center = center;
+    }
+
+    void PointEmitter::emit()
+    {
+        Particle particle = particle_to_emit;
+        particle.position = generate_random_point_on_surface();
+
+        emit_particle(particle);
+    }
+
+    vec3 PointEmitter::generate_random_point_on_surface()
+    {
+        return center;
+    }
+
     // SphereEmitter
     // -----------------------------------------------------------------------------------------------------------------
     SphereEmitter::SphereEmitter(const vec3 &center, bool particle_2D, f32 radius)
