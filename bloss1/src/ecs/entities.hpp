@@ -17,6 +17,7 @@ namespace bls
                f32 damage,
                f32 explosion_radius,
                f32 explosion_duration);
+    u32 ophanim_target_indicator(ECS &ecs, u32 target_id, const vec3 &offset, const vec3 &rotation, f32 duration);
     u32 ball(ECS &ecs, const Transform &transform);
     u32 vampire(ECS &ecs, const Transform &transform);
     u32 abomination(ECS &ecs, const Transform &transform);

@@ -88,6 +88,43 @@ namespace bls
         return id;
     }
 
+    u32 ophanim_target_indicator(ECS &ecs, u32 target_id, const vec3 &offset, const vec3 &rotation, f32 duration)
+    {
+        const u32 id = ecs.get_id();
+        ecs.names[id] = "bullet_indicator";
+
+        const vec3 target_pos = ecs.transforms[target_id]->position;
+
+        // Calculate offseted position from target
+        auto model_mat = mat4(1.0f);
+        model_mat = glm::translate(model_mat, target_pos);
+        model_mat = glm::rotate(model_mat, rotation.x, vec3(1.0f, 0.0f, 0.0f));
+        model_mat = glm::rotate(model_mat, rotation.y, vec3(0.0f, 1.0f, 0.0f));
+        model_mat = glm::rotate(model_mat, rotation.z, vec3(0.0f, 0.0f, 1.0f));
+        model_mat = glm::translate(model_mat, offset);
+
+        const vec3 indicator_position = vec3(model_mat[3]);
+
+        // Customize indicator emitter
+        auto *emitter = new PointEmitter(indicator_position, false);
+        auto particle = emitter->get_particle();
+        particle.color_begin = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        particle.color_end = vec4(0.9f, 0.5f, 0.0f, 1.0f);
+        particle.life_time = 0.5f;
+        particle.velocity = vec3(0.0f, 10.0f, 0.0f);
+        particle.velocity_variation = vec3(1.0f, 2.5f, 1.0f);
+        particle.scale_begin = vec3(1.2f);
+        particle.scale_end = vec3(0.01f);
+        emitter->set_particle(particle);
+
+        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 10, 0.01f);
+
+        ecs.timers[id] = std::make_unique<Timer>();
+        ecs.bullet_indicators[id] = std::make_unique<BulletLandingIndicator>(target_id, offset, rotation, duration);
+
+        return id;
+    }
+
     u32 ball(ECS &ecs, const Transform &transform)
     {
         u32 id = ecs.get_id();

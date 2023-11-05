@@ -78,6 +78,7 @@ namespace bls
                 state_machines.erase(id);
                 projectiles.erase(id);
                 particle_systems.erase(id);
+                bullet_indicators.erase(id);
                 hitpoints.erase(id);
 
                 available_ids.insert(id);
@@ -103,6 +104,7 @@ namespace bls
             std::map<u32, std::unique_ptr<StateMachine>> state_machines;
             std::map<u32, std::unique_ptr<Projectile>> projectiles;
             std::map<u32, std::unique_ptr<ParticleSystem>> particle_systems;
+            std::map<u32, std::unique_ptr<BulletLandingIndicator>> bullet_indicators;
             std::map<u32, f32> hitpoints;
 
             std::queue<u32> deletion_queue;

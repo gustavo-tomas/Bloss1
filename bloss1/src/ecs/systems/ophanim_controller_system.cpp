@@ -29,7 +29,7 @@ namespace bls
 
             const auto &timer = ecs.timers[1];
             timer->time += dt;
-            if (timer->time >= 0.75f)
+            if (timer->time >= 3.75f)
             {
                 // shoot_player(ecs);
                 // rain_on_player(ecs);
@@ -97,6 +97,11 @@ namespace bls
             bullet_transform.position = vec3(model_mat[3]);
             bullet_transform.rotation = vec3(90.0f, 0.0f, 0.0f);
             bullet_transform.scale = vec3(20.0f);
+
+            // Indicate bullet landing point
+            vec3 indicator_offset = offset;
+            indicator_offset.y = 0.0f;
+            ophanim_target_indicator(ecs, 0, indicator_offset, vec3(0.0f, angle, 0.0f), 2.0f);
 
             auto bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
 
