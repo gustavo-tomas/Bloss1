@@ -103,9 +103,9 @@ namespace bls
             indicator_offset.y = 0.0f;
             ophanim_target_indicator(ecs, 0, indicator_offset, vec3(0.0f, angle, 0.0f), 2.0f);
 
-            auto bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
-
-            bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 10.0f, 1.0f);
+            // Bullet fired in the indicator system
+            // auto bullet_object = PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) *
+            // 200'000.0f, 15.0f); bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 10.0f, 1.0f);
         }
     }
 };  // namespace bls

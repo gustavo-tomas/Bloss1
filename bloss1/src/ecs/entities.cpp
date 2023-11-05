@@ -120,7 +120,7 @@ namespace bls
         ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 10, 0.01f);
 
         ecs.timers[id] = std::make_unique<Timer>();
-        ecs.bullet_indicators[id] = std::make_unique<BulletLandingIndicator>(target_id, offset, rotation, duration);
+        ecs.bullet_indicators[id] = std::make_unique<BulletLandingIndicator>(target_id, 1, offset, rotation, duration);
 
         return id;
     }

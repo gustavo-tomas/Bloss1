@@ -345,12 +345,12 @@ namespace bls
     class BulletLandingIndicator : public Component
     {
         public:
-            BulletLandingIndicator(u32 target_id, const vec3 &offset, const vec3 &rotation, f32 duration)
-                : target_id(target_id), offset(offset), rotation(rotation), duration(duration)
+            BulletLandingIndicator(u32 target_id, u32 sender_id, const vec3 &offset, const vec3 &rotation, f32 duration)
+                : sender_id(sender_id), target_id(target_id), offset(offset), rotation(rotation), duration(duration)
             {
             }
 
-            u32 target_id;
+            u32 target_id, sender_id;
             vec3 offset;
             vec3 rotation;
             f32 duration;
