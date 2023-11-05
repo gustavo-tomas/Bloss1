@@ -38,7 +38,7 @@ namespace bls
 
         // Load entities from file
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
-        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
 
         auto &renderer = Game::get().get_renderer();
         renderer.create_shadow_map(*ecs);
