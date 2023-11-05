@@ -346,7 +346,7 @@ namespace bls
     {
         public:
             BulletLandingIndicator(u32 target_id, u32 sender_id, const vec3 &offset, const vec3 &rotation, f32 duration)
-                : sender_id(sender_id), target_id(target_id), offset(offset), rotation(rotation), duration(duration)
+                : target_id(target_id), sender_id(sender_id), offset(offset), rotation(rotation), duration(duration)
             {
             }
 
