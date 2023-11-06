@@ -35,6 +35,7 @@ namespace bls
 
         private:
             void compile_shader(const str &path, const str &code, u32 ID);
+            str get_code_from_file(const str &path);
 
             u32 id;
     };

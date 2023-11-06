@@ -18,47 +18,20 @@ namespace bls
 
         if (geometry_path != "") geometry_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
 
-        str vertex_shader_code;
-        str fragment_shader_code;
-        str geometry_shader_code;
-
-        std::ifstream vertex_shader_stream;
-        std::ifstream fragment_shader_stream;
-        std::ifstream geometry_shader_stream;
+        str vertex_shader_code, fragment_shader_code, geometry_shader_code;
 
         // Read the Vertex Shader code from the file
         try
         {
-            vertex_shader_stream.open(vertex_path);
-            fragment_shader_stream.open(fragment_path);
+            vertex_shader_code = get_code_from_file(vertex_path);
+            fragment_shader_code = get_code_from_file(fragment_path);
 
-            std::stringstream vertex_sstr, frag_sstr, geometry_sstr;
-
-            vertex_sstr << vertex_shader_stream.rdbuf();
-            vertex_shader_code = vertex_sstr.str();
-            vertex_shader_stream.close();
-
-            frag_sstr << fragment_shader_stream.rdbuf();
-            fragment_shader_code = frag_sstr.str();
-            fragment_shader_stream.close();
-
-            if (geometry_path != "")
-            {
-                geometry_shader_stream.open(geometry_path);
-
-                geometry_sstr << geometry_shader_stream.rdbuf();
-                geometry_shader_code = geometry_sstr.str();
-                geometry_shader_stream.close();
-            }
+            if (geometry_path != "") geometry_shader_code = get_code_from_file(geometry_path);
         }
 
         catch (...)
         {
-            LOG_ERROR(
-                "error when reading files '%s' "
-                "and '%s'",
-                vertex_path,
-                fragment_path);
+            LOG_ERROR("error when reading files '%s' and '%s'", vertex_path, fragment_path);
         }
 
         // Compile shaders
@@ -94,9 +67,7 @@ namespace bls
             LOG_ERROR("error when linking shader: '%s'", vertex_path.c_str());
             LOG_ERROR("error when linking program: '%s'", error_message.data());
 
-            throw std::runtime_error(
-                "failed to link "
-                "program");
+            throw std::runtime_error("failed to link program");
         }
 
         glDetachShader(id, vertex_shader_id);
@@ -109,9 +80,7 @@ namespace bls
 
         if (geometry_path != "") glDeleteShader(geometry_shader_id);
 
-        LOG_SUCCESS(
-            "shaders compiled & linked "
-            "successfully");
+        LOG_SUCCESS("shaders compiled & linked successfully");
     }
 
     void OpenGLShader::compile_shader(const str &path, const str &code, u32 ID)
@@ -137,6 +106,20 @@ namespace bls
 
             LOG_ERROR("error when compiling '%s': %s", path.c_str(), error_message.data());
         }
+    }
+
+    str OpenGLShader::get_code_from_file(const str &path)
+    {
+        str code = "";
+        std::stringstream sstr;
+        std::ifstream stream;
+
+        stream.open(path);
+        sstr << stream.rdbuf();
+        code = sstr.str();
+        stream.close();
+
+        return code;
     }
 
     void OpenGLShader::bind()
