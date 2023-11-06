@@ -132,10 +132,7 @@ namespace bls
                 }
 
                 else
-                    throw std::runtime_error(
-                        "unsupported number of "
-                        "channels: '" +
-                        to_str(num_components) + "'");
+                    throw std::runtime_error("unsupported number of channels: '" + to_str(num_components) + "'");
 
                 // Create texture
                 glCreateTextures(GL_TEXTURE_2D, 1, &texture_id);
