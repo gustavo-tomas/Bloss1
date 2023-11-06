@@ -454,8 +454,24 @@ namespace bls
                     ImGui::InputFloat("radius", radius);
                 }
 
+                ImGui::Text("emitter");
                 ImGui::Checkbox("particle_2D", &particle_sys->emitter->particle_2D);
                 ImGui::InputFloat3("center", value_ptr(particle_sys->emitter->center));
+                ImGui::InputInt("particles to be emitted",
+                                reinterpret_cast<i32 *>(&particle_sys->particles_to_be_emitted));
+                ImGui::InputFloat("time to emit", &particle_sys->time_to_emit);
+                ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+                ImGui::Text("particle");
+                auto particle = particle_sys->emitter->get_particle();
+                ImGui::InputFloat("lifetime", &particle.life_time);
+                ImGui::InputFloat4("color begin", value_ptr(particle.color_begin));
+                ImGui::InputFloat4("color end", value_ptr(particle.color_end));
+                ImGui::InputFloat3("scale begin", value_ptr(particle.scale_begin));
+                ImGui::InputFloat3("scale end", value_ptr(particle.scale_end));
+                ImGui::InputFloat3("velocity", value_ptr(particle.velocity));
+                ImGui::InputFloat3("velocity variation", value_ptr(particle.velocity_variation));
+                particle_sys->emitter->set_particle(particle);
 
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }

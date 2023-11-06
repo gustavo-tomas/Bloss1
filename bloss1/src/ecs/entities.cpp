@@ -35,7 +35,13 @@ namespace bls
         return id;
     }
 
-    u32 bullet(ECS &ecs, const Transform &transform, const PhysicsObject &object, u32 sender_id)
+    u32 bullet(ECS &ecs,
+               const Transform &transform,
+               const PhysicsObject &object,
+               u32 sender_id,
+               f32 damage,
+               f32 explosion_radius,
+               f32 explosion_duration)
     {
         auto id = ecs.get_id();
         auto model = Model::create("bullet", "bloss1/assets/models/bullet/bullet.fbx", false);
@@ -51,8 +57,70 @@ namespace bls
                                              Collider::ColliderMask::Projectile,  // description
                                              Collider::ColliderMask::World |      // interaction
                                                  Collider::ColliderMask::Player | Collider::ColliderMask::Enemy);
-        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id);
+        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id, damage, explosion_radius, explosion_duration);
         ecs.timers[id] = std::make_unique<Timer>();
+
+        auto *emitter = new SphereEmitter(transform.position, false, transform.scale.x / 6.25f);
+        // auto *emitter = new BoxEmitter(transform.position, false, vec3(transform.scale.x / 5.0f));
+        // auto *emitter = new PointEmitter(transform.position, false);
+
+        auto particle = emitter->get_particle();
+
+        // Player bullet
+        if (sender_id == 0)
+        {
+            particle.color_begin = vec4(0.0f, 0.8f, 0.81f, 1.0f);
+            particle.color_end = vec4(0.68f, 0.93f, 0.93f, 1.0f);
+            particle.life_time = 0.75f;
+        }
+
+        // Enemy bullet
+        else
+        {
+            particle.color_begin = vec4(0.95f, 0.0f, 0.0f, 1.0f);
+            particle.color_end = vec4(0.95f, 0.93f, 0.0f, 1.0f);
+            particle.life_time = 0.75f;
+        }
+        emitter->set_particle(particle);
+
+        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 40, 0.01f);
+
+        return id;
+    }
+
+    u32 ophanim_target_indicator(ECS &ecs, u32 target_id, const vec3 &offset, const vec3 &rotation, f32 duration)
+    {
+        const u32 id = ecs.get_id();
+        ecs.names[id] = "bullet_indicator";
+
+        const vec3 target_pos = ecs.transforms[target_id]->position;
+
+        // Calculate offseted position from target
+        auto model_mat = mat4(1.0f);
+        model_mat = glm::translate(model_mat, target_pos);
+        model_mat = glm::rotate(model_mat, rotation.x, vec3(1.0f, 0.0f, 0.0f));
+        model_mat = glm::rotate(model_mat, rotation.y, vec3(0.0f, 1.0f, 0.0f));
+        model_mat = glm::rotate(model_mat, rotation.z, vec3(0.0f, 0.0f, 1.0f));
+        model_mat = glm::translate(model_mat, offset);
+
+        const vec3 indicator_position = vec3(model_mat[3]);
+
+        // Customize indicator emitter
+        auto *emitter = new PointEmitter(indicator_position, false);
+        auto particle = emitter->get_particle();
+        particle.color_begin = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        particle.color_end = vec4(0.9f, 0.5f, 0.0f, 1.0f);
+        particle.life_time = 0.5f;
+        particle.velocity = vec3(0.0f, 10.0f, 0.0f);
+        particle.velocity_variation = vec3(1.0f, 2.5f, 1.0f);
+        particle.scale_begin = vec3(1.2f);
+        particle.scale_end = vec3(0.01f);
+        emitter->set_particle(particle);
+
+        ecs.particle_systems[id] = std::make_unique<ParticleSystem>(emitter, 10, 0.01f);
+
+        ecs.timers[id] = std::make_unique<Timer>();
+        ecs.bullet_indicators[id] = std::make_unique<BulletLandingIndicator>(target_id, 1, offset, rotation, duration);
 
         return id;
     }

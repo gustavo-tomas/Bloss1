@@ -17,4 +17,6 @@ namespace bls
     void sound_system(ECS &ecs, f32 dt);
     void state_machine_system(ECS &ecs, f32 dt);
     void projectile_system(ECS &ecs, f32 dt);
+    void cleanup_system(ECS &ecs, f32 dt);
+    void bullet_indicator_system(ECS &ecs, f32 dt);
 };  // namespace bls

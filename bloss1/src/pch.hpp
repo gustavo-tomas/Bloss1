@@ -14,6 +14,7 @@
 #include <iostream>    // Good ol' cout
 #include <map>         // Maps
 #include <memory>      // Unique ptr
+#include <queue>       // Deletion queue
 #include <random>      // RNG
 #include <set>         // Yes
 #include <sstream>     // String stream

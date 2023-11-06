@@ -122,17 +122,14 @@ namespace bls
         auto left_x = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_X);
         auto left_y = Input::get_joystick_axis_value(JOYSTICK_2, GAMEPAD_AXIS_LEFT_Y);
 
-        vec3 clamped_front = vec3(front.x, 0.0f, front.z);
-
-        if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y;
-
-        if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x;
-
         if (fabs(left_x) >= TOLERANCE || fabs(left_y) >= TOLERANCE)
         {
             player_state = PLAYER_STATE_WALKING;
-
             if (left_y >= TOLERANCE) player_state = PLAYER_STATE_WALKING_BACK;
+
+            vec3 clamped_front = vec3(front.x, 0.0f, front.z);
+            if (fabs(left_y) >= TOLERANCE) object->force += clamped_front * controller->speed * -left_y * dt;
+            if (fabs(left_x) >= TOLERANCE) object->force += right * controller->speed * left_x * dt;
         }
 
         // Turn
@@ -149,8 +146,8 @@ namespace bls
         if (fabs(right_y) >= TOLERANCE) y_offset = -right_y * 10.0f;
 
         // Calculate rotation
-        f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt * 250.0f;
-        f32 yaw = transform->rotation.y + x_offset * controller->sensitivity * dt * 250.0f;
+        f32 pitch = transform->rotation.x + y_offset * controller->sensitivity * dt;
+        f32 yaw = transform->rotation.y + x_offset * controller->sensitivity * dt;
 
         pitch = clamp(pitch, MIN_PLAYER_PITCH, MAX_PLAYER_PITCH);  // Clamp pitch to avoid flipping
 
@@ -165,7 +162,7 @@ namespace bls
             if (player_timers[PLAYER_TIMER_STR_JUMP] <= PLAYER_TIMER_JUMP)
             {
                 player_state = PLAYER_STATE_IDLE;  // @TODO: finish jumping state
-                object->force += WORLD_UP * controller->speed.y;
+                object->force += WORLD_UP * controller->speed.y * dt;
                 player_timers[PLAYER_TIMER_STR_JUMP] += dt;
             }
         }
@@ -251,11 +248,6 @@ namespace bls
 
     void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
-        bullet(ecs, transform, object, 0);
-
-        // Create and emit particles
-        const auto &player_particle_sys = ecs.particle_systems[0];
-        player_particle_sys->emitter->set_center(transform.position);
-        player_particle_sys->particles_to_be_emitted += 15;
+        bullet(ecs, transform, object, 0, 5.0f, 12.0f, 0.75f);
     }
 };  // namespace bls

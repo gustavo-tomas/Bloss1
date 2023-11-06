@@ -27,16 +27,18 @@ namespace bls
         ecs->add_system(player_controller_system);
         ecs->add_system(ophanim_controller_system);
         ecs->add_system(physics_system);
+        ecs->add_system(bullet_indicator_system);
         ecs->add_system(projectile_system);
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
         ecs->add_system(render_system);
         ecs->add_system(sound_system);
+        ecs->add_system(cleanup_system);
 
         // Load entities from file
         // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
-        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/mecha_movement.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
 
         auto &renderer = Game::get().get_renderer();
         renderer.create_shadow_map(*ecs);

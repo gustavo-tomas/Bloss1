@@ -29,7 +29,7 @@ sound: file, name, volume, play_now, looping;
 timer: time;
 transform_animation: number_of_transforms, transform1, duration1; transform2, duration2; ... ;
 hitpoints: hitpoints;
-particle_system: type, particle_2D, center, dimensions;
+particle_system: type, particle_2D, particles_to_be_emitted, time_to_emit, center, dimensions;
 
 // Post processing config:
 <post_processing>

@@ -53,6 +53,7 @@ namespace bls
             std::unique_ptr<Stage> stage;
 
             f64 target_spf;
+            f64 last_time, current_time, dt;
             bool window_open, minimized;
     };
 };  // namespace bls

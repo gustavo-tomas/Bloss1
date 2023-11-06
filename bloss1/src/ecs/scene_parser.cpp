@@ -275,6 +275,8 @@ namespace bls
                     scene << "box"
                           << ", ";
                     scene << to_str(particle_sys->emitter->particle_2D) << ", ";
+                    scene << to_str(particle_sys->particles_to_be_emitted) << ", ";
+                    scene << to_str(particle_sys->time_to_emit) << ", ";
                     write_vec3(&scene, particle_sys->emitter->center, ", ");
                     write_vec3(&scene, emitter->dimensions, ";");
                 }
@@ -286,6 +288,8 @@ namespace bls
                     scene << "sphere"
                           << ", ";
                     scene << to_str(particle_sys->emitter->particle_2D) << ", ";
+                    scene << to_str(particle_sys->particles_to_be_emitted) << ", ";
+                    scene << to_str(particle_sys->time_to_emit) << ", ";
                     write_vec3(&scene, particle_sys->emitter->center, ", ");
                     scene << to_str(emitter->radius) << ";";
                 }
@@ -344,9 +348,7 @@ namespace bls
                 scene << "\n";
             }
 
-            else if (pass.name ==
-                     "PosterizationPas"
-                     "s")
+            else if (pass.name == "PosterizationPass")
             {
                 scene << "\tposterization_pass: ";
                 scene << to_str(pass.position) << ", ";
@@ -356,9 +358,7 @@ namespace bls
                 scene << "\n";
             }
 
-            else if (pass.name ==
-                     "PixelizationPas"
-                     "s")
+            else if (pass.name == "PixelizationPass")
             {
                 scene << "\tpixelization_pass: ";
                 scene << to_str(pass.position) << ", ";
@@ -565,9 +565,7 @@ namespace bls
             ecs.timers[entity_id] = std::make_unique<Timer>(Timer(stof(time)));
         }
 
-        else if (component_name ==
-                 "transform_"
-                 "animation")
+        else if (component_name == "transform_animation")
         {
             vec3 position, rotation, scale;
             str size, duration;
@@ -599,11 +597,13 @@ namespace bls
 
         else if (component_name == "particle_system")
         {
-            str type, particle_2D;
+            str type, particle_2D, particles_to_be_emitted, time_to_emit;
             vec3 center;
 
             std::getline(iline, type, ',');
             std::getline(iline, particle_2D, ',');
+            std::getline(iline, particles_to_be_emitted, ',');
+            std::getline(iline, time_to_emit, ',');
             center = read_vec3(&iline, ',');
 
             if (type == "sphere")
@@ -612,7 +612,8 @@ namespace bls
                 std::getline(iline, radius, ';');
 
                 auto *emitter = new SphereEmitter(center, std::stoi(particle_2D), std::stof(radius));
-                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(emitter);
+                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(
+                    emitter, std::stoul(particles_to_be_emitted), std::stof(time_to_emit));
             }
 
             else if (type == "box")
@@ -620,7 +621,8 @@ namespace bls
                 vec3 dimensions = read_vec3(&iline, ',');
 
                 auto *emitter = new BoxEmitter(center, std::stoi(particle_2D), dimensions);
-                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(emitter);
+                ecs.particle_systems[entity_id] = std::make_unique<ParticleSystem>(
+                    emitter, std::stoul(particles_to_be_emitted), std::stof(time_to_emit));
             }
 
             else

@@ -331,12 +331,28 @@ namespace bls
     class ParticleSystem : public Component
     {
         public:
-            ParticleSystem(Emitter *emitter) : particles_to_be_emitted(0)
+            ParticleSystem(Emitter *emitter, u32 particles_to_be_emitted = 50, f32 time_to_emit = 0.1f)
+                : particles_to_be_emitted(particles_to_be_emitted), time_to_emit(time_to_emit)
             {
                 this->emitter = std::unique_ptr<Emitter>(emitter);
             }
 
             std::unique_ptr<Emitter> emitter;
             u32 particles_to_be_emitted;
+            f32 time_to_emit;
+    };
+
+    class BulletLandingIndicator : public Component
+    {
+        public:
+            BulletLandingIndicator(u32 target_id, u32 sender_id, const vec3 &offset, const vec3 &rotation, f32 duration)
+                : target_id(target_id), sender_id(sender_id), offset(offset), rotation(rotation), duration(duration)
+            {
+            }
+
+            u32 target_id, sender_id;
+            vec3 offset;
+            vec3 rotation;
+            f32 duration;
     };
 };  // namespace bls

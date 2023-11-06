@@ -254,10 +254,8 @@ namespace bls
                     break;
 
                 default:
-                    LOG_ERROR(
-                        "invalid texture type for "
-                        "material '%d'",
-                        type);
+                    LOG_ERROR("invalid texture type for material '%d'", type);
+                    texture_type = TextureType::Diffuse;
                     break;
             }
 

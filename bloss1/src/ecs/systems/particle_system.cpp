@@ -10,16 +10,31 @@
 
 namespace bls
 {
+    std::map<u32, Timer> emission_timers;
+
     void particle_system(ECS &ecs, f32 dt)
     {
         // Emit particles
         for (auto &[id, particle_sys] : ecs.particle_systems)
         {
-            while (particle_sys->particles_to_be_emitted > 0)
+            // Emit particles along the way
+            if (ecs.names[id] == "bullet") particle_sys->emitter->set_center(ecs.transforms[id]->position);
+
+            if (!emission_timers.count(id)) emission_timers[id] = Timer();
+
+            // Only emit at certain intervals
+            if (emission_timers[id].time == 0.0f)
             {
-                particle_sys->emitter->emit();
-                particle_sys->particles_to_be_emitted--;
+                auto particles_remaining = particle_sys->particles_to_be_emitted;
+                while (particles_remaining > 0)
+                {
+                    particle_sys->emitter->emit();
+                    particles_remaining--;
+                }
             }
+
+            emission_timers[id].time += dt;
+            if (emission_timers[id].time >= particle_sys->time_to_emit) emission_timers[id].time = 0.0f;
 
             // Render particle
             particle_sys->emitter->render_particle(ecs, dt);
@@ -36,11 +51,21 @@ namespace bls
                                          "bloss1/assets/shaders/particles/particle.vs",
                                          "bloss1/assets/shaders/particles/particle_texture.fs");
         quad = std::make_unique<Quad>(renderer);
-        pool_index = 999;
+        pool_index = 9999;
         particle_pool.resize(pool_index + 1);
         particle_texture =
             Texture::create("particle", "bloss1/assets/textures/particles/particle_black.png", TextureType::Diffuse);
         model = Model::create("particle", "bloss1/assets/models/particles/particle.obj", false);
+
+        particle_to_emit.color_begin = {0.9f, 0.9f, 0.3f, 1.0f};
+        particle_to_emit.color_end = {0.3f, 0.9f, 0.9f, 1.0f};
+        particle_to_emit.scale_begin = vec3(0.5f);
+        particle_to_emit.scale_variation = vec3(0.3f);
+        particle_to_emit.scale_end = vec3(0.01f);
+        particle_to_emit.life_time = 10.0f;
+        particle_to_emit.velocity = vec3(0.0f);
+        particle_to_emit.velocity_variation = {0.5f, 2.0f, 0.5f};
+        particle_to_emit.position = center;
 
         this->center = center;
         this->particle_2D = particle_2D;
@@ -109,6 +134,8 @@ namespace bls
                     mesh->vao->bind();
                     renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
                     mesh->vao->unbind();
+
+                    AppStats::vertices += mesh->vertices.size();
                 }
             }
         }
@@ -150,6 +177,36 @@ namespace bls
         this->center = new_center;
     }
 
+    void Emitter::set_particle(const Particle &particle)
+    {
+        this->particle_to_emit = particle;
+    }
+
+    Particle Emitter::get_particle()
+    {
+        return particle_to_emit;
+    }
+
+    // PointEmitter
+    // -----------------------------------------------------------------------------------------------------------------
+    PointEmitter::PointEmitter(const vec3 &center, bool particle_2D) : Emitter(center, EmitterType::Point, particle_2D)
+    {
+        this->center = center;
+    }
+
+    void PointEmitter::emit()
+    {
+        Particle particle = particle_to_emit;
+        particle.position = generate_random_point_on_surface();
+
+        emit_particle(particle);
+    }
+
+    vec3 PointEmitter::generate_random_point_on_surface()
+    {
+        return center;
+    }
+
     // SphereEmitter
     // -----------------------------------------------------------------------------------------------------------------
     SphereEmitter::SphereEmitter(const vec3 &center, bool particle_2D, f32 radius)
@@ -161,15 +218,7 @@ namespace bls
 
     void SphereEmitter::emit()
     {
-        Particle particle = {};
-        particle.color_begin = {0.9f, 0.9f, 0.3f, 1.0f};
-        particle.color_end = {0.3f, 0.9f, 0.9f, 1.0f};
-        particle.scale_begin = vec3(0.5f);
-        particle.scale_variation = vec3(0.3f);
-        particle.scale_end = vec3(0.01f);
-        particle.life_time = 10.0f;
-        particle.velocity = vec3(0.0f);
-        particle.velocity_variation = {3.0f, 1.0f, 0.0f};
+        Particle particle = particle_to_emit;
         particle.position = generate_random_point_on_surface();
 
         emit_particle(particle);
@@ -200,15 +249,7 @@ namespace bls
 
     void BoxEmitter::emit()
     {
-        Particle particle = {};
-        particle.color_begin = {0.9f, 0.9f, 0.3f, 1.0f};
-        particle.color_end = {0.3f, 0.9f, 0.9f, 1.0f};
-        particle.scale_begin = vec3(0.5f);
-        particle.scale_variation = vec3(0.3f);
-        particle.scale_end = vec3(0.01f);
-        particle.life_time = 10.0f;
-        particle.velocity = vec3(0.0f);
-        particle.velocity_variation = {0.5f, 2.0f, 0.5f};
+        Particle particle = particle_to_emit;
         particle.position = generate_random_point_on_surface();
 
         emit_particle(particle);
