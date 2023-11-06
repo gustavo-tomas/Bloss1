@@ -5,6 +5,7 @@
  */
 
 #include "renderer/buffers.hpp"
+#include "renderer/height_map.hpp"
 #include "renderer/post/post_processing.hpp"
 #include "renderer/renderer.hpp"
 #include "renderer/shader.hpp"
@@ -26,10 +27,11 @@ namespace bls
 
             void clear_color(const vec4 &color) override;
             void clear() override;
-            void draw_indexed(RenderingMode mode, u32 count) override;
+            void draw_indexed(RenderingMode mode, u32 count, const void *indices) override;
             void draw_arrays(RenderingMode mode, u32 count) override;
 
             void create_shadow_map(ECS &ecs) override;
+            void create_height_map(const str &path) override;
             void create_post_processing_passes() override;
 
             std::map<str, std::shared_ptr<Shader>> &get_shaders() override;
@@ -38,6 +40,7 @@ namespace bls
             std::unique_ptr<Skybox> &get_skybox() override;
             std::unique_ptr<Quad> &get_rendering_quad() override;
             std::unique_ptr<ShadowMap> &get_shadow_map() override;
+            std::unique_ptr<HeightMap> &get_height_map() override;
             std::unique_ptr<PostProcessingSystem> &get_post_processing() override;
 
         private:
@@ -50,6 +53,7 @@ namespace bls
 
             std::unique_ptr<Skybox> skybox;
             std::unique_ptr<ShadowMap> shadow_map;
+            std::unique_ptr<HeightMap> height_map;
             std::unique_ptr<PostProcessingSystem> post_processing;
     };
 };  // namespace bls

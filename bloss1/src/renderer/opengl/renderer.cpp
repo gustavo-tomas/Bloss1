@@ -192,10 +192,10 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count)
+    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count, const void *indices)
     {
         auto opengl_mode = convert_to_opengl_rendering_mode(mode);
-        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, 0);
+        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, indices);
     }
 
     void OpenGLRenderer::draw_arrays(RenderingMode mode, u32 count)
@@ -214,6 +214,11 @@ namespace bls
             dir.y *= -1.0f;
             shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
         }
+    }
+
+    void OpenGLRenderer::create_height_map(const str &path)
+    {
+        height_map = std::make_unique<HeightMap>(path);
     }
 
     void OpenGLRenderer::create_post_processing_passes()
@@ -270,6 +275,11 @@ namespace bls
     std::unique_ptr<ShadowMap> &OpenGLRenderer::get_shadow_map()
     {
         return shadow_map;
+    }
+
+    std::unique_ptr<HeightMap> &OpenGLRenderer::get_height_map()
+    {
+        return height_map;
     }
 
     std::unique_ptr<PostProcessingSystem> &OpenGLRenderer::get_post_processing()

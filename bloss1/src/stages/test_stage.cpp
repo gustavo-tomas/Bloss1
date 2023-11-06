@@ -42,6 +42,7 @@ namespace bls
 
         auto &renderer = Game::get().get_renderer();
         renderer.create_shadow_map(*ecs);
+        renderer.create_height_map("bloss1/assets/textures/iceland_heightmap.png");
         renderer.create_post_processing_passes();
 
         // Load configurations from file

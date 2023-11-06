@@ -3,6 +3,7 @@
 #include "core/input.hpp"
 #include "ecs/ecs.hpp"
 #include "renderer/font.hpp"
+#include "renderer/height_map.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
 #include "renderer/primitives/box.hpp"
@@ -41,6 +42,7 @@ namespace bls
         auto &skybox = renderer.get_skybox();
         auto &quad = renderer.get_rendering_quad();
         auto &shadow_map = renderer.get_shadow_map();
+        auto &height_map = renderer.get_height_map();
         auto &post_processing = renderer.get_post_processing();
 
         // Shaders - by now they should have been initialized
@@ -74,6 +76,9 @@ namespace bls
 
         // Render the scene
         render_scene(ecs, *g_buffer_shader, renderer);
+
+        // Render height map
+        height_map->render(view, projection);
 
         // Render particles
         particle_system(ecs, dt);
@@ -282,10 +287,7 @@ namespace bls
                             break;
 
                         default:
-                            LOG_ERROR(
-                                "invalid "
-                                "texture "
-                                "type");
+                            LOG_ERROR("invalid texture type");
                             break;
                     }
 
