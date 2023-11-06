@@ -11,7 +11,11 @@ namespace bls
     class OpenGLShader : public Shader
     {
         public:
-            OpenGLShader(const str &vertex_path, const str &fragment_path, const str &geometry_path = "");
+            OpenGLShader(const str &vertex_path,
+                         const str &fragment_path,
+                         const str &geometry_path = "",
+                         const str &tess_ctrl_path = "",
+                         const str &tess_eval_path = "");
 
             // Use/activate the shader
             void bind() override;

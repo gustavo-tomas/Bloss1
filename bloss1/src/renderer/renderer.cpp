@@ -46,12 +46,15 @@ namespace bls
     std::shared_ptr<Shader> Shader::create(const str &name,
                                            const str &vertex_path,
                                            const str &fragment_path,
-                                           const str &geometry_path)
+                                           const str &geometry_path,
+                                           const str &tess_ctrl_path,
+                                           const str &tess_eval_path)
     {
         if (ShaderManager::get().exists(name)) return ShaderManager::get().get_shader(name);
 
 #ifdef _OPENGL
-        auto shader = std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path);
+        auto shader =
+            std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path, tess_ctrl_path, tess_eval_path);
         ShaderManager::get().load(name, shader);
         return shader;
 #else

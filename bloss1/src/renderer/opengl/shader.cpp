@@ -9,16 +9,25 @@
 
 namespace bls
 {
-    OpenGLShader::OpenGLShader(const str &vertex_path, const str &fragment_path, const str &geometry_path)
+    OpenGLShader::OpenGLShader(const str &vertex_path,
+                               const str &fragment_path,
+                               const str &geometry_path,
+                               const str &tess_ctrl_path,
+                               const str &tess_eval_path)
     {
         // Create the shaders
         GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
         GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
         GLuint geometry_shader_id = MAX_SHADER_ID;
+        GLuint tess_ctrl_shader_id = MAX_SHADER_ID;
+        GLuint tess_eval_shader_id = MAX_SHADER_ID;
 
         if (geometry_path != "") geometry_shader_id = glCreateShader(GL_GEOMETRY_SHADER);
+        if (tess_ctrl_path != "") tess_ctrl_shader_id = glCreateShader(GL_TESS_CONTROL_SHADER);
+        if (tess_eval_path != "") tess_eval_shader_id = glCreateShader(GL_TESS_EVALUATION_SHADER);
 
         str vertex_shader_code, fragment_shader_code, geometry_shader_code;
+        str tess_ctrl_shader_code, tess_eval_shader_code;
 
         // Read the Vertex Shader code from the file
         try
@@ -27,6 +36,8 @@ namespace bls
             fragment_shader_code = get_code_from_file(fragment_path);
 
             if (geometry_path != "") geometry_shader_code = get_code_from_file(geometry_path);
+            if (tess_ctrl_path != "") tess_ctrl_shader_code = get_code_from_file(tess_ctrl_path);
+            if (tess_eval_path != "") tess_eval_shader_code = get_code_from_file(tess_eval_path);
         }
 
         catch (...)
@@ -41,6 +52,12 @@ namespace bls
         if (geometry_path != "" && geometry_shader_id != MAX_SHADER_ID)
             compile_shader(geometry_path, geometry_shader_code, geometry_shader_id);
 
+        if (tess_ctrl_path != "" && tess_ctrl_shader_id != MAX_SHADER_ID)
+            compile_shader(tess_ctrl_path, tess_ctrl_shader_code, tess_ctrl_shader_id);
+
+        if (tess_eval_path != "" && tess_eval_shader_id != MAX_SHADER_ID)
+            compile_shader(tess_eval_path, tess_eval_shader_code, tess_eval_shader_id);
+
         // Link the program
         LOG_INFO("linking program");
         id = glCreateProgram();
@@ -49,6 +66,8 @@ namespace bls
         glAttachShader(id, fragment_shader_id);
 
         if (geometry_path != "") glAttachShader(id, geometry_shader_id);
+        if (tess_ctrl_path != "") glAttachShader(id, tess_ctrl_shader_id);
+        if (tess_eval_path != "") glAttachShader(id, tess_eval_shader_id);
 
         glLinkProgram(id);
 
@@ -74,11 +93,15 @@ namespace bls
         glDetachShader(id, fragment_shader_id);
 
         if (geometry_path != "") glDetachShader(id, geometry_shader_id);
+        if (tess_ctrl_path != "") glDetachShader(id, tess_ctrl_shader_id);
+        if (tess_eval_path != "") glDetachShader(id, tess_eval_shader_id);
 
         glDeleteShader(vertex_shader_id);
         glDeleteShader(fragment_shader_id);
 
         if (geometry_path != "") glDeleteShader(geometry_shader_id);
+        if (tess_ctrl_path != "") glDeleteShader(tess_ctrl_shader_id);
+        if (tess_eval_path != "") glDeleteShader(tess_eval_shader_id);
 
         LOG_SUCCESS("shaders compiled & linked successfully");
     }
