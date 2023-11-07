@@ -24,6 +24,7 @@ namespace bls
         public:
             static std::vector<PassConfig> render_passes;
             static bool render_colliders;
+            static bool tess_wireframe;
     };
 
     class AppStats

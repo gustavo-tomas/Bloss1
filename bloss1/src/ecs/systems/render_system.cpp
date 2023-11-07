@@ -78,7 +78,15 @@ namespace bls
         render_scene(ecs, *g_buffer_shader, renderer);
 
         // Render height map
-        height_map->render(view, projection);
+        if (AppConfig::tess_wireframe)
+        {
+            renderer.set_debug_mode(AppConfig::tess_wireframe);
+            height_map->render(view, projection);
+            renderer.set_debug_mode(!AppConfig::tess_wireframe);
+        }
+
+        else
+            height_map->render(view, projection);
 
         // Render particles
         particle_system(ecs, dt);
