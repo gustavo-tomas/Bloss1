@@ -2,6 +2,7 @@
 
 layout (quads, fractional_odd_spacing, cw) in;
 
+uniform vec2 displacement;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -26,6 +27,7 @@ void main()
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     vec2 texCoord = (t1 - t0) * v + t0;
+    texCoord += displacement;
 
     Height = PerlinNoise(texCoord * 10.0) * 64.0;
 

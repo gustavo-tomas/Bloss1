@@ -12,6 +12,8 @@ namespace bls
         this->max_tess_level = max_tess_level;
         this->min_distance = min_distance;
         this->max_distance = max_distance;
+        this->displacement = vec2(0.0f);
+        this->displacement_multiplier = vec2(0.0f);
 
         // Create shaders
         shader = Shader::create("height_map_shader",
@@ -78,7 +80,7 @@ namespace bls
     {
     }
 
-    void HeightMap::render(const mat4& view, const mat4& projection)
+    void HeightMap::render(const mat4& view, const mat4& projection, f32 dt)
     {
         auto& renderer = Game::get().get_renderer();
 
@@ -87,6 +89,9 @@ namespace bls
         shader->set_uniform4("model", mat4(1.0f));
         shader->set_uniform4("view", view);
         shader->set_uniform4("projection", projection);
+
+        displacement += vec2(dt);
+        shader->set_uniform2("displacement", displacement * displacement_multiplier);
 
         shader->set_uniform1("min_tess_level", min_tess_level);
         shader->set_uniform1("max_tess_level", max_tess_level);

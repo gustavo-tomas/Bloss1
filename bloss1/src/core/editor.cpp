@@ -144,6 +144,8 @@ namespace bls
         ImGui::Text("Terrain");
         ImGui::Separator();
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
+
         ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
         ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
         ImGui::InputFloat("Min distance", &height_map->min_distance);

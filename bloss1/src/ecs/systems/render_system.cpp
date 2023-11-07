@@ -81,12 +81,12 @@ namespace bls
         if (AppConfig::tess_wireframe)
         {
             renderer.set_debug_mode(AppConfig::tess_wireframe);
-            height_map->render(view, projection);
+            height_map->render(view, projection, dt);
             renderer.set_debug_mode(!AppConfig::tess_wireframe);
         }
 
         else
-            height_map->render(view, projection);
+            height_map->render(view, projection, dt);
 
         // Render particles
         particle_system(ecs, dt);

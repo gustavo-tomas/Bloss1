@@ -20,13 +20,15 @@ namespace bls
                       f32 max_distance = 1000);
             ~HeightMap();
 
-            void render(const mat4& view, const mat4& projection);
+            void render(const mat4& view, const mat4& projection, f32 dt);
 
             u32 min_tess_level, max_tess_level;
             f32 min_distance, max_distance;
+            vec2 displacement_multiplier;
 
         private:
             u32 num_vert_per_patch, num_patches;
+            vec2 displacement;
 
             std::shared_ptr<Shader> shader;
             std::unique_ptr<VertexArray> vao;
