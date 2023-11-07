@@ -32,7 +32,12 @@ namespace bls
             void draw_arrays(RenderingMode mode, u32 count) override;
 
             void create_shadow_map(ECS &ecs) override;
-            void create_height_map(const str &path) override;
+            void create_height_map(u32 width,
+                                   u32 height,
+                                   u32 min_tess_level,
+                                   u32 max_tess_level,
+                                   f32 min_distance,
+                                   f32 max_distance) override;
             void create_post_processing_passes() override;
 
             std::map<str, std::shared_ptr<Shader>> &get_shaders() override;

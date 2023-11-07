@@ -6,7 +6,7 @@
 namespace bls
 {
     HeightMap::HeightMap(
-        const str& texture_path, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance)
+        u32 width, u32 height, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance)
     {
         this->min_tess_level = min_tess_level;
         this->max_tess_level = max_tess_level;
@@ -21,10 +21,8 @@ namespace bls
                                 "bloss1/assets/shaders/height_map.tcs.glsl",
                                 "bloss1/assets/shaders/height_map.tes.glsl");
 
-        // Load heightmap texture
-        texture = Texture::create(texture_path, texture_path, TextureType::Diffuse);
-        f32 width = static_cast<f32>(texture->get_width());
-        f32 height = static_cast<f32>(texture->get_height());
+        const f32 w = static_cast<f32>(width);
+        const f32 h = static_cast<f32>(height);
 
         num_vert_per_patch = 4;
         num_patches = 20;
@@ -35,29 +33,29 @@ namespace bls
         {
             for (u32 j = 0; j < num_patches; j++)
             {
-                vertices.push_back(-width / 2.0f + width * i / static_cast<f32>(num_patches));    // v.x
-                vertices.push_back(0.0f);                                                         // v.y
-                vertices.push_back(-height / 2.0f + height * j / static_cast<f32>(num_patches));  // v.z
-                vertices.push_back(i / static_cast<f32>(num_patches));                            // u
-                vertices.push_back(j / static_cast<f32>(num_patches));                            // v
+                vertices.push_back(-w / 2.0f + w * i / static_cast<f32>(num_patches));  // v.x
+                vertices.push_back(0.0f);                                               // v.y
+                vertices.push_back(-h / 2.0f + h * j / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back(i / static_cast<f32>(num_patches));                  // u
+                vertices.push_back(j / static_cast<f32>(num_patches));                  // v
 
-                vertices.push_back(-width / 2.0f + width * (i + 1) / static_cast<f32>(num_patches));  // v.x
-                vertices.push_back(0.0f);                                                             // v.y
-                vertices.push_back(-height / 2.0f + height * j / static_cast<f32>(num_patches));      // v.z
-                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                          // u
-                vertices.push_back(j / static_cast<f32>(num_patches));                                // v
+                vertices.push_back(-w / 2.0f + w * (i + 1) / static_cast<f32>(num_patches));  // v.x
+                vertices.push_back(0.0f);                                                     // v.y
+                vertices.push_back(-h / 2.0f + h * j / static_cast<f32>(num_patches));        // v.z
+                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                  // u
+                vertices.push_back(j / static_cast<f32>(num_patches));                        // v
 
-                vertices.push_back(-width / 2.0f + width * i / static_cast<f32>(num_patches));          // v.x
-                vertices.push_back(0.0f);                                                               // v.y
-                vertices.push_back(-height / 2.0f + height * (j + 1) / static_cast<f32>(num_patches));  // v.z
-                vertices.push_back(i / static_cast<f32>(num_patches));                                  // u
-                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                            // v
+                vertices.push_back(-w / 2.0f + w * i / static_cast<f32>(num_patches));        // v.x
+                vertices.push_back(0.0f);                                                     // v.y
+                vertices.push_back(-h / 2.0f + h * (j + 1) / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back(i / static_cast<f32>(num_patches));                        // u
+                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                  // v
 
-                vertices.push_back(-width / 2.0f + width * (i + 1) / static_cast<f32>(num_patches));    // v.x
-                vertices.push_back(0.0f);                                                               // v.y
-                vertices.push_back(-height / 2.0f + height * (j + 1) / static_cast<f32>(num_patches));  // v.z
-                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                            // u
-                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                            // v
+                vertices.push_back(-w / 2.0f + w * (i + 1) / static_cast<f32>(num_patches));  // v.x
+                vertices.push_back(0.0f);                                                     // v.y
+                vertices.push_back(-h / 2.0f + h * (j + 1) / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                  // u
+                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                  // v
             }
         }
 
@@ -90,13 +88,10 @@ namespace bls
         shader->set_uniform4("view", view);
         shader->set_uniform4("projection", projection);
 
-        shader->set_uniform1("heightMap", 1U);
         shader->set_uniform1("min_tess_level", min_tess_level);
         shader->set_uniform1("max_tess_level", max_tess_level);
         shader->set_uniform1("min_distance", min_distance);
         shader->set_uniform1("max_distance", max_distance);
-
-        texture->bind(1);
 
         vao->bind();
         renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);

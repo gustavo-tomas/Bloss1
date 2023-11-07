@@ -223,9 +223,11 @@ namespace bls
         }
     }
 
-    void OpenGLRenderer::create_height_map(const str &path)
+    void OpenGLRenderer::create_height_map(
+        u32 width, u32 height, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance)
     {
-        height_map = std::make_unique<HeightMap>(path);
+        height_map =
+            std::make_unique<HeightMap>(width, height, min_tess_level, max_tess_level, min_distance, max_distance);
     }
 
     void OpenGLRenderer::create_post_processing_passes()

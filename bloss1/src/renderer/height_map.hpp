@@ -6,14 +6,14 @@
 
 #include "renderer/buffers.hpp"
 #include "renderer/shader.hpp"
-#include "renderer/texture.hpp"
 
 namespace bls
 {
     class HeightMap
     {
         public:
-            HeightMap(const str& texture_path,
+            HeightMap(u32 width,
+                      u32 height,
                       u32 min_tess_level = 4,
                       u32 max_tess_level = 64,
                       f32 min_distance = 20,
@@ -29,7 +29,6 @@ namespace bls
             u32 num_vert_per_patch, num_patches;
 
             std::shared_ptr<Shader> shader;
-            std::shared_ptr<Texture> texture;
             std::unique_ptr<VertexArray> vao;
             std::unique_ptr<VertexBuffer> vbo;
     };
