@@ -1,6 +1,6 @@
 #version 460 core
 
-layout (quads, fractional_odd_spacing, ccw) in;
+layout (quads, fractional_odd_spacing, cw) in;
 
 uniform sampler2D heightMap;
 uniform mat4 model;

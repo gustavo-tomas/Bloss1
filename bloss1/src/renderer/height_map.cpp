@@ -5,8 +5,14 @@
 
 namespace bls
 {
-    HeightMap::HeightMap(const str& texture_path)
+    HeightMap::HeightMap(
+        const str& texture_path, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance)
     {
+        this->min_tess_level = min_tess_level;
+        this->max_tess_level = max_tess_level;
+        this->min_distance = min_distance;
+        this->max_distance = max_distance;
+
         // Create shaders
         shader = Shader::create("height_map_shader",
                                 "bloss1/assets/shaders/height_map.vs",
@@ -83,15 +89,18 @@ namespace bls
         shader->set_uniform4("model", mat4(1.0f));
         shader->set_uniform4("view", view);
         shader->set_uniform4("projection", projection);
+
         shader->set_uniform1("heightMap", 1U);
+        shader->set_uniform1("min_tess_level", min_tess_level);
+        shader->set_uniform1("max_tess_level", max_tess_level);
+        shader->set_uniform1("min_distance", min_distance);
+        shader->set_uniform1("max_distance", max_distance);
 
         texture->bind(1);
 
         vao->bind();
-
-        renderer.set_face_culling(false);
         renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);
-        renderer.set_face_culling(true);
+        vao->unbind();
 
         // Not exactly right but gives a good estimate
         AppStats::vertices += num_vert_per_patch * num_patches * num_patches;
