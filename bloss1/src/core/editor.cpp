@@ -200,8 +200,7 @@ namespace bls
                 ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
 
             else
-                ImGui::Text(
-                    "BasePass is always enabled");
+                ImGui::Text("BasePass is always enabled");
 
             if (pass.id > 0) post_processing->set_pass(pass.id, pass.enabled, pass.position);
         }
