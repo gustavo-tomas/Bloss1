@@ -24,6 +24,7 @@ namespace bls
             void set_debug_mode(bool active) override;
             void set_blending(bool active) override;
             void set_face_culling(bool active) override;
+            void set_tesselation_patches(u32 patches) override;
 
             void clear_color(const vec4 &color) override;
             void clear() override;

@@ -40,6 +40,7 @@ namespace bls
             virtual void set_debug_mode(bool active) = 0;
             virtual void set_blending(bool active) = 0;
             virtual void set_face_culling(bool active) = 0;
+            virtual void set_tesselation_patches(u32 patches) = 0;
 
             virtual void clear_color(const vec4 &color) = 0;
             virtual void clear() = 0;

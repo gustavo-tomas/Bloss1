@@ -1,54 +1,59 @@
 #include "renderer/height_map.hpp"
 
+#include "config.hpp"
+#include "core/game.hpp"
+
 namespace bls
 {
-    HeightMap::HeightMap(const str& texture_path) : texture_path(texture_path)
+    HeightMap::HeightMap(const str& texture_path)
     {
         // Create shaders
-        shader = Shader::create(
-            "height_map_shader", "bloss1/assets/shaders/height_map.vs", "bloss1/assets/shaders/height_map.fs");
+        shader = Shader::create("height_map_shader",
+                                "bloss1/assets/shaders/height_map.vs",
+                                "bloss1/assets/shaders/height_map.fs",
+                                "",
+                                "bloss1/assets/shaders/height_map.tcs.glsl",
+                                "bloss1/assets/shaders/height_map.tes.glsl");
 
         // Load heightmap texture
-        stbi_set_flip_vertically_on_load(true);
+        texture = Texture::create(texture_path, texture_path, TextureType::Diffuse);
+        f32 width = static_cast<f32>(texture->get_width());
+        f32 height = static_cast<f32>(texture->get_height());
 
-        unsigned char* data = stbi_load(texture_path.c_str(), &width, &height, &channels, 0);
-
-        if (data)
-        {
-            LOG_INFO("Loaded heightmap of size %d x %d", width, height);
-        }
-
-        else
-            throw std::runtime_error("failed to load height map");
+        num_vert_per_patch = 4;
+        num_patches = 20;
 
         // Setup vertices
         std::vector<f32> vertices;
-        f32 scale_y = 64.0f / 256.0f, shift_y = 16.0f;
-        i32 rez = 1;
-        for (i32 i = 0; i < height; i++)
+        for (u32 i = 0; i < num_patches; i++)
         {
-            for (i32 j = 0; j < width; j++)
+            for (u32 j = 0; j < num_patches; j++)
             {
-                unsigned char* pixelOffset = data + (j + width * i) * channels;
-                unsigned char y = pixelOffset[0];
+                vertices.push_back(-width / 2.0f + width * i / static_cast<f32>(num_patches));    // v.x
+                vertices.push_back(0.0f);                                                         // v.y
+                vertices.push_back(-height / 2.0f + height * j / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back(i / static_cast<f32>(num_patches));                            // u
+                vertices.push_back(j / static_cast<f32>(num_patches));                            // v
 
-                // vertex
-                vertices.push_back(-height / 2.0f + height * i / static_cast<f32>(height));  // vx
-                vertices.push_back(static_cast<i32>(y) * scale_y - shift_y);                 // vy
-                vertices.push_back(-width / 2.0f + width * j / static_cast<f32>(width));     // vz
+                vertices.push_back(-width / 2.0f + width * (i + 1) / static_cast<f32>(num_patches));  // v.x
+                vertices.push_back(0.0f);                                                             // v.y
+                vertices.push_back(-height / 2.0f + height * j / static_cast<f32>(num_patches));      // v.z
+                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                          // u
+                vertices.push_back(j / static_cast<f32>(num_patches));                                // v
+
+                vertices.push_back(-width / 2.0f + width * i / static_cast<f32>(num_patches));          // v.x
+                vertices.push_back(0.0f);                                                               // v.y
+                vertices.push_back(-height / 2.0f + height * (j + 1) / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back(i / static_cast<f32>(num_patches));                                  // u
+                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                            // v
+
+                vertices.push_back(-width / 2.0f + width * (i + 1) / static_cast<f32>(num_patches));    // v.x
+                vertices.push_back(0.0f);                                                               // v.y
+                vertices.push_back(-height / 2.0f + height * (j + 1) / static_cast<f32>(num_patches));  // v.z
+                vertices.push_back((i + 1) / static_cast<f32>(num_patches));                            // u
+                vertices.push_back((j + 1) / static_cast<f32>(num_patches));                            // v
             }
         }
-
-        stbi_image_free(data);
-
-        num_strips = (height - 1) / rez;
-        num_triangles_per_strip = (width / rez) * 2 - 2;
-
-        // Setup indices
-        std::vector<u32> indices;
-        for (i32 i = 0; i < height - 1; i += rez)
-            for (i32 j = 0; j < width; j += rez)
-                for (i32 k = 0; k < 2; k++) indices.push_back(j + width * (i + k * rez));
 
         // Setup buffers
         vao = std::unique_ptr<VertexArray>(VertexArray::create());
@@ -56,9 +61,13 @@ namespace bls
 
         vbo = std::unique_ptr<VertexBuffer>(
             VertexBuffer::create(static_cast<void*>(vertices.data()), vertices.size() * sizeof(f32)));
-        vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 0, (void*)0);
 
-        ebo = std::unique_ptr<IndexBuffer>(IndexBuffer::create(indices, indices.size()));
+        vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 5 * sizeof(f32), reinterpret_cast<void*>(0));
+        vao->add_vertex_buffer(
+            1, 2, ShaderDataType::Float, false, 5 * sizeof(f32), reinterpret_cast<void*>((sizeof(f32) * 3)));
+
+        auto& renderer = Game::get().get_renderer();
+        renderer.set_tesselation_patches(num_vert_per_patch);
     }
 
     HeightMap::~HeightMap()
@@ -71,21 +80,20 @@ namespace bls
 
         shader->bind();
 
-        shader->set_uniform4("projection", projection);
-        shader->set_uniform4("view", view);
         shader->set_uniform4("model", mat4(1.0f));
+        shader->set_uniform4("view", view);
+        shader->set_uniform4("projection", projection);
+        shader->set_uniform1("heightMap", 1U);
+
+        texture->bind(1);
 
         vao->bind();
 
         renderer.set_face_culling(false);
-        for (u32 strip = 0; strip < num_strips; strip++)
-        {
-            renderer.draw_indexed(RenderingMode::TriangleStrip,
-                                  num_triangles_per_strip + 2,
-                                  reinterpret_cast<void*>(sizeof(u32) * (num_triangles_per_strip + 2) * strip));
-        }
+        renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);
         renderer.set_face_culling(true);
 
-        AppStats::vertices += num_strips * num_triangles_per_strip * 3;
+        // Not exactly right but gives a good estimate
+        AppStats::vertices += num_vert_per_patch * num_patches * num_patches;
     }
 };  // namespace bls

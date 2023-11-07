@@ -184,6 +184,11 @@ namespace bls
             glDisable(GL_CULL_FACE);
     }
 
+    void OpenGLRenderer::set_tesselation_patches(u32 patches)
+    {
+        glPatchParameteri(GL_PATCH_VERTICES, patches);
+    }
+
     void OpenGLRenderer::clear_color(const vec4 &color)
     {
         glClearColor(color.r, color.g, color.b, color.a);
