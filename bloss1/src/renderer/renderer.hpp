@@ -12,7 +12,8 @@ namespace bls
     {
         Lines,
         Triangles,
-        TriangleStrip
+        TriangleStrip,
+        Patches
     };
 
     class Skybox;
