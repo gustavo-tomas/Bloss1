@@ -40,7 +40,6 @@ namespace bls
         // Shaders - by now they should have been initialized
         auto g_buffer_shader = shaders["g_buffer"].get();
         auto pbr_shader = shaders["pbr"].get();
-        auto ui_shader = shaders["ui"].get();
 
         // Reset the viewport
         renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});

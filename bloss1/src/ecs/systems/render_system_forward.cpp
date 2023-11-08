@@ -29,7 +29,6 @@ namespace bls
         auto far = camera->far;
 
         auto &shaders = renderer.get_shaders();
-        auto &textures = renderer.get_textures();
         auto &skybox = renderer.get_skybox();
         auto &shadow_map = renderer.get_shadow_map();
         auto &height_map = renderer.get_height_map();
