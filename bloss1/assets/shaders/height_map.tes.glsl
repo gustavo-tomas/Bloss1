@@ -21,6 +21,7 @@ in vec2 TextureCoord[];
 
 out float Height;
 out float MinMaxHeight;
+out vec2 TextureCoords;
 
 // https://github.com/stegu/webgl-noise
 float PerlinNoise(vec2 p);
@@ -40,6 +41,8 @@ void main()
     vec2 t1 = (t11 - t10) * u + t10;
     vec2 texCoord = (t1 - t0) * v + t0;
     texCoord += displacement;
+
+    TextureCoords = texCoord;
 
     if (noise_algorithm == 0) {
         Height = FBM(texCoord * fbm_scale) * fbm_height - (fbm_height / 2.0);

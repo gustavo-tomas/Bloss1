@@ -2,6 +2,7 @@
 
 in float Height;
 in float MinMaxHeight;
+in vec2 TextureCoords;
 
 out vec4 FragColor;
 
