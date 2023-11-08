@@ -1,7 +1,7 @@
 #include "config.hpp"
 #include "core/game.hpp"
-#include "ecs/ecs.hpp"
 #include "ecs/systems/render_system.hpp"
+#include "renderer/font.hpp"
 #include "renderer/height_map.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
@@ -11,9 +11,9 @@
 
 namespace bls
 {
-    void render_system_deferred(ECS &ecs, f32 dt)
+    void render_system_forward(ECS &ecs, f32 dt)
     {
-        BLS_PROFILE_SCOPE("render_system_deferred");
+        BLS_PROFILE_SCOPE("render_system_forward");
 
         auto &window = Game::get().get_window();
         auto &renderer = Game::get().get_renderer();
@@ -30,17 +30,13 @@ namespace bls
 
         auto &shaders = renderer.get_shaders();
         auto &textures = renderer.get_textures();
-        auto &g_buffer = renderer.get_gbuffer();
         auto &skybox = renderer.get_skybox();
-        auto &quad = renderer.get_rendering_quad();
         auto &shadow_map = renderer.get_shadow_map();
         auto &height_map = renderer.get_height_map();
         auto &post_processing = renderer.get_post_processing();
 
         // Shaders - by now they should have been initialized
-        auto g_buffer_shader = shaders["g_buffer"].get();
-        auto pbr_shader = shaders["pbr"].get();
-        auto ui_shader = shaders["ui"].get();
+        auto pbr_shader = shaders["f_pbr"].get();
 
         // Reset the viewport
         renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});
@@ -57,46 +53,13 @@ namespace bls
         renderer.clear();
         renderer.set_viewport(0, 0, width, height);
 
-        // Geometry pass: render scene data into gbuffer
-        // -------------------------------------------------------------------------------------------------------------
-        g_buffer->bind();
-        renderer.clear();
-
-        g_buffer_shader->bind();
-        g_buffer_shader->set_uniform4("projection", projection);
-        g_buffer_shader->set_uniform4("view", view);
-
-        // Render the scene
-        render_scene(ecs, *g_buffer_shader, renderer);
-
-        // Render height map
-        if (AppConfig::tess_wireframe)
-        {
-            renderer.set_debug_mode(AppConfig::tess_wireframe);
-            height_map->render(view, projection, dt);
-            renderer.set_debug_mode(!AppConfig::tess_wireframe);
-        }
-
-        else
-            height_map->render(view, projection, dt);
-
-        // Render particles
-        particle_system(ecs, dt);
-
-        g_buffer->unbind();
-        g_buffer_shader->unbind();
-
-        // Lighting pass: calculate lighting using the gbuffer content
-        // -------------------------------------------------------------------------------------------------------------
-        renderer.clear();
-
         pbr_shader->bind();
+        pbr_shader->set_uniform4("projection", projection);
+        pbr_shader->set_uniform4("view", view);
 
-        // Set camera position
         pbr_shader->set_uniform3("viewPos", position);
-
-        // Set light uniforms
         pbr_shader->set_uniform3("lightDir", shadow_map->get_light_dir());
+
         pbr_shader->set_uniform1("near", near);
         pbr_shader->set_uniform1("far", far);
 
@@ -129,30 +92,29 @@ namespace bls
             light_counter++;
         }
 
-        // Set texture attachments ---
-        u32 tex_position = 0;
-        for (const auto &[name, texture] : textures)
-        {
-            if (name == "ui") continue;
-
-            pbr_shader->set_uniform1("textures." + name, tex_position);
-            texture->bind(tex_position);
-            tex_position++;
-        }
-
         // Bind maps
         skybox->bind(*pbr_shader, 12);           // IBL maps
         shadow_map->bind_maps(*pbr_shader, 15);  // Shadow map
 
-        // Begin post processing process
+        // Begin post processing
         post_processing->begin();
-        quad->render();  // Render light quad
-        post_processing->end();
 
-        // Copy content of geometry's depth buffer to default framebuffer's depth buffer
-        // -------------------------------------------------------------------------------------------------------------
-        g_buffer->bind_and_blit(width, height);
-        g_buffer->unbind();
+        // Render the scene
+        render_scene(ecs, *pbr_shader, renderer);
+
+        // Render height map
+        if (AppConfig::tess_wireframe)
+        {
+            renderer.set_debug_mode(AppConfig::tess_wireframe);
+            height_map->render(view, projection, dt);
+            renderer.set_debug_mode(!AppConfig::tess_wireframe);
+        }
+
+        else
+            height_map->render(view, projection, dt);
+
+        // Render particles
+        particle_system(ecs, dt);
 
         // Draw the skybox last
         skybox->draw(view, projection);
@@ -160,12 +122,15 @@ namespace bls
         // Draw UI
         render_ui();
 
-// Render debug lines
+        // Render texts
+        render_texts(ecs);
+
+        // Render debug lines
 #if !defined(_RELEASE)
         if (AppConfig::render_colliders) render_colliders(ecs, projection, view);
 #endif
 
-        // Render texts
-        render_texts(ecs);
+        // End post processing
+        post_processing->end();
     }
 };  // namespace bls

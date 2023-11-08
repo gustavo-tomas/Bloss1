@@ -72,6 +72,10 @@ namespace bls
         // PBR shader
         shaders["pbr"] = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
 
+        // PBR shader
+        shaders["f_pbr"] = Shader::create(
+            "f_pbr", "bloss1/assets/shaders/pbr/pbr_forward.vs", "bloss1/assets/shaders/pbr/pbr_forward.fs");
+
         // Debug shader
         shaders["color"] = Shader::create(
             "color", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
@@ -109,11 +113,7 @@ namespace bls
         render_buffer->bind();
 
         // Check if framebuffer is complete
-        if (!g_buffer->check())
-            throw std::runtime_error(
-                "framebuffer is not "
-                "complete");
-
+        if (!g_buffer->check()) throw std::runtime_error("framebuffer is not complete");
         g_buffer->unbind();
 
         // Create a skybox

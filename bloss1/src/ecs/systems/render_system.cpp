@@ -129,8 +129,42 @@ namespace bls
         }
     }
 
+    void render_ui()
+    {
+        auto &renderer = Game::get().get_renderer();
+        auto &textures = renderer.get_textures();
+        auto &shader = renderer.get_shaders()["ui"];
+        auto &quad = renderer.get_rendering_quad();
+        auto &window = Game::get().get_window();
+
+        auto width = window.get_width();
+        auto height = window.get_height();
+
+        auto p = std::find_if(textures.begin(), textures.end(), [](auto p) { return p.first == "ui"; });
+        std::shared_ptr<bls::Texture> ui_texture = p->second;
+
+        auto tex_width = ui_texture->get_width();
+        auto tex_height = ui_texture->get_height();
+
+        renderer.set_viewport(
+            (width / 2) - (tex_width / 4), (height / 2) - (tex_height / 4), tex_width / 2, tex_height / 2);
+
+        shader->bind();
+        shader->set_uniform1("screenTexture", 0U);
+        ui_texture->bind(0);
+        quad->render();
+    }
+
     void render_texts(ECS &ecs)
     {
+        auto &renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
+
+        auto width = window.get_width();
+        auto height = window.get_height();
+
+        renderer.set_viewport(0, 0, width, height);
+
         auto &texts = ecs.texts;
         auto &transforms = ecs.transforms;
         for (const auto &[id, text] : texts)

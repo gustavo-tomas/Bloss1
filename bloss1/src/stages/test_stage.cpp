@@ -32,7 +32,7 @@ namespace bls
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
-        ecs->add_system(render_system_deferred);
+        ecs->add_system(render_system_forward);  // 8
         ecs->add_system(sound_system);
         ecs->add_system(cleanup_system);
 
@@ -61,6 +61,12 @@ namespace bls
     void TestStage::update(f32 dt)
     {
         BLS_PROFILE_SCOPE("update");
+
+        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_2))
+            ecs->systems[8] = render_system_deferred;
+
+        else
+            ecs->systems[8] = render_system_forward;
 
         // Update all systems in registration order
         auto &systems = ecs->systems;
