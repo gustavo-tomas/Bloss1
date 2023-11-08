@@ -145,6 +145,23 @@ namespace bls
         ImGui::Separator();
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
         ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
+        ImGui::InputInt("Noise Algorithm", reinterpret_cast<i32 *>(&height_map->noise_algorithm));
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::Text("FBM");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputInt("Octaves", &height_map->fbm_octaves);
+        ImGui::InputFloat("FBM Scale", &height_map->fbm_scale);
+        ImGui::InputFloat("FBM Height", &height_map->fbm_height);
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::Text("Perlin");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputFloat("Perlin Scale", &height_map->perlin_scale);
+        ImGui::InputFloat("Perlin Height", &height_map->perlin_height);
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
         ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
         ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
@@ -313,8 +330,8 @@ namespace bls
                     ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 
-                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
                 ImGui::InputFloat3("offset", value_ptr(ecs.colliders[id]->offset));
+                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
 

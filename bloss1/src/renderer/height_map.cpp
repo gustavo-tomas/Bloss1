@@ -12,8 +12,15 @@ namespace bls
         this->max_tess_level = max_tess_level;
         this->min_distance = min_distance;
         this->max_distance = max_distance;
+
         this->displacement = vec2(0.0f);
         this->displacement_multiplier = vec2(0.0f);
+        this->fbm_height = 64.0f;
+        this->perlin_height = 64.0f;
+        this->fbm_scale = 1.0f;
+        this->perlin_scale = 1.0f;
+        this->fbm_octaves = 6;
+        this->noise_algorithm = 0;
 
         // Create shaders
         shader = Shader::create("height_map_shader",
@@ -97,6 +104,15 @@ namespace bls
         shader->set_uniform1("max_tess_level", max_tess_level);
         shader->set_uniform1("min_distance", min_distance);
         shader->set_uniform1("max_distance", max_distance);
+
+        shader->set_uniform1("noise_algorithm", noise_algorithm);
+
+        shader->set_uniform1("fbm_scale", fbm_scale);
+        shader->set_uniform1("fbm_height", fbm_height);
+        shader->set_uniform1("octaves", static_cast<u32>(fbm_octaves));
+
+        shader->set_uniform1("perlin_scale", perlin_scale);
+        shader->set_uniform1("perlin_height", perlin_height);
 
         vao->bind();
         renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);

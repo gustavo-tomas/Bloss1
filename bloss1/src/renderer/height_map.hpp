@@ -22,9 +22,11 @@ namespace bls
 
             void render(const mat4& view, const mat4& projection, f32 dt);
 
-            u32 min_tess_level, max_tess_level;
+            u32 min_tess_level, max_tess_level, noise_algorithm;
             f32 min_distance, max_distance;
             vec2 displacement_multiplier;
+            f32 fbm_scale, fbm_height, perlin_scale, perlin_height;
+            i32 fbm_octaves;
 
         private:
             u32 num_vert_per_patch, num_patches;

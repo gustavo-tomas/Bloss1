@@ -2,6 +2,16 @@
 
 layout (quads, fractional_odd_spacing, cw) in;
 
+// FBM
+uniform int octaves;
+uniform float fbm_scale;
+uniform float fbm_height;
+
+// Perlin
+uniform float perlin_scale;
+uniform float perlin_height;
+
+uniform int noise_algorithm;
 uniform vec2 displacement;
 uniform mat4 model;
 uniform mat4 view;
@@ -10,9 +20,11 @@ uniform mat4 projection;
 in vec2 TextureCoord[];
 
 out float Height;
+out float MinMaxHeight;
 
 // https://github.com/stegu/webgl-noise
 float PerlinNoise(vec2 p);
+float FBM(vec2 st);
 
 void main()
 {
@@ -29,7 +41,15 @@ void main()
     vec2 texCoord = (t1 - t0) * v + t0;
     texCoord += displacement;
 
-    Height = PerlinNoise(texCoord * 10.0) * 64.0;
+    if (noise_algorithm == 0) {
+        Height = FBM(texCoord * fbm_scale) * fbm_height - (fbm_height / 2.0);
+        MinMaxHeight = fbm_height / 2.0;
+    }
+    
+    else {
+        Height = PerlinNoise(texCoord * perlin_scale) * perlin_height - (perlin_height / 2.0);
+        MinMaxHeight = perlin_height / 2.0;
+    }
 
     vec4 p00 = gl_in[0].gl_Position;
     vec4 p01 = gl_in[1].gl_Position;
@@ -107,4 +127,44 @@ float PerlinNoise(vec2 P)
     
     // return 2.3 * n_xy;
     return (2.3 * n_xy) * 0.5 + 0.5;
+}
+
+float random(vec2 st)
+{
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+}
+
+float noise(vec2 st)
+{
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u.x) +
+              (c - a) * u.y * (1.0 - u.x) +
+              (d - b) * u.x * u.y;
+}
+
+float FBM(vec2 st)
+{
+    // Initial values
+    float value = 0.0;
+    float amplitude = 0.5;
+    
+    // Loop of octaves
+    for (int i = 0; i < octaves; i++)
+    {
+        value += amplitude * noise(st);
+        st *= 2.0;
+        amplitude *= 0.5;
+    }
+
+    return value;
 }
