@@ -121,8 +121,6 @@ namespace bls
 
                 mesh->vao->bind();
                 renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
-
-                // Reset
                 mesh->vao->unbind();
 
                 // Update stats
