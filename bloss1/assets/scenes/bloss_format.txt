@@ -40,6 +40,7 @@ particle_system: type, particle_2D, particles_to_be_emitted, time_to_emit, cente
 	sharpen_pass: u32 position, bool enabled, f32 amount;
 	posterization_pass: u32 position, bool enabled, f32 levels;
 	pixelization_pass: u32 position, bool enabled, u32 pixel_size;
+	outline_pass: u32 position, bool enabled, vec3 color, f32 threshold;
 }
 
 // Example:
