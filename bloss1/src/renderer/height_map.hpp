@@ -6,6 +6,7 @@
 
 #include "renderer/buffers.hpp"
 #include "renderer/shader.hpp"
+#include "renderer/texture.hpp"
 
 namespace bls
 {
@@ -28,11 +29,15 @@ namespace bls
             f32 fbm_scale, fbm_height, perlin_scale, perlin_height;
             i32 fbm_octaves;
 
+            std::vector<f32> texture_heights;
+            bool toggle_gradient;
+
         private:
             u32 num_vert_per_patch, num_patches;
             vec2 displacement;
 
             std::shared_ptr<Shader> shader;
+            std::vector<std::shared_ptr<Texture>> texture_layers;
             std::unique_ptr<VertexArray> vao;
             std::unique_ptr<VertexBuffer> vbo;
     };

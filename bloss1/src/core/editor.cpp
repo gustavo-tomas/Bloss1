@@ -144,8 +144,22 @@ namespace bls
         ImGui::Text("Terrain");
         ImGui::Separator();
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
+        ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
+        ImGui::InputFloat("Min distance", &height_map->min_distance);
+        ImGui::InputFloat("Max distance", &height_map->max_distance);
         ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
         ImGui::InputInt("Noise Algorithm", reinterpret_cast<i32 *>(&height_map->noise_algorithm));
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::Text("Layers");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        for (size_t i = 0; i < height_map->texture_heights.size(); i++)
+            ImGui::InputFloat(("Layer " + to_str(i)).c_str(), &height_map->texture_heights[i]);
+
+        ImGui::Checkbox("Toggle Gradient", &height_map->toggle_gradient);
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
         ImGui::Text("FBM");
@@ -161,13 +175,6 @@ namespace bls
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
         ImGui::InputFloat("Perlin Scale", &height_map->perlin_scale);
         ImGui::InputFloat("Perlin Height", &height_map->perlin_height);
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
-        ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
-        ImGui::InputFloat("Min distance", &height_map->min_distance);
-        ImGui::InputFloat("Max distance", &height_map->max_distance);
-
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
         ImGui::Text("Post processing passes");

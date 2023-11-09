@@ -15,12 +15,22 @@ namespace bls
 
         this->displacement = vec2(0.0f);
         this->displacement_multiplier = vec2(0.0f);
-        this->fbm_height = 64.0f;
+        this->fbm_height = 364.0f;
         this->perlin_height = 64.0f;
-        this->fbm_scale = 1.0f;
+        this->fbm_scale = 5.0f;
         this->perlin_scale = 1.0f;
         this->fbm_octaves = 6;
         this->noise_algorithm = 0;
+
+        texture_heights.resize(4);
+        texture_layers.resize(4);
+
+        texture_heights[0] = 0.03f;
+        texture_heights[1] = 0.62f;
+        texture_heights[2] = 0.67f;
+        texture_heights[3] = 0.72f;
+
+        this->toggle_gradient = false;
 
         // Create shaders
         shader = Shader::create("height_map_shader",
@@ -29,6 +39,14 @@ namespace bls
                                 "",
                                 "bloss1/assets/shaders/height_map.tcs.glsl",
                                 "bloss1/assets/shaders/height_map.tes.glsl");
+
+        // Sand -> Trees -> Rock -> Snow
+        texture_layers[0] =
+            Texture::create("h_t0", "bloss1/assets/textures/coast_sand_01_diff_2k.png", TextureType::Diffuse);
+        texture_layers[1] =
+            Texture::create("h_t1", "bloss1/assets/textures/coast_sand_rocks_02_diff_2k.png", TextureType::Diffuse);
+        texture_layers[2] = Texture::create("h_t2", "bloss1/assets/textures/rock_05_diff_2k.png", TextureType::Diffuse);
+        texture_layers[3] = Texture::create("h_t3", "bloss1/assets/textures/snow_02_diff_2k.png", TextureType::Diffuse);
 
         const f32 w = static_cast<f32>(width);
         const f32 h = static_cast<f32>(height);
@@ -113,6 +131,15 @@ namespace bls
 
         shader->set_uniform1("perlin_scale", perlin_scale);
         shader->set_uniform1("perlin_height", perlin_height);
+
+        shader->set_uniform1("toggleGradient", toggle_gradient);
+        shader->set_uniform1("layers", static_cast<u32>(texture_heights.size()));
+        for (size_t i = 0; i < texture_heights.size(); i++)
+        {
+            shader->set_uniform1("textures[" + to_str(i) + "]", static_cast<u32>(i) + 4U);
+            shader->set_uniform1("heights[" + to_str(i) + "]", texture_heights[i]);
+            texture_layers[i]->bind(i + 4U);
+        }
 
         vao->bind();
         renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);
