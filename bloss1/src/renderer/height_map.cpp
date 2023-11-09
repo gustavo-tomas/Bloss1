@@ -141,6 +141,18 @@ namespace bls
             texture_layers[i]->bind(i + 4U);
         }
 
+        const auto& ecs = Game::get().get_curr_stage().ecs;
+        for (auto& [id, dir_light] : ecs->dir_lights)
+        {
+            auto& direction = ecs->transforms[id]->rotation;
+            shader->set_uniform3("dirLight.direction", direction);
+            shader->set_uniform3("dirLight.ambient", dir_light->ambient);
+            shader->set_uniform3("dirLight.diffuse", dir_light->diffuse);
+            shader->set_uniform3("dirLight.specular", dir_light->specular);
+
+            break;
+        }
+
         vao->bind();
         renderer.draw_arrays(RenderingMode::Patches, num_vert_per_patch * num_patches * num_patches);
         vao->unbind();
