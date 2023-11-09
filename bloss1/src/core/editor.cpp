@@ -263,6 +263,13 @@ namespace bls
             ImGui::InputInt("Pixel Size", reinterpret_cast<i32 *>(&pixel_pass->pixel_size));
         }
 
+        else if (typeid(*pass.pass) == typeid(OutlinePass))
+        {
+            auto *outline_pass = static_cast<OutlinePass *>(pass.pass);
+            ImGui::InputFloat("Threshold", &outline_pass->threshold);
+            ImGui::InputFloat3("Edge Color", value_ptr(outline_pass->color));
+        }
+
         else
             ImGui::Text("-");
     }

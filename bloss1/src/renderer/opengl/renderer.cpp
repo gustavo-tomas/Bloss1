@@ -254,6 +254,7 @@ namespace bls
         post_processing->add_pass(new SharpenPass(width, height, 0.05f), pass_position++);
         post_processing->add_pass(new PosterizationPass(width, height, 8.0f), pass_position++);
         post_processing->add_pass(new PixelizationPass(width, height, 4), pass_position++);
+        post_processing->add_pass(new OutlinePass(width, height, vec3(0.0f), 0.8f), pass_position++);
     }
 
     std::map<str, std::shared_ptr<Shader>> &OpenGLRenderer::get_shaders()

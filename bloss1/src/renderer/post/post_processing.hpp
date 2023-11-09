@@ -281,6 +281,39 @@ namespace bls
             }
     };
 
+    class OutlinePass : public RenderPass
+    {
+        public:
+            OutlinePass(u32 width, u32 height, const vec3 &color, f32 threshold)
+                : RenderPass(width, height), color(color), threshold(threshold)
+            {
+                shader = Shader::create(
+                    "outline", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/outline.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform3("edge_color", color);
+                shader->set_uniform1("threshold", threshold);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "OutlinePass";
+            }
+
+            f32 threshold;
+            vec3 color;
+    };
+
     class PostProcessingSystem
     {
             struct PostProcessingPass

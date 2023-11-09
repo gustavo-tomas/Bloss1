@@ -52,3 +52,4 @@ $ just clean cfg
 - [Rendering terrain with Tesselation Shaders](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
 - [Noise algorithms](https://github.com/stegu/webgl-noise)
 - [FBM algorithm](https://thebookofshaders.com/13/)
+- [Edge detection shader](https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115)
