@@ -40,7 +40,7 @@ namespace bls
     {
     }
 
-    void update_state_machine(ECS &ecs, u32 id, const str &state, f32 dt)
+    void update_state_machine(ECS &ecs, u32 id, const str &state, f32)
     {
         const auto &state_machine = ecs.state_machines[id];
         if (state_machine->current_state == state) return;

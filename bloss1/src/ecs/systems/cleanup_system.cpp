@@ -3,7 +3,7 @@
 
 namespace bls
 {
-    void cleanup_system(ECS& ecs, f32 dt)
+    void cleanup_system(ECS& ecs, f32)
     {
         BLS_PROFILE_SCOPE("cleanup_system");
 

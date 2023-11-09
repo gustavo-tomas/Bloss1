@@ -51,8 +51,8 @@ namespace bls
                       sin(radians(ophanim_transform->rotation.y)) * cos(radians(ophanim_transform->rotation.x))};
         front = normalize(front);
 
-        vec3 right = normalize(cross(front, {0.0f, 1.0f, 0.0f}));
-        vec3 up = normalize(cross(right, front));
+        // vec3 right = normalize(cross(front, {0.0f, 1.0f, 0.0f}));
+        // vec3 up = normalize(cross(right, front));
 
         Transform bullet_transform = *ophanim_transform;
         bullet_transform.position = bullet_transform.position + front * 30.0f;

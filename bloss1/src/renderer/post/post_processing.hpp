@@ -310,8 +310,8 @@ namespace bls
                 return "OutlinePass";
             }
 
-            f32 threshold;
             vec3 color;
+            f32 threshold;
     };
 
     class PostProcessingSystem
