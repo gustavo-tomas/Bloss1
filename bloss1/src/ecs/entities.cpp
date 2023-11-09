@@ -57,7 +57,8 @@ namespace bls
                                              Collider::ColliderMask::Projectile,  // description
                                              Collider::ColliderMask::World |      // interaction
                                                  Collider::ColliderMask::Player | Collider::ColliderMask::Enemy);
-        ecs.projectiles[id] = std::make_unique<Projectile>(sender_id, damage, explosion_radius, explosion_duration);
+        ecs.projectiles[id] =
+            std::make_unique<Projectile>(sender_id, damage, explosion_radius, explosion_duration, 10.0f);
         ecs.timers[id] = std::make_unique<Timer>();
 
         auto *emitter = new SphereEmitter(transform.position, false, transform.scale.x / 6.25f);

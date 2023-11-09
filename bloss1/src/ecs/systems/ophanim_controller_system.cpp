@@ -1,3 +1,4 @@
+#include "core/game.hpp"
 #include "ecs/ecs.hpp"
 #include "ecs/entities.hpp"
 
@@ -7,6 +8,9 @@ namespace bls
     void rain_on_player(ECS &ecs);
     void cage_on_player(ECS &ecs);
 
+    const f32 MIN_POS_Y = 50.0f;
+    const f32 MAX_POS_Y = 100.0f;
+
     f32 ophanim_initial_hp = -1;
     void ophanim_controller_system(ECS &ecs, f32 dt)
     {
@@ -14,7 +18,7 @@ namespace bls
 
         str ophanim_state = OPHANIM_STATE_IDLE;
 
-        if (ecs.hitpoints[1] < ophanim_initial_hp)
+        if (ecs.hitpoints[1] < ophanim_initial_hp && ecs.hitpoints[0] > 0.0f)
         {
             ophanim_state = OPHANIM_STATE_ALERT;
 
@@ -29,13 +33,16 @@ namespace bls
 
             const auto &timer = ecs.timers[1];
             timer->time += dt;
-            if (timer->time >= 3.75f)
-            {
-                // shoot_player(ecs);
-                // rain_on_player(ecs);
+            if (timer->time < 3.75f) return;
+
+            auto &rand_engine = Game::get().get_random_engine();
+            if (rand_engine.get_float(0, 1) < 0.5)
+                rain_on_player(ecs);
+
+            else
                 cage_on_player(ecs);
-                timer->time = 0.0f;
-            }
+
+            timer->time = 0.0f;
         }
 
         update_state_machine(ecs, 1, ophanim_state, dt);
@@ -66,16 +73,26 @@ namespace bls
     void rain_on_player(ECS &ecs)
     {
         const auto &player_transform = ecs.transforms[0];
+        const auto &player_vel = ecs.physics_objects[0]->velocity;
+        const u16 num_of_bullets = 5;
 
-        Transform bullet_transform = *player_transform;
-        bullet_transform.position = bullet_transform.position + vec3(0.0f, 100.0f, 0.0f);
-        bullet_transform.rotation = vec3(90.0f, 0.0f, 0.0f);
-        bullet_transform.scale = vec3(20.0f);
+        for (u16 i = 0; i < num_of_bullets; i++)
+        {
+            // Roughly predict player position
+            const vec3 offset = vec3(0.0f, 120.0f, 0.0f) + normalize(player_vel) * 20.0f * static_cast<f32>(i);
+            mat4 model_mat = mat4(1.0f);
+            model_mat = glm::translate(model_mat, player_transform->position + offset);
 
-        PhysicsObject bullet_object =
-            PhysicsObject(vec3(0.0f), vec3(10000.0f), vec3(0.0f, -1.0f, 0.0f) * 200'000.0f, 15.0f);
+            Transform bullet_transform;
+            bullet_transform.position = vec3(model_mat[3]);
+            bullet_transform.rotation = vec3(90.0f, 0.0f, 0.0f);
+            bullet_transform.scale = vec3(20.0f);
 
-        bullet(ecs, bullet_transform, bullet_object, 1, 2.0f, 15.0f, 1.0f);
+            // Indicate bullet landing point
+            vec3 indicator_offset = offset;
+            indicator_offset.y = 0.0f;
+            ophanim_target_indicator(ecs, 0, indicator_offset, vec3(0.0f), 2.0f);
+        }
     }
 
     void cage_on_player(ECS &ecs)
