@@ -376,6 +376,18 @@ namespace bls
 
                 scene << "\n";
             }
+
+            else if (pass.name == "OutlinePass")
+            {
+                scene << "\toutline_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                write_vec3(&scene, static_cast<OutlinePass *>(pass.pass)->color, ", ");
+                scene << to_str(static_cast<OutlinePass *>(pass.pass)->threshold) << "; ";
+
+                scene << "\n";
+            }
         }
 
         scene << "}"
@@ -722,9 +734,7 @@ namespace bls
             }
 
             // PosterizationPass
-            else if (parameter ==
-                     "posterization_"
-                     "pass")
+            else if (parameter == "posterization_pass")
             {
                 std::getline(iline, position, ',');
                 std::getline(iline, enabled, ',');
@@ -749,9 +759,7 @@ namespace bls
             }
 
             // PixelizationPass
-            else if (parameter ==
-                     "pixelization_"
-                     "pass")
+            else if (parameter == "pixelization_pass")
             {
                 std::getline(iline, position, ',');
                 std::getline(iline, enabled, ',');
@@ -783,6 +791,29 @@ namespace bls
                 auto it = std::find_if(AppConfig::render_passes.begin(),
                                        AppConfig::render_passes.end(),
                                        [](const auto &pass) { return typeid(*pass.pass) == typeid(PixelizationPass); });
+
+                if (it != AppConfig::render_passes.end())
+                {
+                    it->enabled = std::stoul(enabled);
+                    it->position = std::stoul(position);
+                    post_processing->set_pass(it->id, it->enabled, it->position);
+                }
+            }
+
+            // OutlinePass
+            else if (parameter == "outline_pass")
+            {
+                str threshold;
+
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                vec3 color = read_vec3(&iline, ',');
+                std::getline(iline, threshold, ';');
+
+                auto it = std::find_if(AppConfig::render_passes.begin(),
+                                       AppConfig::render_passes.end(),
+                                       [](const auto &pass) { return typeid(*pass.pass) == typeid(OutlinePass); });
 
                 if (it != AppConfig::render_passes.end())
                 {

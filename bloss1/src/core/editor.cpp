@@ -8,6 +8,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "platform/glfw/window.hpp"
+#include "renderer/height_map.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
 
@@ -126,12 +127,46 @@ namespace bls
 
     void Editor::render_config()
     {
+        auto &renderer = Game::get().get_renderer();
+
         ImGui::Begin("Configuration");
 
         ImGui::Text("Debug options");
         ImGui::Separator();
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
         ImGui::Checkbox("Colliders", &AppConfig::render_colliders);
+        ImGui::Checkbox("Tesselation Wireframe", &AppConfig::tess_wireframe);
+
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        auto &height_map = renderer.get_height_map();
+
+        ImGui::Text("Terrain");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
+        ImGui::InputInt("Noise Algorithm", reinterpret_cast<i32 *>(&height_map->noise_algorithm));
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::Text("FBM");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputInt("Octaves", &height_map->fbm_octaves);
+        ImGui::InputFloat("FBM Scale", &height_map->fbm_scale);
+        ImGui::InputFloat("FBM Height", &height_map->fbm_height);
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::Text("Perlin");
+        ImGui::Separator();
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        ImGui::InputFloat("Perlin Scale", &height_map->perlin_scale);
+        ImGui::InputFloat("Perlin Height", &height_map->perlin_height);
+        ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+        ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
+        ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
+        ImGui::InputFloat("Min distance", &height_map->min_distance);
+        ImGui::InputFloat("Max distance", &height_map->max_distance);
 
         ImGui::Dummy(ImVec2(10.0f, 10.0f));
 
@@ -155,7 +190,7 @@ namespace bls
         ImGui::TableSetupColumn("Active");
 
         ImGui::TableHeadersRow();
-        auto &post_processing = Game::get().get_renderer().get_post_processing();
+        auto &post_processing = renderer.get_post_processing();
         for (auto &pass : AppConfig::render_passes)
         {
             ImGui::TableNextRow();
@@ -184,9 +219,7 @@ namespace bls
                 ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
 
             else
-                ImGui::Text(
-                    "BasePass is always "
-                    "enabled");
+                ImGui::Text("BasePass is always enabled");
 
             if (pass.id > 0) post_processing->set_pass(pass.id, pass.enabled, pass.position);
         }
@@ -228,6 +261,13 @@ namespace bls
         {
             auto *pixel_pass = static_cast<PixelizationPass *>(pass.pass);
             ImGui::InputInt("Pixel Size", reinterpret_cast<i32 *>(&pixel_pass->pixel_size));
+        }
+
+        else if (typeid(*pass.pass) == typeid(OutlinePass))
+        {
+            auto *outline_pass = static_cast<OutlinePass *>(pass.pass);
+            ImGui::InputFloat("Threshold", &outline_pass->threshold);
+            ImGui::InputFloat3("Edge Color", value_ptr(outline_pass->color));
         }
 
         else
@@ -297,8 +337,8 @@ namespace bls
                     ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 
-                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
                 ImGui::InputFloat3("offset", value_ptr(ecs.colliders[id]->offset));
+                ImGui::Checkbox("immovable", &ecs.colliders[id]->immovable);
                 ImGui::Dummy(ImVec2(10.0f, 10.0f));
             }
 

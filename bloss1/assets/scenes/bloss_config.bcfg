@@ -6,4 +6,5 @@
 	sharpen_pass: 4, 0, 0.05;
 	posterization_pass: 5, 0, 18.0;
 	pixelization_pass: 6, 0, 5;
+	outline_pass: 7, 0, (0.0, 0.0, 0.0), 0.8;
 }

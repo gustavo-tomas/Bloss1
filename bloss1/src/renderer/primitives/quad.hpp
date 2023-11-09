@@ -50,15 +50,11 @@ namespace bls
             IndexBuffer *ebo;
 
             std::vector<f32> vertices = {
-                // positions          // texture Coords
-                (-1.0f), 1.0f,  0.0f, 0.0f,
-                1.0f,  // 0
-                (-1.0f), -1.0f, 0.0f, 0.0f,
-                0.0f,  // 1
-                (1.0f),  1.0f,  0.0f, 1.0f,
-                1.0f,  // 2
-                (1.0f),  -1.0f, 0.0f, 1.0f,
-                0.0f  // 3
+                // positions        // texture Coords
+                -1.0f, 1.0f,  0.0f, 0.0f, 1.0f,  // 0
+                -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,  // 1
+                1.0f,  1.0f,  0.0f, 1.0f, 1.0f,  // 2
+                1.0f,  -1.0f, 0.0f, 1.0f, 0.0f   // 3
             };
 
             std::vector<u32> indices = {

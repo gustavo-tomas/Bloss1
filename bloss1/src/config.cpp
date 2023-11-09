@@ -8,4 +8,5 @@ namespace bls
 
     std::vector<PassConfig> AppConfig::render_passes = {};
     bool AppConfig::render_colliders = true;
+    bool AppConfig::tess_wireframe = false;
 };  // namespace bls

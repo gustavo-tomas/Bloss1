@@ -36,6 +36,8 @@ namespace bls
             static std::shared_ptr<Shader> create(const str &name,
                                                   const str &vertex_path,
                                                   const str &fragment_path,
-                                                  const str &geometry_path = "");
+                                                  const str &geometry_path = "",
+                                                  const str &tess_ctrl_path = "",
+                                                  const str &tess_eval_path = "");
     };
 };  // namespace bls

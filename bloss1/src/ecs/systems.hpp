@@ -8,7 +8,8 @@
 
 namespace bls
 {
-    void render_system(ECS &ecs, f32 dt);
+    void render_system_deferred(ECS &ecs, f32 dt);
+    void render_system_forward(ECS &ecs, f32 dt);
     void physics_system(ECS &ecs, f32 dt);
     void animation_system(ECS &ecs, f32 dt);
     void camera_system(ECS &ecs, f32 dt);

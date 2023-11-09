@@ -13,11 +13,11 @@ namespace bls
     const f32 MIN_CAMERA_ZOOM = 45.0f;
     const f32 MAX_CAMERA_ZOOM = 70.0f;
 
-    const f32 MIN_PLAYER_PITCH = 0.0f;
-    const f32 MAX_PLAYER_PITCH = 25.0f;
+    const f32 MIN_PLAYER_PITCH = -89.0f;  // 0.0f
+    const f32 MAX_PLAYER_PITCH = 89.0f;   // 25.0f
 
-    const f32 PLAYER_TIMER_JUMP = 2.0f;
-    const f32 PLAYER_TIMER_JUMP_COOLDOWN = 1.0f;
+    const f32 PLAYER_TIMER_JUMP = 200000.0f;
+    const f32 PLAYER_TIMER_JUMP_COOLDOWN = 0.0f;
     const f32 PLAYER_TIMER_SHOOT_COOLDOWN = 1.0f;
 
     const str PLAYER_TIMER_STR_JUMP = "jumping";

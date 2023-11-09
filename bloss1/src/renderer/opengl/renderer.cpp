@@ -19,6 +19,8 @@ namespace bls
                 return GL_TRIANGLES;
             case RenderingMode::TriangleStrip:
                 return GL_TRIANGLE_STRIP;
+            case RenderingMode::Patches:
+                return GL_PATCHES;
             default:
                 throw std::runtime_error("invalid rendering mode\n");
         }
@@ -70,6 +72,10 @@ namespace bls
         // PBR shader
         shaders["pbr"] = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
 
+        // PBR shader
+        shaders["f_pbr"] = Shader::create(
+            "f_pbr", "bloss1/assets/shaders/pbr/pbr_forward.vs", "bloss1/assets/shaders/pbr/pbr_forward.fs");
+
         // Debug shader
         shaders["color"] = Shader::create(
             "color", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
@@ -107,11 +113,7 @@ namespace bls
         render_buffer->bind();
 
         // Check if framebuffer is complete
-        if (!g_buffer->check())
-            throw std::runtime_error(
-                "framebuffer is not "
-                "complete");
-
+        if (!g_buffer->check()) throw std::runtime_error("framebuffer is not complete");
         g_buffer->unbind();
 
         // Create a skybox
@@ -182,6 +184,11 @@ namespace bls
             glDisable(GL_CULL_FACE);
     }
 
+    void OpenGLRenderer::set_tesselation_patches(u32 patches)
+    {
+        glPatchParameteri(GL_PATCH_VERTICES, patches);
+    }
+
     void OpenGLRenderer::clear_color(const vec4 &color)
     {
         glClearColor(color.r, color.g, color.b, color.a);
@@ -192,10 +199,10 @@ namespace bls
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count)
+    void OpenGLRenderer::draw_indexed(RenderingMode mode, u32 count, const void *indices)
     {
         auto opengl_mode = convert_to_opengl_rendering_mode(mode);
-        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, 0);
+        glDrawElements(opengl_mode, count, GL_UNSIGNED_INT, indices);
     }
 
     void OpenGLRenderer::draw_arrays(RenderingMode mode, u32 count)
@@ -214,6 +221,13 @@ namespace bls
             dir.y *= -1.0f;
             shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
         }
+    }
+
+    void OpenGLRenderer::create_height_map(
+        u32 width, u32 height, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance)
+    {
+        height_map =
+            std::make_unique<HeightMap>(width, height, min_tess_level, max_tess_level, min_distance, max_distance);
     }
 
     void OpenGLRenderer::create_post_processing_passes()
@@ -240,6 +254,7 @@ namespace bls
         post_processing->add_pass(new SharpenPass(width, height, 0.05f), pass_position++);
         post_processing->add_pass(new PosterizationPass(width, height, 8.0f), pass_position++);
         post_processing->add_pass(new PixelizationPass(width, height, 4), pass_position++);
+        post_processing->add_pass(new OutlinePass(width, height, vec3(0.0f), 0.8f), pass_position++);
     }
 
     std::map<str, std::shared_ptr<Shader>> &OpenGLRenderer::get_shaders()
@@ -270,6 +285,11 @@ namespace bls
     std::unique_ptr<ShadowMap> &OpenGLRenderer::get_shadow_map()
     {
         return shadow_map;
+    }
+
+    std::unique_ptr<HeightMap> &OpenGLRenderer::get_height_map()
+    {
+        return height_map;
     }
 
     std::unique_ptr<PostProcessingSystem> &OpenGLRenderer::get_post_processing()
