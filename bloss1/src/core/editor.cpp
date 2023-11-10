@@ -277,6 +277,13 @@ namespace bls
             ImGui::InputFloat3("Edge Color", value_ptr(outline_pass->color));
         }
 
+        else if (typeid(*pass.pass) == typeid(VignettePass))
+        {
+            auto *vignette_pass = static_cast<VignettePass *>(pass.pass);
+            ImGui::InputFloat("Lens Radius", &vignette_pass->lens_radius);
+            ImGui::InputFloat("Lens Feathering", &vignette_pass->lens_feathering);
+        }
+
         else
             ImGui::Text("-");
     }

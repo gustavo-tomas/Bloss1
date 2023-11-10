@@ -388,6 +388,18 @@ namespace bls
 
                 scene << "\n";
             }
+
+            else if (pass.name == "VignettePass")
+            {
+                scene << "\tvignette_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<VignettePass *>(pass.pass)->lens_radius) << ", ";
+                scene << to_str(static_cast<VignettePass *>(pass.pass)->lens_feathering) << "; ";
+
+                scene << "\n";
+            }
         }
 
         scene << "}"
@@ -820,6 +832,33 @@ namespace bls
                     auto *outline_pass = static_cast<OutlinePass *>(it->pass);
                     outline_pass->color = color;
                     outline_pass->threshold = std::stof(threshold);
+
+                    it->enabled = std::stoul(enabled);
+                    it->position = std::stoul(position);
+                    post_processing->set_pass(it->id, it->enabled, it->position);
+                }
+            }
+
+            // VignettePass
+            else if (parameter == "vignette_pass")
+            {
+                str lens_radius, lens_feathering;
+
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                std::getline(iline, lens_radius, ',');
+                std::getline(iline, lens_feathering, ';');
+
+                auto it = std::find_if(AppConfig::render_passes.begin(),
+                                       AppConfig::render_passes.end(),
+                                       [](const auto &pass) { return typeid(*pass.pass) == typeid(VignettePass); });
+
+                if (it != AppConfig::render_passes.end())
+                {
+                    auto *vignette_pass = static_cast<VignettePass *>(it->pass);
+                    vignette_pass->lens_radius = std::stof(lens_radius);
+                    vignette_pass->lens_feathering = std::stof(lens_feathering);
 
                     it->enabled = std::stoul(enabled);
                     it->position = std::stoul(position);

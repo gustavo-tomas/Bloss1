@@ -314,6 +314,38 @@ namespace bls
             f32 threshold;
     };
 
+    class VignettePass : public RenderPass
+    {
+        public:
+            VignettePass(u32 width, u32 height, f32 lens_radius, f32 lens_feathering)
+                : RenderPass(width, height), lens_radius(lens_radius), lens_feathering(lens_feathering)
+            {
+                shader = Shader::create(
+                    "vignette", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/vignette.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform1("lens_radius", lens_radius);
+                shader->set_uniform1("lens_feathering", lens_feathering);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "VignettePass";
+            }
+
+            f32 lens_radius, lens_feathering;
+    };
+
     class PostProcessingSystem
     {
             struct PostProcessingPass
