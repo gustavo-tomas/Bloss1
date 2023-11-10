@@ -49,6 +49,18 @@ namespace bls
         // soloud.setRelativePlaySpeed(handle, 0.7f); // Play a bit slower; 1.0f is normal
     }
 
+    void SoloudAudioEngine::play_dist(
+        const str &name, const vec3 &position, const vec3 &velocity, f32 distance_from_source, const f32 max_dist)
+    {
+        f32 distance = clamp(distance_from_source, 0.0f, max_dist);
+
+        const f32 MIN_VOLUME = 0.001f;
+        f32 volume = 1.0f - (distance / max_dist);
+        volume = clamp(volume, MIN_VOLUME, 1.0f);
+
+        soloud.play3d(*audios[name], position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, volume);
+    }
+
     void SoloudAudioEngine::set_echo_filter(const str &name, f32 delay, f32 decay)
     {
         if (!filters.count(name)) filters[name] = std::make_unique<SoLoud::EchoFilter>();

@@ -1,3 +1,4 @@
+#include "core/game.hpp"
 #include "ecs/ecs.hpp"
 #include "tools/profiler.hpp"
 
@@ -35,6 +36,26 @@ namespace bls
                     auto particle = emitter->get_particle();
                     particle.life_time = projectile->explosion_duration - explosion_timers[id].time;
                     emitter->set_particle(particle);
+
+                    if (explosion_timers[id].time == 0.0f)
+                    {
+                        // Decreases sound volume base on distance to listener
+                        const auto listener_pos = ecs.transforms[0]->position;
+                        const auto projectile_pos = ecs.transforms[id]->position;
+                        f32 distance = glm::distance(listener_pos, projectile_pos);
+
+                        auto &audio_engine = Game::get().get_audio_engine();
+
+                        audio_engine.load("bullet_explosion_sfx",
+                                          "bloss1/assets/sounds/387229__eflexmusic__explosion-closenear-mixed.wav");
+
+                        // Reduces volume for ophanim projectile explosion
+                        if (projectile->sender_id == 1)
+                            audio_engine.play("bullet_explosion_sfx", vec3(0.0f), vec3(0.0f), 0.2f);
+
+                        else
+                            audio_engine.play_dist("bullet_explosion_sfx", vec3(0.0f), vec3(0.0f), distance, 1000.0f);
+                    }
                 }
 
                 explosion_timers[id].time += dt;

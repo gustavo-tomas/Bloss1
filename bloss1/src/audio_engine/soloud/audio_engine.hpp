@@ -22,6 +22,11 @@ namespace bls
                       const vec3 &position = vec3(0.0f),
                       const vec3 &velocity = vec3(0.0f),
                       f32 volume = 1.0f) override;
+            void play_dist(const str &name,
+                           const vec3 &position = vec3(0.0f),
+                           const vec3 &velocity = vec3(0.0f),
+                           f32 distance_from_source = 0.0f,
+                           const f32 max_dist = 1000.0f) override;
 
             void set_echo_filter(const str &name, f32 delay, f32 decay) override;
 

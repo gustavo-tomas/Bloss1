@@ -1,3 +1,4 @@
+#include "core/game.hpp"
 #include "core/input.hpp"
 #include "ecs/ecs.hpp"
 #include "ecs/entities.hpp"
@@ -248,6 +249,10 @@ namespace bls
 
     void shoot(ECS &ecs, const Transform &transform, const PhysicsObject &object)
     {
+        auto &audio_engine = Game::get().get_audio_engine();
         bullet(ecs, transform, object, 0, 5.0f, 25.0f, 1.0f);
+
+        audio_engine.load("player_shoot_sfx", "bloss1/assets/sounds/709042__funnyvoices__shotgun-eu-fx.wav");
+        audio_engine.play("player_shoot_sfx");
     }
 };  // namespace bls

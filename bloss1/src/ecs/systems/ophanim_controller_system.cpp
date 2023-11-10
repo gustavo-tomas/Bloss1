@@ -12,6 +12,7 @@ namespace bls
     const f32 MAX_POS_Y = 100.0f;
 
     f32 ophanim_initial_hp = -1;
+    bool alerted = false;
     void ophanim_controller_system(ECS &ecs, f32 dt)
     {
         if (ophanim_initial_hp < 0) ophanim_initial_hp = ecs.hitpoints[1];
@@ -24,6 +25,16 @@ namespace bls
 
             const auto &player_transform = ecs.transforms[0];
             const auto &ophanim_transform = ecs.transforms[1];
+
+            if (!alerted)
+            {
+                auto &audio_engine = Game::get().get_audio_engine();
+
+                audio_engine.load("ophanim_alerted_sfx",
+                                  "bloss1/assets/sounds/193602__speedenza__deep-metal-impact-airy-angellic-chorus.wav");
+                audio_engine.play("ophanim_alerted_sfx");
+                alerted = true;
+            }
 
             // Rotates towards player @TODO: fix alignment
             auto rotationMatrix =

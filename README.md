@@ -53,3 +53,4 @@ $ just clean cfg
 - [Noise algorithms](https://github.com/stegu/webgl-noise)
 - [FBM algorithm](https://thebookofshaders.com/13/)
 - [Edge detection shader](https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115)
+- [Sound library](https://freesound.org/)
