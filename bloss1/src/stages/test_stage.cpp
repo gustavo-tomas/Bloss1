@@ -73,9 +73,14 @@ namespace bls
         for (const auto &system : systems) system(*ecs, dt);
 
         // @TODO: Player won
-        if (ecs->hitpoints[1] <= 0.0f)
+        if (ecs->systems.size() > 0 && ecs->hitpoints[1] <= 0.0f)
         {
-            Game::get().change_stage(nullptr);
+            auto &audio_engine = Game::get().get_audio_engine();
+
+            audio_engine.load("ophanim_death_sfx", "bloss1/assets/sounds/124601__nominal__nog-paal.wav");
+            audio_engine.play("ophanim_death_sfx");
+
+            ecs->clear_systems();
             return;
         }
 

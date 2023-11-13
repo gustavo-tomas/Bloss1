@@ -52,6 +52,12 @@ namespace bls
                 systems.push_back(system);
             }
 
+            // Clear all systems
+            void clear_systems()
+            {
+                systems.clear();
+            }
+
             void mark_for_deletion(u32 id)
             {
                 deletion_queue.push(id);
