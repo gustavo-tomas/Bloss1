@@ -68,6 +68,13 @@ namespace bls
         else
             ecs->systems[8] = render_system_forward;
 
+        // Exit the stage
+        if (Input::is_key_pressed(KEY_ESCAPE))
+        {
+            Game::get().change_stage(nullptr);
+            return;
+        }
+
         // Update all systems in registration order
         auto &systems = ecs->systems;
         for (const auto &system : systems) system(*ecs, dt);
@@ -87,7 +94,7 @@ namespace bls
         }
 
         // @TODO: Player lost
-        if (ecs->hitpoints[0] <= 0.0f)
+        else if (ecs->hitpoints[0] <= 0.0f)
         {
             auto &audio_engine = Game::get().get_audio_engine();
 
@@ -96,13 +103,6 @@ namespace bls
             audio_engine.play("player_death_sfx");
 
             ecs->clear_systems();
-            return;
-        }
-
-        // Exit the stage
-        if (Input::is_key_pressed(KEY_ESCAPE))
-        {
-            Game::get().change_stage(nullptr);
             return;
         }
     }
