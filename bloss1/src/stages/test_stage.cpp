@@ -72,8 +72,10 @@ namespace bls
         auto &systems = ecs->systems;
         for (const auto &system : systems) system(*ecs, dt);
 
+        if (ecs->systems.size() == 0) return;
+
         // @TODO: Player won
-        if (ecs->systems.size() > 0 && ecs->hitpoints[1] <= 0.0f)
+        if (ecs->hitpoints[1] <= 0.0f)
         {
             auto &audio_engine = Game::get().get_audio_engine();
 
@@ -87,7 +89,13 @@ namespace bls
         // @TODO: Player lost
         if (ecs->hitpoints[0] <= 0.0f)
         {
-            Game::get().change_stage(nullptr);
+            auto &audio_engine = Game::get().get_audio_engine();
+
+            audio_engine.load("player_death_sfx",
+                              "bloss1/assets/sounds/505751__thehorriblejoke__computer-breaking-sound.wav");
+            audio_engine.play("player_death_sfx");
+
+            ecs->clear_systems();
             return;
         }
 
