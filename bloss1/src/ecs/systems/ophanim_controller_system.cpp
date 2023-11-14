@@ -11,6 +11,9 @@ namespace bls
     const f32 MIN_POS_Y = 50.0f;
     const f32 MAX_POS_Y = 100.0f;
 
+    const f32 healthy_timer = 3.75f;
+    const f32 injured_timer = 1.5f;
+
     f32 ophanim_initial_hp = -1;
     bool alerted = false;
     void ophanim_controller_system(ECS &ecs, f32 dt)
@@ -44,7 +47,10 @@ namespace bls
 
             const auto &timer = ecs.timers[1];
             timer->time += dt;
-            if (timer->time < 3.75f) return;
+
+            f32 cooldown_timer = healthy_timer;
+            if (ecs.hitpoints[1] < ophanim_initial_hp / 2.0f) cooldown_timer = injured_timer;
+            if (timer->time < cooldown_timer) return;
 
             auto &rand_engine = Game::get().get_random_engine();
             if (rand_engine.get_float(0, 1) < 0.5)
