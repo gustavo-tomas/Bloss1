@@ -115,8 +115,44 @@ namespace bls
     void Editor::render_status()
     {
         ImGui::Begin("Status");
+
+        // Show performance plots
         ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", AppStats::ms_per_frame, AppStats::framerate);
+        {
+            static std::vector<f32> frame_values(100, 0.0f);
+            if (frame_values.size() == 100) frame_values.erase(frame_values.begin());
+            frame_values.push_back(AppStats::ms_per_frame);
+
+            ImGui::PlotHistogram("##",
+                                 frame_values.data(),
+                                 static_cast<i32>(frame_values.size()),
+                                 0,
+                                 NULL,
+                                 0.0f,
+                                 33.3f,
+                                 ImVec2(0, 60.0f));
+
+            // ImGui::PlotLines(
+            //     "##", frame_values.data(), static_cast<i32>(frame_values.size()), 0, NULL, 0.0f, 33.3f,
+            //     ImVec2(0, 60.0f));
+        }
+
         ImGui::Text("Vertices: %u", AppStats::vertices);
+        {
+            static std::vector<f32> vert_values(100, 0.0f);
+            if (vert_values.size() == 100) vert_values.erase(vert_values.begin());
+            vert_values.push_back(AppStats::vertices);
+
+            ImGui::PlotHistogram("##",
+                                 vert_values.data(),
+                                 static_cast<i32>(vert_values.size()),
+                                 0,
+                                 NULL,
+                                 0.0f,
+                                 5'000'000.0f,
+                                 ImVec2(0, 60.0f));
+        }
+
         ImGui::End();
 
         // Reset stats
