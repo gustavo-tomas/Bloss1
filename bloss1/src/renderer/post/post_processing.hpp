@@ -346,6 +346,36 @@ namespace bls
             f32 lens_radius, lens_feathering;
     };
 
+    class KuwaharaPass : public RenderPass
+    {
+        public:
+            KuwaharaPass(u32 width, u32 height, u32 radius) : RenderPass(width, height), radius(radius)
+            {
+                shader = Shader::create(
+                    "kuwahara", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/kuwahara.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform1("radius", radius);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "KuwaharaPass";
+            }
+
+            u32 radius;
+    };
+
     class PostProcessingSystem
     {
             struct PostProcessingPass

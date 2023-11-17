@@ -320,6 +320,12 @@ namespace bls
             ImGui::InputFloat("Lens Feathering", &vignette_pass->lens_feathering);
         }
 
+        else if (typeid(*pass.pass) == typeid(KuwaharaPass))
+        {
+            auto *kuwahara_pass = static_cast<KuwaharaPass *>(pass.pass);
+            ImGui::InputInt("Radius", reinterpret_cast<i32 *>(&kuwahara_pass->radius));
+        }
+
         else
             ImGui::Text("-");
     }

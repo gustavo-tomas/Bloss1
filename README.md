@@ -55,3 +55,4 @@ $ just clean cfg
 - [Edge detection shader](https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115)
 - [Sound library](https://freesound.org/)
 - [Vignette Shader](https://developer.unigine.com/forum/topic/2346-vignette-shader/)
+- [Kuwahara Shader](https://www.shadertoy.com/view/MsXSz4#)
