@@ -8,4 +8,5 @@
 	pixelization_pass: 6, 0, 5;
 	outline_pass: 7, 0, (0.0, 0.0, 0.0), 0.8;
 	vignette_pass: 8, 0, 0.85, 0.45;
+	kuwahara_pass: 9, 0, 4;
 }

@@ -400,6 +400,17 @@ namespace bls
 
                 scene << "\n";
             }
+
+            else if (pass.name == "KuwaharaPass")
+            {
+                scene << "\tkuwahara_pass: ";
+                scene << to_str(pass.position) << ", ";
+                scene << to_str(pass.enabled) << ", ";
+
+                scene << to_str(static_cast<KuwaharaPass *>(pass.pass)->radius) << "; ";
+
+                scene << "\n";
+            }
         }
 
         scene << "}"
@@ -859,6 +870,31 @@ namespace bls
                     auto *vignette_pass = static_cast<VignettePass *>(it->pass);
                     vignette_pass->lens_radius = std::stof(lens_radius);
                     vignette_pass->lens_feathering = std::stof(lens_feathering);
+
+                    it->enabled = std::stoul(enabled);
+                    it->position = std::stoul(position);
+                    post_processing->set_pass(it->id, it->enabled, it->position);
+                }
+            }
+
+            // KuwaharaPass
+            else if (parameter == "kuwahara_pass")
+            {
+                str radius;
+
+                std::getline(iline, position, ',');
+                std::getline(iline, enabled, ',');
+
+                std::getline(iline, radius, ';');
+
+                auto it = std::find_if(AppConfig::render_passes.begin(),
+                                       AppConfig::render_passes.end(),
+                                       [](const auto &pass) { return typeid(*pass.pass) == typeid(KuwaharaPass); });
+
+                if (it != AppConfig::render_passes.end())
+                {
+                    auto *kuwahara_pass = static_cast<KuwaharaPass *>(it->pass);
+                    kuwahara_pass->radius = std::stoul(radius);
 
                     it->enabled = std::stoul(enabled);
                     it->position = std::stoul(position);
