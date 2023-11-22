@@ -1,291 +1,18 @@
-#include "ecs/ecs.hpp"
+#include "config.hpp"
 #include "core/game.hpp"
-#include "renderer/model.hpp"
-#include "renderer/shader.hpp"
-#include "renderer/skybox.hpp"
+#include "ecs/ecs.hpp"
 #include "renderer/font.hpp"
-#include "renderer/shadow_map.hpp"
-#include "renderer/post/post_processing.hpp"
+#include "renderer/model.hpp"
 #include "renderer/primitives/box.hpp"
 #include "renderer/primitives/line.hpp"
-#include "renderer/primitives/quad.hpp"
 #include "renderer/primitives/sphere.hpp"
 
 namespace bls
 {
-    void initialize(ECS& ecs);
-
-    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer);
-    void render_colliders(ECS& ecs, const mat4& projection, const mat4& view);
-    void render_texts(ECS& ecs);
-
-    // @TODO: oooooooooooffffff
-    static bool initialized = false;
-
-    struct RenderState
-    {
-        std::unique_ptr<Quad> quad;
-        std::unique_ptr<FrameBuffer> g_buffer;
-        std::unique_ptr<RenderBuffer> render_buffer;
-        std::map<str, std::shared_ptr<Shader>> shaders;
-
-        std::unordered_map<str, std::shared_ptr<Texture>> textures;
-
-        std::unique_ptr<Skybox> skybox;
-        std::unique_ptr<ShadowMap> shadow_map;
-        std::unique_ptr<PostProcessingSystem> post_processing;
-    };
-
-    RenderState render_state;
-
-    void initialize(ECS& ecs)
-    {
-        render_state = { };
-
-        auto& renderer = Game::get().get_renderer();
-        auto& window = Game::get().get_window();
-
-        auto width = window.get_width();
-        auto height = window.get_height();
-
-        // Create shaders
-        // -------------------------------------------------------------------------------------------------------------
-
-        // Geometry buffer shader
-        render_state.shaders["g_buffer"] = Shader::create("g_buffer", "bloss1/assets/shaders/g_buffer.vs", "bloss1/assets/shaders/g_buffer.fs");
-
-        // PBR shader
-        render_state.shaders["pbr"] = Shader::create("pbr", "bloss1/assets/shaders/pbr/pbr.vs", "bloss1/assets/shaders/pbr/pbr.fs");
-
-        // Debug shader
-        render_state.shaders["color"] = Shader::create("color", "bloss1/assets/shaders/test/base_color.vs", "bloss1/assets/shaders/test/base_color.fs");
-
-        // Create g_buffer framebuffer
-        render_state.g_buffer = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
-
-        // Create and attach framebuffer textures
-        // @TODO: this is hardcoded
-        std::vector<str> texture_names = { "position", "normal", "albedo", "arm", "tbnNormal", "depth" };
-        for (const auto& name : texture_names)
-        {
-            render_state.textures[name] = Texture::create(width, height, ImageFormat::RGBA32F,
-                                          TextureParameter::Repeat, TextureParameter::Repeat,
-                                          TextureParameter::Nearest, TextureParameter::Nearest);
-
-            render_state.g_buffer->attach_texture(render_state.textures[name].get());
-        }
-        render_state.g_buffer->draw();
-
-        // Create and attach depth buffer
-        render_state.render_buffer = std::unique_ptr<RenderBuffer>(RenderBuffer::create(width, height, AttachmentType::Depth));
-        render_state.render_buffer->bind();
-
-        // Check if framebuffer is complete
-        if (!render_state.g_buffer->check())
-            exit(1);
-
-        render_state.g_buffer->unbind();
-
-        // Create a skybox
-        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        render_state.skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024, 1024, 10));
-        // render_state.skybox = Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr", 512, 32, 512, 512, 10);
-
-        // Create a quad for rendering
-        render_state.quad = std::make_unique<Quad>(renderer);
-
-        // Create shadow map
-        for (const auto& [id, dir_light] : ecs.dir_lights)
-        {
-            const auto& transform = ecs.transforms[id];
-            auto dir = transform->rotation;
-            dir.y *= -1.0f;
-            render_state.shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
-        }
-
-        // Create post processing system
-        render_state.post_processing = std::make_unique<PostProcessingSystem>(width, height);
-        render_state.post_processing->add_render_pass(new FogPass(width, height,
-                vec3(0.5f),
-                vec2(ecs.cameras[0].get()->far / 3.0f, ecs.cameras[0].get()->far / 2.0f),
-                ecs.cameras[0].get()->position, render_state.textures["position"].get()));
-        render_state.post_processing->add_render_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f));
-        // render_state.post_processing->add_render_pass(new SharpenPass(width, height, 0.05f));
-        render_state.post_processing->add_render_pass(new PosterizationPass(width, height, 8.0f));
-        render_state.post_processing->add_render_pass(new PixelizationPass(width, height, 4));
-    }
-
-    void render_system(ECS& ecs, f32 dt)
-    {
-        if (!initialized)
-        {
-            initialize(ecs);
-            initialized = true;
-        }
-
-        auto& window = Game::get().get_window();
-        auto& renderer = Game::get().get_renderer();
-
-        auto width = window.get_width();
-        auto height = window.get_height();
-
-        // @TODO: player id
-        auto camera = ecs.cameras[0].get();
-        auto position = camera->position;
-        auto projection = camera->projection_matrix;
-        auto view = camera->view_matrix;
-        auto near = camera->near;
-        auto far = camera->far;
-
-        auto& shaders = render_state.shaders;
-        auto& textures = render_state.textures;
-        auto& g_buffer = render_state.g_buffer;
-        auto& skybox = render_state.skybox;
-        auto& quad = render_state.quad;
-        auto& shadow_map = render_state.shadow_map;
-        auto& post_processing = render_state.post_processing;
-
-        // Shaders - by now they should have been initialized
-        auto g_buffer_shader = shaders["g_buffer"].get();
-        auto pbr_shader = shaders["pbr"].get();
-
-        // Reset the viewport
-        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
-        renderer.clear();
-        renderer.set_viewport(0, 0, width, height);
-
-        // Update animators
-        for (auto& [id, model] : ecs.models)
-        {
-            auto animator = model->model->animator.get();
-            if (animator)
-            {
-                // @TODO: test - Blend animations
-                if (ecs.names[id] == "abomination")
-                {
-                    auto& animations = model->model->animations;
-                    auto twist_anim = animations["Armature|Twist"].get();
-                    auto rotate_anim = animations["Armature|ArmatureAction.005"].get();
-                    f32 blend_factor = 0.5f;
-
-                    animator->blend_animations(rotate_anim, twist_anim, blend_factor, dt);
-                }
-
-                else
-                    animator->update(dt);
-            }
-        }
-
-        // @TODO: see if this can be done during geometry pass
-        // Render shadow map
-        shadow_map->bind();
-        render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
-        shadow_map->unbind();
-
-        // Reset the viewport
-        renderer.clear_color({ 0.0f, 0.0f, 0.0f, 1.0f });
-        renderer.clear();
-        renderer.set_viewport(0, 0, width, height);
-
-        // Geometry pass: render scene data into gbuffer
-        // -------------------------------------------------------------------------------------------------------------
-        g_buffer->bind();
-        renderer.clear();
-
-        g_buffer_shader->bind();
-        g_buffer_shader->set_uniform4("projection", projection);
-        g_buffer_shader->set_uniform4("view", view);
-
-        // Render the scene
-        render_scene(ecs, *g_buffer_shader, renderer);
-
-        g_buffer->unbind();
-        g_buffer_shader->unbind();
-
-        // Lighting pass: calculate lighting using the gbuffer content
-        // -------------------------------------------------------------------------------------------------------------
-        renderer.clear();
-
-        pbr_shader->bind();
-
-        // Set camera position
-        pbr_shader->set_uniform3("viewPos", position);
-
-        // Set light uniforms
-        pbr_shader->set_uniform3("lightDir", render_state.shadow_map->get_light_dir());
-        pbr_shader->set_uniform1("near", near);
-        pbr_shader->set_uniform1("far", far);
-
-        // Set lights uniforms
-        u32 light_counter = 0;
-
-        // Point lights
-        auto& point_lights = ecs.point_lights;
-        auto& transforms = ecs.transforms;
-        for (auto& [id, light] : point_lights)
-        {
-            auto transform = transforms[id].get();
-
-            pbr_shader->set_uniform3("lights.pointLightPositions[" + to_str(light_counter) + "]", transform->position);
-            pbr_shader->set_uniform3("lights.pointLightColors[" + to_str(light_counter) + "]", light->diffuse);
-
-            light_counter++;
-        }
-
-        // Directional lights
-        light_counter = 0;
-        auto& dir_lights = ecs.dir_lights;
-        for (auto& [id, light] : dir_lights)
-        {
-            auto transform = transforms[id].get();
-
-            pbr_shader->set_uniform3("lights.dirLightDirections[" + to_str(light_counter) + "]", transform->rotation);
-            pbr_shader->set_uniform3("lights.dirLightColors[" + to_str(light_counter) + "]", light->diffuse);
-
-            light_counter++;
-        }
-
-        // Set texture attachments
-        auto& attachments = g_buffer->get_attachments();
-        u32 tex_position = attachments.size() - 1;
-        for (const auto& [name, texture] : textures)
-        {
-            pbr_shader->set_uniform1("textures." + name, tex_position);
-            attachments[tex_position]->bind(tex_position);
-            tex_position--; // Traverse from back to front
-        }
-
-        // Bind maps
-        skybox->bind(*pbr_shader, 10);          // IBL maps
-        shadow_map->bind_maps(*pbr_shader, 13); // Shadow map
-
-        // Begin post processing process
-        post_processing->begin();
-        quad->render();      // Render light quad
-        post_processing->end();
-
-        // Render all passes
-        post_processing->render();
-
-        // Copy content of geometry's depth buffer to default framebuffer's depth buffer
-        // -------------------------------------------------------------------------------------------------------------
-        g_buffer->bind_and_blit(width, height);
-        g_buffer->unbind();
-
-        // Draw the skybox last
-        skybox->draw(view, projection);
-
-        // Render debug lines
-        // render_colliders(ecs, projection, view);
-
-        // Render texts
-        render_texts(ecs);
-    }
-
-    void render_scene(ECS& ecs, Shader& shader, Renderer& renderer)
+    void render_scene(ECS &ecs, Shader &shader, Renderer &renderer)
     {
         // Render all entities
-        for (const auto& [id, model] : ecs.models)
+        for (const auto &[id, model] : ecs.models)
         {
             // Reset bone matrices
             for (u32 i = 0; i < MAX_BONE_MATRICES; i++)
@@ -308,15 +35,30 @@ namespace bls
             // Translate
             model_matrix = translate(model_matrix, transform->position);
 
-            // @TODO: i dont know what im doing but it works
-
             // Player model matrix
             if (ecs.names[id] == "player")
             {
                 // Rotate
                 model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
-                model_matrix = rotate(model_matrix, radians(-transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            }
+
+            // Player bullet model matrix
+            else if (ecs.names[id] == "bullet" && ecs.projectiles[id]->sender_id == 0)
+            {
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.y + 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(-transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+            }
+
+            // Ophanim model matrix
+            else if (ecs.names[id] == "ophanim")
+            {
+                // Compensate for model rotation
                 model_matrix = rotate(model_matrix, radians(transform->rotation.x), vec3(1.0f, 0.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.y - 90.0f), vec3(0.0f, 1.0f, 0.0f));
+                model_matrix = rotate(model_matrix, radians(transform->rotation.z), vec3(0.0f, 0.0f, 1.0f));
             }
 
             else
@@ -334,7 +76,7 @@ namespace bls
             shader.set_uniform4("model", model_matrix);
 
             // Render the model
-            for (auto& mesh : model->model->meshes)
+            for (const auto &mesh : model->model->meshes)
             {
                 // Bind textures
                 for (u32 i = 0; i < mesh->textures.size(); i++)
@@ -346,44 +88,101 @@ namespace bls
 
                     switch (type)
                     {
-                        case TextureType::Diffuse:          type_name = "diffuse";   break;
-                        case TextureType::Specular:         type_name = "specular";  break;
-                        case TextureType::Normal:           type_name = "normal";    break;
-                        case TextureType::Metalness:        type_name = "metalness"; break;
-                        case TextureType::Roughness:        type_name = "roughness"; break;
-                        case TextureType::AmbientOcclusion: type_name = "ao";        break;
+                        case TextureType::Diffuse:
+                            type_name = "diffuse";
+                            break;
+                        case TextureType::Specular:
+                            type_name = "specular";
+                            break;
+                        case TextureType::Normal:
+                            type_name = "normal";
+                            break;
+                        case TextureType::Metalness:
+                            type_name = "metalness";
+                            break;
+                        case TextureType::Roughness:
+                            type_name = "roughness";
+                            break;
+                        case TextureType::AmbientOcclusion:
+                            type_name = "ao";
+                            break;
+                        case TextureType::Emissive:
+                            type_name = "emissive";
+                            break;
 
-                        default: std::cerr << "invalid texture type: '" << type << "'\n";
+                        default:
+                            LOG_ERROR("invalid texture type");
+                            break;
                     }
 
                     shader.set_uniform1("material." + type_name, i);
-                    texture->bind(i); // Offset the active samplers in the frag shader
+                    texture->bind(i);  // Offset the active samplers in the frag shader
                 }
 
                 mesh->vao->bind();
                 renderer.draw_indexed(RenderingMode::Triangles, mesh->indices.size());
-
-                // Reset
                 mesh->vao->unbind();
+
+                // Update stats
+                AppStats::vertices += mesh->vertices.size();
             }
         }
     }
 
-    void render_texts(ECS& ecs)
+    void render_ui()
     {
-        auto& texts = ecs.texts;
-        auto& transforms = ecs.transforms;
-        for (const auto& [id, text] : texts)
+        auto &renderer = Game::get().get_renderer();
+        auto &textures = renderer.get_textures();
+        auto &shader = renderer.get_shaders()["ui"];
+        auto &quad = renderer.get_rendering_quad();
+        auto &window = Game::get().get_window();
+
+        auto width = window.get_width();
+        auto height = window.get_height();
+
+        auto p = std::find_if(textures.begin(), textures.end(), [](auto p) { return p.first == "ui"; });
+        std::shared_ptr<bls::Texture> ui_texture = p->second;
+
+        auto tex_width = ui_texture->get_width();
+        auto tex_height = ui_texture->get_height();
+
+        renderer.set_viewport(
+            (width / 2) - (tex_width / 4), (height / 2) - (tex_height / 4), tex_width / 2, tex_height / 2);
+
+        shader->bind();
+        shader->set_uniform1("screenTexture", 0U);
+        ui_texture->bind(0);
+        quad->render();
+    }
+
+    void render_texts(ECS &ecs)
+    {
+        auto &renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
+
+        auto width = window.get_width();
+        auto height = window.get_height();
+
+        renderer.set_viewport(0, 0, width, height);
+
+        auto &texts = ecs.texts;
+        auto &transforms = ecs.transforms;
+        for (const auto &[id, text] : texts)
         {
             auto transform = transforms[id].get();
-            text->font->render(text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
+            text->font->render(
+                text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
         }
     }
 
-    void render_colliders(ECS& ecs, const mat4& projection, const mat4& view)
+    void render_colliders(ECS &ecs, const mat4 &projection, const mat4 &view)
     {
+        // Restore viewport
+        auto &renderer = Game::get().get_renderer();
+        auto &window = Game::get().get_window();
+        renderer.set_viewport(0, 0, window.get_width(), window.get_height());
+
         // Set debug mode
-        auto& renderer = Game::get().get_renderer();
         renderer.set_debug_mode(true);
 
         auto color_shader = Shader::create("color", "", "");
@@ -392,53 +191,66 @@ namespace bls
         color_shader->set_uniform4("projection", projection);
         color_shader->set_uniform4("view", view);
         color_shader->set_uniform4("model", mat4(1.0f));
-        color_shader->set_uniform3("color", { 1.0f, 0.0f, 0.0f });
+        color_shader->set_uniform3("color", {1.0f, 0.0f, 0.0f});
 
         // Create axes lines for debugging              // Start    // End
         std::vector<std::unique_ptr<Line>> axes;
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f))); // x
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f))); // y
-        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f))); // z
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(1000.0f, 0.0f, 0.0f)));  // x
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 1000.0f, 0.0f)));  // y
+        axes.push_back(std::make_unique<Line>(renderer, vec3(0.0f), vec3(0.0f, 0.0f, 1000.0f)));  // z
 
         // Render axes lines
         for (u64 i = 0; i < axes.size(); i++)
         {
             vec3 color;
 
-            if (i == 0) color = { 1.0f, 0.0f, 0.0f }; // x axis is red
-            if (i == 1) color = { 0.0f, 1.0f, 0.0f }; // y axis is green
-            if (i == 2) color = { 0.0f, 0.0f, 1.0f }; // z axis is blue
+            if (i == 0) color = {1.0f, 0.0f, 0.0f};  // x axis is red
+            if (i == 1) color = {0.0f, 1.0f, 0.0f};  // y axis is green
+            if (i == 2) color = {0.0f, 0.0f, 1.0f};  // z axis is blue
 
             color_shader->set_uniform3("color", color);
             axes[i]->render();
         }
 
         // Render colliders
-        for (const auto& [id, collider] : ecs.colliders)
+        for (const auto &[id, collider] : ecs.colliders)
         {
+            auto &transform = ecs.transforms[id];
+
             color_shader->set_uniform3("color", collider->color);
             if (collider->type == Collider::ColliderType::Sphere)
             {
                 auto collider_sphere = std::make_unique<Sphere>(renderer,
-                                       ecs.transforms[id]->position + collider->offset,
-                                       static_cast<SphereCollider*>(collider.get())->radius);
+                                                                transform->position + collider->offset,
+                                                                static_cast<SphereCollider *>(collider.get())->radius);
 
                 collider_sphere->render();
             }
 
             else if (collider->type == Collider::ColliderType::Box)
             {
-                auto collider_box = std::make_unique<Box>(renderer, ecs.transforms[id]->position + collider->offset,
-                                    static_cast<BoxCollider*>(collider.get())->width,
-                                    static_cast<BoxCollider*>(collider.get())->height,
-                                    static_cast<BoxCollider*>(collider.get())->depth);
+                auto collider_box = std::make_unique<Box>(renderer,
+                                                          transform->position + collider->offset,
+                                                          static_cast<BoxCollider *>(collider.get())->dimensions);
 
                 collider_box->render();
             }
+
+            // Render orientation vector
+            auto pitch = transform->rotation.x;
+            auto yaw = transform->rotation.y;
+            auto front = vec3(
+                cos(radians(yaw)) * cos(radians(pitch)), sin(radians(pitch)), sin(radians(yaw)) * cos(radians(pitch)));
+
+            auto orientation_line =
+                std::make_unique<Line>(renderer, transform->position, transform->position + (front * 30.0f));
+
+            color_shader->set_uniform3("color", {1.0f, 0.0f, 1.0f});
+            orientation_line->render();
         }
 
         // Unset debug mode
         color_shader->unbind();
         renderer.set_debug_mode(false);
     }
-};
+};  // namespace bls

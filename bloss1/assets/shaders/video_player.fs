@@ -7,5 +7,5 @@ in vec2 TexCoords;
 uniform sampler2D frame;
 
 void main() {
-    FragColor = texture(frame, TexCoords); // @TODO: check for screen and texture aspect ratio
+    FragColor = texture(frame, TexCoords);
 }

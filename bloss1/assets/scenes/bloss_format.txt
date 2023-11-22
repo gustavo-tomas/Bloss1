@@ -1,0 +1,55 @@
+// @TODO: some components are not implemented yet
+
+// Format:
+[entity_name]
+{
+    component_type1: component_arg1, component_arg2, component_arg3, ... ;
+    component_type2: component_arg1, component_arg2, component_arg3, ... ;
+    ...
+}
+
+// Configuration:
+<cfg_name>
+{
+    cfg_1: arg_1, arg_2, ... ;
+    cfg_2: arg_1, arg_2, ... ;
+}
+
+// Components:
+model: file, flip_uvs;
+transform: position, rotation, scale;
+physics_object: velocity, terminal_velocity, force, mass;
+collider: type, dimensions, offset, immovable, description_mask, interaction_mask;
+dir_light: ambient, diffuse, specular;
+point_light: ambient, diffuse, specular, constant, linear, quadratic;
+camera: offset, world_up, zoom, near, far, lerp_factor;
+camera_controller: speed, sensitivity;
+text: font, ~text~, color;
+sound: file, name, volume, play_now, looping;
+timer: time;
+transform_animation: number_of_transforms, transform1, duration1; transform2, duration2; ... ;
+hitpoints: hitpoints;
+particle_system: type, particle_2D, particles_to_be_emitted, time_to_emit, center, dimensions;
+
+// Post processing config:
+<post_processing>
+{
+    fog_pass: u32 position, bool enabled, vec3 fog_color, vec2 min_max;
+    bloom_pass: u32 position, bool enabled, u32 samples, f32 spread, f32 threshold, f32 amount;
+    fxaa_pass: u32 position, bool enabled;
+	sharpen_pass: u32 position, bool enabled, f32 amount;
+	posterization_pass: u32 position, bool enabled, f32 levels;
+	pixelization_pass: u32 position, bool enabled, u32 pixel_size;
+	outline_pass: u32 position, bool enabled, vec3 color, f32 threshold;
+	vignette_pass: u32 position, bool enabled, f32 lens_radius, f32 lens_feathering;
+	kuwahara_pass: u32 position, bool enabled, u32 radius;
+}
+
+// Example:
+[ball]
+{
+    model: bloss1/assets/models/sphere/rusted_sphere.gltf, 0;
+    transform: (10.0, 10.0, 0.0), (0.0, 90.0, 0.0), (5.0, 5.0, 5.0);
+    physics_object: (0.0, 0.0, 0.0), (10.0, 10.0, 10.0), (0.0, 0.0, 0.0), 1.0;
+    collider: sphere, 5.0, (0.0, 0.0, 0.0), 0;
+}

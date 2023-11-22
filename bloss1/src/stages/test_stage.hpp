@@ -4,8 +4,8 @@
  * @brief Simple sandbox stage and not much else.
  */
 
-#include "stages/stage.hpp"
 #include "ecs/ecs.hpp"
+#include "stages/stage.hpp"
 
 namespace bls
 {
@@ -17,8 +17,5 @@ namespace bls
 
             void start() override;
             void update(f32 dt) override;
-
-        private:
-            std::unique_ptr<ECS> ecs;
     };
-};
+};  // namespace bls

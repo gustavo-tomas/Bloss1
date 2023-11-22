@@ -1,19 +1,21 @@
 #include "stages/test_stage.hpp"
+
 #include "core/game.hpp"
 #include "core/input.hpp"
-#include "ecs/systems.hpp"
 #include "ecs/entities.hpp"
+#include "ecs/scene_parser.hpp"
+#include "ecs/state_machine.hpp"
+#include "ecs/systems.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
     TestStage::TestStage()
     {
-
     }
 
     TestStage::~TestStage()
     {
-
     }
 
     void TestStage::start()
@@ -22,51 +24,86 @@ namespace bls
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
+        ecs->add_system(player_controller_system);
+        ecs->add_system(ophanim_controller_system);
         ecs->add_system(physics_system);
-        ecs->add_system(camera_controller_system);
+        ecs->add_system(bullet_indicator_system);
+        ecs->add_system(projectile_system);
+        ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
-        ecs->add_system(render_system);
+        ecs->add_system(render_system_forward);  // 8
+        ecs->add_system(sound_system);
+        ecs->add_system(cleanup_system);
 
-        // Add some entities to the world
-        player(*ecs, Transform(vec3(0.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
+        // Load entities from file
+        // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
 
-        for (u32 i = 0; i < 5; i++)
-            ball(*ecs, Transform(vec3((i + 1) * 10.0f, 10.0f, 0.0f), vec3(0.0f, 90.0f, 0.0f), vec3(5.0f)));
+        auto &renderer = Game::get().get_renderer();
+        renderer.create_shadow_map(*ecs);
+        renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
+        renderer.create_post_processing_passes();
 
-        vampire(*ecs, Transform(vec3(-20.0f, 10.0f, -20.0f), vec3(0.0f), vec3(0.001f, 0.001f, 0.001f)));
-        abomination(*ecs, Transform(vec3(-30.0f, 40.0f, 0.0f), vec3(-90.0f, 0.0f, 180.0f), vec3(1.0f, 1.0f, 1.0f))); // @TODO: fix rotation
+        // Load configurations from file
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
 
-        // Floor is created last
-        floor(*ecs, Transform(vec3(0.0f), vec3(0.0f), vec3(10.0f, 1.0f, 10.0f)));
+        const u32 player_id = 0;
+        const u32 ophanim_id = 1;
 
-        // Add directional lights
-        directional_light(*ecs,
-                          Transform(vec3(0.0f), vec3(0.3f, -1.0f, 0.15f)),
-                          DirectionalLight(vec3(0.0f), vec3(0.005f, 0.005f, 0.005f)));
+        ecs->state_machines[player_id] = std::make_unique<StateMachine>(PLAYER_STATE_IDLE);
+        ecs->state_machines[player_id]->state->enter(*ecs, player_id, ecs->state_machines[player_id]->current_state);
 
-        // Add point lights
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3( 100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f,  100.0f)), PointLight(vec3(40000.0f)));
-        point_light(*ecs, Transform(vec3(-100.0f, 100.0f, -100.0f)), PointLight(vec3(40000.0f)));
-
-        // Add some text
-        text(*ecs,
-             Transform(vec3(20.0f), vec3(0.0f), vec3(0.5f)),
-             "Very high impact text",
-             vec3(0.4f, 0.6f, 0.8f));
+        ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
+        ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
     }
 
     void TestStage::update(f32 dt)
     {
-        // Update all systems in registration order
-        auto& systems = ecs->systems;
-        for (auto& system : systems)
-            system(*ecs, dt);
+        BLS_PROFILE_SCOPE("update");
+
+        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_2))
+            ecs->systems[8] = render_system_deferred;
+
+        else
+            ecs->systems[8] = render_system_forward;
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
+        {
             Game::get().change_stage(nullptr);
+            return;
+        }
+
+        // Update all systems in registration order
+        auto &systems = ecs->systems;
+        for (const auto &system : systems) system(*ecs, dt);
+
+        if (ecs->systems.size() == 0) return;
+
+        // @TODO: Player won
+        if (ecs->hitpoints[1] <= 0.0f)
+        {
+            auto &audio_engine = Game::get().get_audio_engine();
+
+            audio_engine.load("ophanim_death_sfx", "bloss1/assets/sounds/124601__nominal__nog-paal.wav");
+            audio_engine.play("ophanim_death_sfx");
+
+            ecs->clear_systems();
+            return;
+        }
+
+        // @TODO: Player lost
+        else if (ecs->hitpoints[0] <= 0.0f)
+        {
+            auto &audio_engine = Game::get().get_audio_engine();
+
+            audio_engine.load("player_death_sfx",
+                              "bloss1/assets/sounds/505751__thehorriblejoke__computer-breaking-sound.wav");
+            audio_engine.play("player_death_sfx");
+
+            ecs->clear_systems();
+            return;
+        }
     }
-};
+};  // namespace bls

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "renderer/shader.hpp"
-#include "renderer/primitives/quad.hpp"
+#include "config.hpp"
 #include "core/game.hpp"
+#include "renderer/primitives/quad.hpp"
+#include "renderer/shader.hpp"
 
 namespace bls
 {
@@ -16,10 +17,13 @@ namespace bls
 
                 // Create a fbo and a color attachment texture to render the scene
                 fbo = std::unique_ptr<FrameBuffer>(FrameBuffer::create());
-                screen_texture = Texture::create(width, height,
+                screen_texture = Texture::create(width,
+                                                 height,
                                                  ImageFormat::RGB8,
-                                                 TextureParameter::Repeat, TextureParameter::Repeat,
-                                                 TextureParameter::Linear, TextureParameter::Linear);
+                                                 TextureParameter::Repeat,
+                                                 TextureParameter::Repeat,
+                                                 TextureParameter::Linear,
+                                                 TextureParameter::Linear);
                 fbo->attach_texture(screen_texture.get());
                 rbo_depth = std::unique_ptr<RenderBuffer>(RenderBuffer::create(width, height, AttachmentType::Depth));
 
@@ -31,12 +35,11 @@ namespace bls
 
             virtual ~RenderPass()
             {
-                std::cout << "post processing texture destroyed successfully\n";
             }
 
             virtual void bind()
             {
-                auto& renderer = Game::get().get_renderer();
+                auto &renderer = Game::get().get_renderer();
 
                 fbo->bind();
 
@@ -56,6 +59,8 @@ namespace bls
                 quad->render();
             }
 
+            virtual str get_name() = 0;
+
         protected:
             u32 width, height;
 
@@ -71,24 +76,35 @@ namespace bls
         public:
             BasePass(u32 width, u32 height) : RenderPass(width, height)
             {
-                shader = Shader::create("base_pass", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/base.fs");
+                shader = Shader::create(
+                    "base_pass", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/base.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
+            }
+
+            str get_name() override
+            {
+                return "BasePass";
             }
     };
 
     class FogPass : public RenderPass
     {
         public:
-            FogPass(u32 width, u32 height,
-                    const vec3& fog_color, const vec2& min_max, const vec3& camera_position, Texture* position_texture)
+            FogPass(u32 width,
+                    u32 height,
+                    const vec3 &fog_color,
+                    const vec2 &min_max,
+                    const vec3 &camera_position,
+                    Texture *position_texture)
                 : RenderPass(width, height),
                   fog_color(fog_color),
                   min_max(min_max),
                   camera_position(camera_position),
                   position_texture(position_texture)
             {
-                shader = Shader::create("fog", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/fog.fs");
+                shader =
+                    Shader::create("fog", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/fog.fs");
                 shader->bind();
                 shader->set_uniform1("textures.screenTexture", 0U);
                 shader->set_uniform1("textures.positionTexture", 1U);
@@ -108,21 +124,25 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override
+            {
+                return "FogPass";
+            }
+
             vec3 fog_color;
             vec2 min_max;
-            const vec3& camera_position;
-            Texture* position_texture;
+            const vec3 &camera_position;
+            Texture *position_texture;
     };
 
     class BloomPass : public RenderPass
     {
         public:
-            BloomPass(u32 width, u32 height,
-                      u32 samples, f32 spread, f32 threshold, f32 amount)
-                : RenderPass(width, height),
-                  samples(samples), spread(spread), threshold(threshold), amount(amount)
+            BloomPass(u32 width, u32 height, u32 samples, f32 spread, f32 threshold, f32 amount)
+                : RenderPass(width, height), samples(samples), spread(spread), threshold(threshold), amount(amount)
             {
-                shader = Shader::create("bloom", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/bloom.fs");
+                shader = Shader::create(
+                    "bloom", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/bloom.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
             }
@@ -141,6 +161,11 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override
+            {
+                return "BloomPass";
+            }
+
             u32 samples;
             f32 spread;
             f32 threshold;
@@ -150,10 +175,10 @@ namespace bls
     class SharpenPass : public RenderPass
     {
         public:
-            SharpenPass(u32 width, u32 height, f32 amount)
-                : RenderPass(width, height), amount(amount)
+            SharpenPass(u32 width, u32 height, f32 amount) : RenderPass(width, height), amount(amount)
             {
-                shader = Shader::create("sharpen", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/sharpen.fs");
+                shader = Shader::create(
+                    "sharpen", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/sharpen.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
             }
@@ -167,16 +192,22 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override
+            {
+                return "SharpenPass";
+            }
+
             f32 amount;
     };
 
     class PosterizationPass : public RenderPass
     {
         public:
-            PosterizationPass(u32 width, u32 height, f32 levels)
-                : RenderPass(width, height), levels(levels)
+            PosterizationPass(u32 width, u32 height, f32 levels) : RenderPass(width, height), levels(levels)
             {
-                shader = Shader::create("posterization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/posterization.fs");
+                shader = Shader::create("posterization",
+                                        "bloss1/assets/shaders/post/base.vs",
+                                        "bloss1/assets/shaders/post/posterization.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
             }
@@ -190,16 +221,21 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override
+            {
+                return "PosterizationPass";
+            }
+
             f32 levels;
     };
 
     class PixelizationPass : public RenderPass
     {
         public:
-            PixelizationPass(u32 width, u32 height, u32 pixel_size)
-                : RenderPass(width, height), pixel_size(pixel_size)
+            PixelizationPass(u32 width, u32 height, u32 pixel_size) : RenderPass(width, height), pixel_size(pixel_size)
             {
-                shader = Shader::create("pixelization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/pixelization.fs");
+                shader = Shader::create(
+                    "pixelization", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/pixelization.fs");
                 shader->bind();
                 shader->set_uniform1("screenTexture", 0U);
             }
@@ -213,57 +249,241 @@ namespace bls
                 quad->render();
             }
 
+            str get_name() override
+            {
+                return "PixelizationPass";
+            }
+
             u32 pixel_size;
     };
 
-    class PostProcessingSystem
+    class FXAAPass : public RenderPass
     {
         public:
-
-            // Always add a base pass
-            PostProcessingSystem(u32 width, u32 height)
+            FXAAPass(u32 width, u32 height) : RenderPass(width, height)
             {
-                add_render_pass(new BasePass(width, height));
-            }
-
-            ~PostProcessingSystem()
-            {
-                std::cout << "post processing system destroyed successfully\n";
-            }
-
-            void add_render_pass(RenderPass* texture)
-            {
-                render_passes.push_back(std::unique_ptr<RenderPass>(texture));
-            }
-
-            void begin()
-            {
-                render_passes.front()->bind();
-            }
-
-            void end()
-            {
-                render_passes.front()->unbind();
+                shader =
+                    Shader::create("fxaa", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/fxaa.fs");
+                shader->bind();
+                shader->set_uniform1("screenTexture", 0U);
             }
 
             void render()
             {
-                // Render all passes in the provided order
-                for (u64 i = 1; i < render_passes.size(); i++)
-                {
-                    auto& prev_pass = render_passes[i - 1];
-                    auto& curr_pass = render_passes[i];
+                shader->bind();
+                screen_texture->bind(0);
+                quad->render();
+            }
 
-                    curr_pass->bind();   // Bind texture for post processing
-                    prev_pass->render(); // Render scene to texture
-                    curr_pass->unbind(); // Unbind post processing texture
+            str get_name() override
+            {
+                return "FXAAPass";
+            }
+    };
+
+    class OutlinePass : public RenderPass
+    {
+        public:
+            OutlinePass(u32 width, u32 height, const vec3 &color, f32 threshold)
+                : RenderPass(width, height), color(color), threshold(threshold)
+            {
+                shader = Shader::create(
+                    "outline", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/outline.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform3("edge_color", color);
+                shader->set_uniform1("threshold", threshold);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "OutlinePass";
+            }
+
+            vec3 color;
+            f32 threshold;
+    };
+
+    class VignettePass : public RenderPass
+    {
+        public:
+            VignettePass(u32 width, u32 height, f32 lens_radius, f32 lens_feathering)
+                : RenderPass(width, height), lens_radius(lens_radius), lens_feathering(lens_feathering)
+            {
+                shader = Shader::create(
+                    "vignette", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/vignette.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform1("lens_radius", lens_radius);
+                shader->set_uniform1("lens_feathering", lens_feathering);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "VignettePass";
+            }
+
+            f32 lens_radius, lens_feathering;
+    };
+
+    class KuwaharaPass : public RenderPass
+    {
+        public:
+            KuwaharaPass(u32 width, u32 height, u32 radius) : RenderPass(width, height), radius(radius)
+            {
+                shader = Shader::create(
+                    "kuwahara", "bloss1/assets/shaders/post/base.vs", "bloss1/assets/shaders/post/kuwahara.fs");
+                shader->bind();
+                shader->set_uniform1("textures.screenTexture", 0U);
+            }
+
+            void render()
+            {
+                shader->bind();
+
+                shader->set_uniform1("radius", radius);
+
+                screen_texture->bind(0);
+
+                quad->render();
+            }
+
+            str get_name() override
+            {
+                return "KuwaharaPass";
+            }
+
+            u32 radius;
+    };
+
+    class PostProcessingSystem
+    {
+            struct PostProcessingPass
+            {
+                    u32 id;
+                    u32 position;
+                    RenderPass *render_pass;
+                    bool enabled;
+            };
+
+        public:
+            // Always add a base pass
+            PostProcessingSystem(u32 width, u32 height)
+            {
+                for (u32 i = 0; i < 100; i++) available_ids.insert(i);
+
+                add_pass(new BasePass(width, height), 0);
+            }
+
+            ~PostProcessingSystem()
+            {
+                for (auto &pass : passes) delete pass.render_pass;
+            }
+
+            void add_pass(RenderPass *texture, u32 position = 1)
+            {
+                passes.push_back({get_id(), position, texture, true});
+                sort_render_passes();
+            }
+
+            void set_pass(u32 id, bool enabled, u32 position)
+            {
+                for (auto &pass : passes)
+                {
+                    if (pass.id == id)
+                    {
+                        pass.position = position;
+                        pass.enabled = enabled;
+                        break;
+                    }
+                }
+
+                sort_render_passes();
+            }
+
+            void begin()
+            {
+                passes.front().render_pass->bind();
+            }
+
+            void end()
+            {
+                passes.front().render_pass->unbind();
+
+                // Make a copy with only enabled passes
+                std::vector<PostProcessingPass> enabled_passes;
+
+                // Filter passes
+                for (const auto &pass : passes)
+                    if (pass.enabled) enabled_passes.push_back(pass);
+
+                // Render all passes in the provided order
+                for (u64 i = 1; i < enabled_passes.size(); i++)
+                {
+                    auto &prev_pass = enabled_passes[i - 1];
+                    auto &curr_pass = enabled_passes[i];
+
+                    curr_pass.render_pass->bind();    // Bind texture for post processing
+                    prev_pass.render_pass->render();  // Render scene to texture
+                    curr_pass.render_pass->unbind();  // Unbind post processing texture
                 }
 
                 // Render final pass
-                render_passes.back()->render();
+                enabled_passes.back().render_pass->render();
             }
 
         private:
-            std::vector<std::unique_ptr<RenderPass>> render_passes;
+            void sort_render_passes()
+            {
+                // Sort in ascending order
+                std::sort(passes.begin(),
+                          passes.end(),
+                          [](const PostProcessingPass &a, const PostProcessingPass &b)
+                          { return a.position < b.position; });
+
+                // Update renderpass configs
+                auto &render_passes = AppConfig::render_passes;
+                render_passes = {};
+
+                for (const auto &pass : passes)
+                    render_passes.push_back(
+                        {pass.id, pass.position, pass.render_pass->get_name(), pass.enabled, pass.render_pass});
+            }
+
+            u32 get_id()
+            {
+                if (available_ids.empty())
+                    throw std::runtime_error(
+                        "no available post processing ids "
+                        "left");
+
+                u32 id = *available_ids.begin();
+                available_ids.erase(id);
+
+                return id;
+            }
+
+            std::set<u32> available_ids;
+            std::vector<PostProcessingPass> passes;
     };
-};
+};  // namespace bls

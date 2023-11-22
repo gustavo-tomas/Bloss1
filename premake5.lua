@@ -3,16 +3,17 @@ workspace "bloss1"
     architecture "x86_64"
     toolset "gcc"
     language "C++"
-    cppdialect "C++17"
-    configurations { "debug", "release" }
+    cppdialect "C++20"
+    configurations { "debug", "profile", "release" }
 
     -- Change backends here
-    defines { "_GLFW", "_OPENGL", "WITH_ALSA" }
+    defines { "_GLFW", "_OPENGL", "_SOLOUD", "WITH_ALSA" }
 
     -- Run vendor premakes here
     include "vendor/soloud"
     include "vendor/glfw"
     include "vendor/assimp"
+    include "vendor/imgui"
 
 -- Engine --------------------------------------------------------------------------------------------------------------
 project "bloss1"
@@ -33,34 +34,37 @@ project "bloss1"
         "vendor/glfw/include",
         "vendor/assimp/include",
         "vendor/glm",
+        "vendor/imgui",
         "vendor/",
         "/usr/include/freetype2"
     }
 
-    linkoptions
+    links
     {
-        "-lGL", "-lGLEW",
-        "-lfreetype",
-        "-lavcodec", "-lavformat", "-lavutil", "-lswscale",
-        "-lasound" -- linux only
+        "soloud", "glfw", "assimp", "imgui",
+        "GL", "GLEW", "freetype", "avcodec", "avformat", "avutil", "swscale", "asound"
     }
-
-    -- Links vendor libraries here
-    links { "soloud", "glfw", "assimp" }
 
     filter "system:linux"
         pic "On"
 
     filter "configurations:debug"
-        buildoptions { "-Wall", "-Wextra", "-O0", "-fsanitize=address", "-fno-omit-frame-pointer" }
+        buildoptions { "-Wall", "-Wextra", "-fsanitize=address", "-fno-omit-frame-pointer" }
         linkoptions { "-fsanitize=address" }
 
-        defines { "_DEBUG" }
+        defines { "_DEBUG", "BLS_PROFILE" }
         symbols "On" -- '-g'
+        optimize "Off" -- '-O0'
         runtime "Debug"
 
+    filter "configurations:profile"
+        defines { "_PROFILE", "BLS_PROFILE" }
+        symbols "Off"
+        optimize "On" -- 'O2'
+        runtime "Release"
+
     filter "configurations:release"
-        buildoptions { "-O3" } -- Zoooom
         defines { "_RELEASE" }
         symbols "Off"
+        optimize "Full" -- '-O3'
         runtime "Release"

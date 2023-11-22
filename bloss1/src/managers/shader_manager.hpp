@@ -11,16 +11,20 @@ namespace bls
     class ShaderManager
     {
         public:
-            void load(const str& name, std::shared_ptr<Shader> shader);
-            std::shared_ptr<Shader> get_shader(const str& name);
-            bool exists(const str& name);
+            void load(const str &name, std::shared_ptr<Shader> shader);
+            std::shared_ptr<Shader> get_shader(const str &name);
+            bool exists(const str &name);
 
-            static ShaderManager& get();
+            static ShaderManager &get();
 
         private:
-            ShaderManager() { }
-            ~ShaderManager() { }
+            ShaderManager()
+            {
+            }
+            ~ShaderManager()
+            {
+            }
 
             std::map<str, std::shared_ptr<Shader>> shaders;
     };
-};
+};  // namespace bls

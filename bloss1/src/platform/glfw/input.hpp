@@ -19,4 +19,4 @@ namespace bls
             f32 get_mouse_x_native() override;
             f32 get_mouse_y_native() override;
     };
-};
+};  // namespace bls

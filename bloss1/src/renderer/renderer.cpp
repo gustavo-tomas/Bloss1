@@ -1,151 +1,203 @@
 #include "renderer/renderer.hpp"
-#include "renderer/model.hpp"
-#include "renderer/skybox.hpp"
-#include "renderer/font.hpp"
-#include "renderer/opengl/renderer.hpp"
-#include "renderer/opengl/shader.hpp"
-#include "renderer/opengl/buffers.hpp"
-#include "renderer/opengl/texture.hpp"
-#include "renderer/opengl/skybox.hpp"
-#include "renderer/opengl/font.hpp"
+
+#include "core/logger.hpp"
+#include "managers/font_manager.hpp"
+#include "managers/model_manager.hpp"
 #include "managers/shader_manager.hpp"
 #include "managers/texture_manager.hpp"
-#include "managers/model_manager.hpp"
-#include "managers/font_manager.hpp"
+#include "renderer/font.hpp"
+#include "renderer/model.hpp"
+#include "renderer/opengl/buffers.hpp"
+#include "renderer/opengl/font.hpp"
+#include "renderer/opengl/renderer.hpp"
+#include "renderer/opengl/shader.hpp"
+#include "renderer/opengl/skybox.hpp"
+#include "renderer/opengl/texture.hpp"
+#include "renderer/skybox.hpp"
 
 namespace bls
 {
-    Renderer* Renderer::create()
+    Renderer *Renderer::create()
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLRenderer();
-        #else
-        std::cerr << "no valid renderer defined\n";
-        exit(1);
-        #endif
+#else
+        throw std::runtime_error(
+            "no valid renderer "
+            "defined");
+#endif
     }
 
-    Skybox* Skybox::create(const str& path,
+    Skybox *Skybox::create(const str &path,
                            const u32 skybox_resolution,
                            const u32 irradiance_resolution,
                            const u32 brdf_resolution,
                            const u32 prefilter_resolution,
                            const u32 max_mip_levels)
     {
-        #ifdef _OPENGL
-        return new OpenGLSkybox(path, skybox_resolution, irradiance_resolution, brdf_resolution, prefilter_resolution, max_mip_levels);
-        #else
+#ifdef _OPENGL
+        return new OpenGLSkybox(
+            path, skybox_resolution, irradiance_resolution, brdf_resolution, prefilter_resolution, max_mip_levels);
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    std::shared_ptr<Shader> Shader::create(const str& name, const str& vertex_path, const str& fragment_path, const str& geometry_path)
+    std::shared_ptr<Shader> Shader::create(const str &name,
+                                           const str &vertex_path,
+                                           const str &fragment_path,
+                                           const str &geometry_path,
+                                           const str &tess_ctrl_path,
+                                           const str &tess_eval_path)
     {
-        if (ShaderManager::get().exists(name))
-            return ShaderManager::get().get_shader(name);
+        if (ShaderManager::get().exists(name)) return ShaderManager::get().get_shader(name);
 
-        #ifdef _OPENGL
-        auto shader = std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path);
+#ifdef _OPENGL
+        auto shader =
+            std::make_shared<OpenGLShader>(vertex_path, fragment_path, geometry_path, tess_ctrl_path, tess_eval_path);
         ShaderManager::get().load(name, shader);
         return shader;
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    // @TODO: there must be a better way
-    std::shared_ptr<Model> Model::create(const str& name, const str& path, bool flip_uvs)
+    std::shared_ptr<Model> Model::create(const str &name, const str &path, bool flip_uvs)
     {
-        if (ModelManager::get().exists(name))
-            return ModelManager::get().get_model(name);
+        if (ModelManager::get().exists(name)) return ModelManager::get().get_model(name);
 
         auto model = std::make_shared<Model>(path, flip_uvs);
         ModelManager::get().load(name, model);
         return model;
     }
 
-    std::shared_ptr<Texture> Texture::create(u32 width, u32 height, ImageFormat format,
-            TextureParameter wrap_s, TextureParameter wrap_t,
-            TextureParameter min_filter, TextureParameter mag_filter)
+    std::shared_ptr<Texture> Texture::create(u32 width,
+                                             u32 height,
+                                             ImageFormat format,
+                                             TextureParameter wrap_s,
+                                             TextureParameter wrap_t,
+                                             TextureParameter min_filter,
+                                             TextureParameter mag_filter)
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         auto texture = std::make_shared<OpenGLTexture>(width, height, format, wrap_s, wrap_t, min_filter, mag_filter);
         return texture;
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    std::shared_ptr<Texture> Texture::create(const str& name, const str& path, TextureType texture_type)
+    std::shared_ptr<Texture> Texture::create(const str &name, const str &path, TextureType texture_type)
     {
-        if (TextureManager::get().exists(name))
-            return TextureManager::get().get_texture(name);
+        if (TextureManager::get().exists(name)) return TextureManager::get().get_texture(name);
 
-        #ifdef _OPENGL
+#ifdef _OPENGL
         auto texture = std::make_shared<OpenGLTexture>(path, texture_type);
         TextureManager::get().load(name, texture);
         return texture;
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    std::shared_ptr<Font> Font::create(const str& name, const str& path)
+    std::shared_ptr<Texture> Texture::get_default(TextureType texture_type)
     {
-        if (FontManager::get().exists(name))
-            return FontManager::get().get_font(name);
+        str name = "";
+        switch (texture_type)
+        {
+            case TextureType::Diffuse:
+                name = "default_diffuse";
+                break;
 
-        #ifdef _OPENGL
+            case TextureType::Normal:
+                name = "default_normal";
+                break;
+
+            case TextureType::Specular:
+                name = "default_specular";
+                break;
+
+            case TextureType::Metalness:
+                name = "default_arm";
+                break;
+
+            case TextureType::Roughness:
+                name = "default_roughness";
+                break;
+
+            case TextureType::AmbientOcclusion:
+                name = "default_ao";
+                break;
+
+            case TextureType::Emissive:
+                name = "default_emissive";
+                break;
+
+            default:
+                LOG_ERROR(
+                    "invalid texture type for "
+                    "default texture");
+                break;
+        }
+
+        return Texture::create(name, "bloss1/assets/textures/" + name + ".png", texture_type);
+    }
+
+    std::shared_ptr<Font> Font::create(const str &name, const str &path)
+    {
+        if (FontManager::get().exists(name)) return FontManager::get().get_font(name);
+
+#ifdef _OPENGL
         auto font = std::make_shared<OpenGLFont>(path);
         FontManager::get().load(name, font);
         return font;
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    VertexBuffer* VertexBuffer::create(void* vertices, u32 size)
+    VertexBuffer *VertexBuffer::create(void *vertices, u32 size)
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLVertexBuffer(vertices, size);
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    IndexBuffer* IndexBuffer::create(const std::vector<u32>& indices, u32 count)
+    IndexBuffer *IndexBuffer::create(const std::vector<u32> &indices, u32 count)
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLIndexBuffer(indices, count);
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    FrameBuffer* FrameBuffer::create()
+    FrameBuffer *FrameBuffer::create()
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLFrameBuffer();
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    RenderBuffer* RenderBuffer::create(u32 width, u32 height, AttachmentType type)
+    RenderBuffer *RenderBuffer::create(u32 width, u32 height, AttachmentType type)
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLRenderBuffer(width, height, type);
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
 
-    VertexArray* VertexArray::create()
+    VertexArray *VertexArray::create()
     {
-        #ifdef _OPENGL
+#ifdef _OPENGL
         return new OpenGLVertexArray();
-        #else
+#else
         return nullptr;
-        #endif
+#endif
     }
-};
+};  // namespace bls

@@ -5,62 +5,60 @@
  *
  */
 
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "math/math.hpp"
+#include "renderer/assimp_utils.hpp"
 #include "renderer/buffers.hpp"
 #include "renderer/texture.hpp"
-#include "renderer/assimp_utils.hpp"
-#include "math/math.hpp"
-
-#include "assimp/scene.h"
-#include "assimp/Importer.hpp"
 
 #define MAX_BONE_PER_VERTEX 4
 #define MAX_BONE_MATRICES 100
 
-// @TODO: for now model = meshes + textures
 namespace bls
 {
     struct AssNodeData
     {
-        mat4 transformation;
-        str name;
-        i32 children_count;
-        std::vector<AssNodeData> children;
+            mat4 transformation;
+            str name;
+            i32 children_count;
+            std::vector<AssNodeData> children;
     };
 
     struct BoneInfo
     {
-        i32 id;
-        mat4 offset;
+            i32 id;
+            mat4 offset;
     };
 
     struct KeyPosition
     {
-        vec3 position;
-        f32 time_stamp;
+            vec3 position;
+            f32 time_stamp;
     };
 
     struct KeyRotation
     {
-        quat orientation;
-        f32 time_stamp;
+            quat orientation;
+            f32 time_stamp;
     };
 
     struct KeyScale
     {
-        vec3 scale;
-        f32 time_stamp;
+            vec3 scale;
+            f32 time_stamp;
     };
 
     struct Vertex
     {
-        vec3 position;
-        vec3 normal;
-        vec2 tex_coords;
-        vec3 tangent;
-        vec3 bitangent;
+            vec3 position;
+            vec3 normal;
+            vec2 tex_coords;
+            vec3 tangent;
+            vec3 bitangent;
 
-        i32 bone_ids[MAX_BONE_PER_VERTEX];
-        f32 weights[MAX_BONE_PER_VERTEX];
+            i32 bone_ids[MAX_BONE_PER_VERTEX];
+            f32 weights[MAX_BONE_PER_VERTEX];
     };
 
     // Mesh
@@ -68,10 +66,15 @@ namespace bls
     class Mesh
     {
         public:
-            Mesh(VertexArray* vao, VertexBuffer* vbo, IndexBuffer* ebo,
-                 const std::vector<Vertex>& vertices, const std::vector<u32>& indices, const std::vector<Texture*>& textures)
+            Mesh(VertexArray *vao,
+                 VertexBuffer *vbo,
+                 IndexBuffer *ebo,
+                 const std::vector<Vertex> &vertices,
+                 const std::vector<u32> &indices,
+                 const std::vector<std::shared_ptr<Texture>> &textures)
                 : vao(vao), vbo(vbo), ebo(ebo), vertices(vertices), indices(indices), textures(textures)
-            { }
+            {
+            }
 
             ~Mesh()
             {
@@ -80,13 +83,13 @@ namespace bls
                 delete ebo;
             }
 
-            VertexArray* vao;
-            VertexBuffer* vbo;
-            IndexBuffer* ebo;
+            VertexArray *vao;
+            VertexBuffer *vbo;
+            IndexBuffer *ebo;
 
             std::vector<Vertex> vertices;
             std::vector<u32> indices;
-            std::vector<Texture*> textures;
+            std::vector<std::shared_ptr<Texture>> textures;
     };
 
     // Bone
@@ -94,7 +97,7 @@ namespace bls
     class Bone
     {
         public:
-            Bone(const str& name, i32 id, const aiNodeAnim* channel);
+            Bone(const str &name, i32 id, const aiNodeAnim *channel);
             ~Bone();
 
             void update(f32 animation_time);
@@ -130,22 +133,30 @@ namespace bls
     class SkeletalAnimation
     {
         public:
-            SkeletalAnimation(const aiNode* root, const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count);
+            SkeletalAnimation(const aiNode *root,
+                              const aiAnimation *animation,
+                              std::map<str, BoneInfo> &model_bone_info_map,
+                              i32 &model_bone_count);
             ~SkeletalAnimation();
 
-            Bone* find_bone(const str& name);
+            Bone *find_bone(const str &name);
+            str get_name();
             f32 get_ticks_per_second();
             f32 get_duration();
-            AssNodeData& get_root_node();
-            std::map<str, BoneInfo>& get_bone_id_map();
+            f32 get_duration_seconds();
+            AssNodeData &get_root_node();
+            std::map<str, BoneInfo> &get_bone_id_map();
 
         private:
-            void read_missing_bones(const aiAnimation* animation, std::map<str, BoneInfo>& model_bone_info_map, i32& model_bone_count);
-            void read_hierarchy_data(AssNodeData& dest, const aiNode* root);
+            void read_missing_bones(const aiAnimation *animation,
+                                    std::map<str, BoneInfo> &model_bone_info_map,
+                                    i32 &model_bone_count);
+            void read_hierarchy_data(AssNodeData &dest, const aiNode *root);
 
             f32 duration;
             i32 ticks_per_second;
-            std::vector<Bone*> bones;
+            str name;
+            std::vector<Bone *> bones;
             AssNodeData root_node;
             std::map<str, BoneInfo> bone_info_map;
     };
@@ -155,24 +166,36 @@ namespace bls
     class Animator
     {
         public:
-            Animator(SkeletalAnimation* animation);
+            Animator(SkeletalAnimation *animation);
             ~Animator();
 
             void update(f32 dt);
-            void play(SkeletalAnimation* animation);
-            void blend_animations(SkeletalAnimation* base_animation, SkeletalAnimation* layered_animation, f32 blend_factor, f32 dt);
-            void calculate_bone_transform(const AssNodeData* node, mat4 parent_transform);
-            void calculate_blended_bone_transform(SkeletalAnimation* base_animation, const AssNodeData* base_node,
-                                                  SkeletalAnimation* layered_animation, const AssNodeData* layered_node,
-                                                  const f32 current_time_base, const f32 current_time_layered,
-                                                  const mat4& parent_transform,
+            void update_blended(f32 dt);
+
+            void play(SkeletalAnimation *animation);
+            void crossfade_from(SkeletalAnimation *prev_animation, f32 blend_factor, bool synchronize = false);
+
+            void calculate_bone_transform(const AssNodeData *node, mat4 parent_transform);
+            void calculate_blended_bone_transform(SkeletalAnimation *base_animation,
+                                                  const AssNodeData *base_node,
+                                                  SkeletalAnimation *layered_animation,
+                                                  const AssNodeData *layered_node,
+                                                  const f32 current_time_base,
+                                                  const f32 current_time_layered,
+                                                  const mat4 &parent_transform,
                                                   const f32 blend_factor);
+
             std::vector<mat4> get_final_bone_matrices();
+            SkeletalAnimation *get_current_animation();
+            f32 get_blend_factor();
 
         private:
             std::vector<mat4> final_bone_matrices;
-            SkeletalAnimation* current_animation;
+            SkeletalAnimation *current_animation;
+            SkeletalAnimation *previous_animation;
             f32 current_time;
+            f32 previous_time;
+            f32 blend_factor;
     };
 
     // Model
@@ -180,32 +203,32 @@ namespace bls
     class Model
     {
         public:
-            Model(const str& path, bool flip_uvs);
+            Model(const str &path, bool flip_uvs);
             ~Model();
 
-            static std::shared_ptr<Model> create(const str& name, const str& path, bool flip_uvs); // i know i know
+            static std::shared_ptr<Model> create(const str &name, const str &path, bool flip_uvs);  // i know i know
 
             str path;
-            std::vector<Mesh*> meshes;
+            bool flip_uvs;
+            std::vector<Mesh *> meshes;
             std::map<str, BoneInfo> bone_info_map;
             std::map<str, std::unique_ptr<SkeletalAnimation>> animations;
             std::unique_ptr<Animator> animator;
             i32 bone_counter;
 
         private:
-
             // Helper methods
-            void process_node(aiNode* node, const aiScene* scene);
-            Mesh* process_mesh(aiMesh* mesh, const aiScene* scene);
-            std::vector<Texture*> load_material_textures(aiMaterial* mat, aiTextureType type);
+            void process_node(aiNode *node, const aiScene *scene);
+            Mesh *process_mesh(aiMesh *mesh, const aiScene *scene);
+            std::vector<std::shared_ptr<Texture>> load_material_textures(aiMaterial *mat, aiTextureType type);
 
-            auto& get_bone_info_map();
-            i32& get_bone_count();
+            auto &get_bone_info_map();
+            i32 &get_bone_count();
 
-            void set_vertex_bone_data_to_default(Vertex& vertex);
-            void set_vertex_bone_data(Vertex& vertex, i32 bone_id, f32 weight);
-            void extract_bone_weight_for_vertices(std::vector<Vertex>& vertices, aiMesh* mesh);
+            void set_vertex_bone_data_to_default(Vertex &vertex);
+            void set_vertex_bone_data(Vertex &vertex, i32 bone_id, f32 weight);
+            void extract_bone_weight_for_vertices(std::vector<Vertex> &vertices, aiMesh *mesh);
 
-            Assimp::Importer* importer; // @TODO: find a better solution
+            Assimp::Importer *importer;
     };
-};
+};  // namespace bls

@@ -4,8 +4,8 @@
  * @brief Sphere primitive with configurable number of segments and radius.
  */
 
-#include "renderer/renderer.hpp"
 #include "renderer/buffers.hpp"
+#include "renderer/renderer.hpp"
 
 namespace bls
 {
@@ -13,7 +13,11 @@ namespace bls
     class Sphere
     {
         public:
-            Sphere(Renderer& renderer, const vec3& position = vec3(0.0f), f32 radius = 1.0f, u32 x_segments = 32, u32 y_segments = 32)
+            Sphere(Renderer &renderer,
+                   const vec3 &position = vec3(0.0f),
+                   f32 radius = 1.0f,
+                   u32 x_segments = 32,
+                   u32 y_segments = 32)
                 : renderer(renderer)
             {
                 // Setup vertices
@@ -81,17 +85,17 @@ namespace bls
                 vao = VertexArray::create();
                 vao->bind();
 
-                vbo = VertexBuffer::create(static_cast<void*>(vertices.data()), vertices.size() * sizeof(f32));
+                vbo = VertexBuffer::create(static_cast<void *>(vertices.data()), vertices.size() * sizeof(f32));
                 ebo = IndexBuffer::create(indices, indices.size());
 
                 // Position
-                vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) 0);
+                vao->add_vertex_buffer(0, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void *)0);
 
                 // Normal
-                vao->add_vertex_buffer(1, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) (3 * sizeof(f32)));
+                vao->add_vertex_buffer(1, 3, ShaderDataType::Float, false, 8 * sizeof(f32), (void *)(3 * sizeof(f32)));
 
                 // Texture coordinates
-                vao->add_vertex_buffer(2, 2, ShaderDataType::Float, false, 8 * sizeof(f32), (void*) (6 * sizeof(f32)));
+                vao->add_vertex_buffer(2, 2, ShaderDataType::Float, false, 8 * sizeof(f32), (void *)(6 * sizeof(f32)));
             };
 
             ~Sphere()
@@ -99,8 +103,6 @@ namespace bls
                 delete vao;
                 delete vbo;
                 delete ebo;
-
-                // std::cout << "sphere destroyed successfully\n";
             };
 
             void render()
@@ -111,10 +113,10 @@ namespace bls
             };
 
         private:
-            Renderer& renderer;
-            VertexArray* vao;
-            VertexBuffer* vbo;
-            IndexBuffer* ebo;
+            Renderer &renderer;
+            VertexArray *vao;
+            VertexBuffer *vbo;
+            IndexBuffer *ebo;
 
             std::vector<f32> vertices;
             std::vector<u32> indices;
@@ -123,4 +125,4 @@ namespace bls
             std::vector<vec2> uv;
             std::vector<vec3> normals;
     };
-};
+};  // namespace bls

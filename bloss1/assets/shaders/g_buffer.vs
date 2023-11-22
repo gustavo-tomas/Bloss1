@@ -10,7 +10,6 @@ layout (location = 6) in vec4 weights;
 
 out VS_OUT {
     vec2 TexCoords;
-    vec3 Normal;
     mat3 TBN;
     vec3 FragPos;
 
@@ -29,7 +28,6 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 void main() {
 
     // Bone influence
-    // @TODO: optimize this
     vec4 positionAfterWeights = vec4(0.0);
     for (int i = 0; i < MAX_BONE_PER_VERTEX; i++) {
         if (boneIDs[i] == -1)
@@ -51,18 +49,14 @@ void main() {
     // Position
     vec4 fragPos = model * positionAfterWeights;
 
-    // Normal matrix
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-
     // TBN matrix
     vec3 T = normalize(vec3(model * vec4(tangent, 0.0)));
     vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));
     vec3 N = normalize(vec3(model * vec4(normal, 0.0)));
-    mat3 tbnMatrix = mat3(T, B, N); // @TODO: use second approach (light in tangent space)
+    mat3 tbnMatrix = mat3(T, B, N);
 
     vs_out.FragPos = fragPos.xyz;
     vs_out.TexCoords = texCoords;
-    vs_out.Normal = normalMatrix * normal;
     vs_out.TBN = tbnMatrix;
 
     // View matrices

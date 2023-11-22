@@ -5,8 +5,8 @@
  *
  */
 
-#include "stages/stage.hpp"
 #include "renderer/video_player.hpp"
+#include "stages/stage.hpp"
 
 namespace bls
 {
@@ -22,4 +22,4 @@ namespace bls
         private:
             std::unique_ptr<VideoPlayer> video_player;
     };
-};
+};  // namespace bls

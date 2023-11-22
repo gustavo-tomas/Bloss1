@@ -1,19 +1,18 @@
 #include "core/game.hpp"
-// #include "stages/menu_stage.hpp"
+
+#include "core/logger.hpp"
+#include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
+#include "tools/profiler.hpp"
 
 namespace bls
 {
-    Game* Game::instance = nullptr;
+    Game *Game::instance = nullptr;
 
-    Game::Game(const str& title, const u32& width, const u32& height)
+    Game::Game(const str &title, const u32 &width, const u32 &height)
     {
         // Create game instance
-        if (instance != nullptr)
-        {
-            std::cerr << "there can be only one instance of game\n";
-            exit(1);
-        }
+        if (instance != nullptr) throw std::runtime_error("there can be only one instance of game");
 
         instance = this;
 
@@ -25,9 +24,16 @@ namespace bls
         renderer = std::unique_ptr<Renderer>(Renderer::create());
         renderer->initialize();
 
+// Create the editor
+#if !defined(_RELEASE)
+        editor = std::make_unique<Editor>(*window.get());
+#endif
+
         // Create the audio engine
-        // @TODO: might wanna create a wrapper just like the renderer
-        audio_engine = std::make_unique<AudioEngine>();
+        audio_engine = std::unique_ptr<AudioEngine>(AudioEngine::create());
+
+        // Create RNG engine
+        random_engine = std::make_unique<Random>();
 
         // Register callbacks
         EventSystem::register_callback<WindowCloseEvent>(BIND_EVENT_FN(Game::on_window_close));
@@ -38,17 +44,19 @@ namespace bls
 
     Game::~Game()
     {
-        std::cout << "game destroyed successfully\n";
     }
 
     void Game::run()
     {
+        BLS_PROFILE_BEGIN_SESSION("MainLoop", "profile/runtime.json");
+
         // Register initial stage
-        change_stage(new TestStage());
+        change_stage(new MenuStage());
 
         // Time variation
-        f64 last_time = window->get_time(), current_time = 0, time_counter = 0, dt = 0;
-        u32 frame_counter = 0;
+        last_time = window->get_time();
+        current_time = 0;
+        dt = 0;
 
         set_target_fps(0);
 
@@ -67,84 +75,95 @@ namespace bls
 
             // Calculate dt
             current_time = window->get_time();
-            dt = current_time - last_time;
+            dt = clamp(static_cast<f32>(current_time - last_time), 0.0f, 0.1f);
             last_time = current_time;
-
-            // Print FPS
-            frame_counter++;
-            time_counter += dt;
-            if (time_counter >= 1.0)
-            {
-                printf("%.3lf ms/frame - %d fps\n", 1000.0 / (f64) frame_counter, frame_counter);
-                frame_counter = time_counter = 0;
-            }
 
             // Update running stage
             stage->update(dt);
+
+            if (!stage) break;
+
+                // Update editor
+#if !defined(_RELEASE)
+            if (stage->ecs != nullptr) editor->update(*stage->ecs, dt);
+#endif
 
             // Update window
             window->update();
 
             // Sleep to match target spf
             f64 elapsed = window->get_time() - last_time;
-            if (target_spf - elapsed > 0.0)
-                window->sleep(target_spf - elapsed);
+            if (target_spf - elapsed > 0.0) window->sleep(target_spf - elapsed);
         }
+
+        BLS_PROFILE_END_SESSION();
     }
 
-    void Game::change_stage(Stage* new_stage)
+    void Game::change_stage(Stage *new_stage)
     {
         stage.reset();
-        stage = std::unique_ptr<Stage>(new_stage);
-        if (stage)
+        if (new_stage)
+        {
+            stage = std::unique_ptr<Stage>(new_stage);
             stage->start();
+        }
     }
 
-    void Game::on_event(Event& event)
+    void Game::on_event(Event &event)
     {
         if (typeid(event) == typeid(WindowCloseEvent))
-            EventSystem::fire_event(static_cast<const WindowCloseEvent&>(event));
+            EventSystem::fire_event(static_cast<const WindowCloseEvent &>(event));
 
         else if (typeid(event) == typeid(WindowResizeEvent))
-            EventSystem::fire_event(static_cast<const WindowResizeEvent&>(event));
+            EventSystem::fire_event(static_cast<const WindowResizeEvent &>(event));
 
         else if (typeid(event) == typeid(KeyPressEvent))
-            EventSystem::fire_event(static_cast<const KeyPressEvent&>(event));
+            EventSystem::fire_event(static_cast<const KeyPressEvent &>(event));
 
         else if (typeid(event) == typeid(MouseScrollEvent))
-            EventSystem::fire_event(static_cast<const MouseScrollEvent&>(event));
+            EventSystem::fire_event(static_cast<const MouseScrollEvent &>(event));
 
         else if (typeid(event) == typeid(MouseMoveEvent))
-            EventSystem::fire_event(static_cast<const MouseMoveEvent&>(event));
+            EventSystem::fire_event(static_cast<const MouseMoveEvent &>(event));
 
         else
-            std::cerr << "invalid event type\n";
+            LOG_ERROR("invalid event type");
     }
 
-    Game& Game::get()
+    Game &Game::get()
     {
-        if (instance == nullptr)
-        {
-            std::cerr << "game instance is nullptr\n";
-            exit(1);
-        }
-
+        if (instance == nullptr) throw std::runtime_error("game instance is nullptr");
         return *instance;
     }
 
-    Renderer& Game::get_renderer()
+    Renderer &Game::get_renderer()
     {
         return *renderer;
     }
 
-    AudioEngine& Game::get_audio_engine()
+    Editor &Game::get_editor()
+    {
+        return *editor;
+    }
+
+    AudioEngine &Game::get_audio_engine()
     {
         return *audio_engine;
     }
 
-    Window& Game::get_window()
+    Window &Game::get_window()
     {
         return *window;
+    }
+
+    Random &Game::get_random_engine()
+    {
+        return *random_engine;
+    }
+
+    Stage &Game::get_curr_stage()
+    {
+        return *stage;
     }
 
     void Game::set_target_fps(u32 fps)
@@ -153,28 +172,25 @@ namespace bls
         target_spf = 1.0 / static_cast<f64>(fps);
     }
 
-    void Game::on_window_close(const WindowCloseEvent&)
+    void Game::on_window_close(const WindowCloseEvent &)
     {
         window_open = false;
     }
 
-    void Game::on_key_press(const KeyPressEvent& event)
+    void Game::on_key_press(const KeyPressEvent &)
     {
-        std::cout << "Key pressed: " << event.key << "\n";
     }
 
-    void Game::on_mouse_scroll(const MouseScrollEvent& event)
+    void Game::on_mouse_scroll(const MouseScrollEvent &)
     {
-        std::cout << "Scroll X: " << event.x_offset << " Scroll Y: " << event.y_offset << "\n";
     }
 
-    void Game::on_window_resize(const WindowResizeEvent& event)
+    void Game::on_window_resize(const WindowResizeEvent &event)
     {
-        std::cout << "Width: " << event.width << " Height: " << event.height << "\n";
         if (event.width <= 100 || event.height <= 100)
             minimized = true;
 
         else
             minimized = false;
     }
-};
+};  // namespace bls

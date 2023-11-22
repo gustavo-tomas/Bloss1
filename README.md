@@ -1,25 +1,35 @@
 # Bloss1
 
-Cute little data-driven (hopefully) c++ engine.
+Final project for my Computer Science course - UnB
+
+C++ game engine.
 
 :)
+
+> Note: the build/run commands use the [just command runner](https://github.com/casey/just)
+
+## Build & Run
+
+```
+$ just
+```
 
 ## Build
 
 ```
-$ scripts/build.sh release
+$ just build cfg
 ```
 
 ## Run
 
 ```
-$ scripts/run.sh release
+$ just run cfg
 ```
 
 ## Clean
 
 ```
-$ scripts/clean.sh
+$ just clean cfg
 ```
 
 ## References
@@ -35,3 +45,14 @@ $ scripts/clean.sh
 - [blending skeletal animations](https://stackoverflow.com/questions/69860756/how-do-i-correctly-blend-between-skeletal-animations-in-opengl-from-a-walk-anima)
 - [3D game shaders for beginners](https://github.com/lettier/3d-game-shaders-for-beginners)
 - [Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
+- [Particle system](https://github.com/TheCherno/OneHourParticleSystem)
+- [Finite State Machine (FSM)](https://gameprogrammingpatterns.com/state.html)
+- [Character controller](https://www.youtube.com/watch?v=EkPfhzIbp2g&t=470s)
+- [The Cherno Profiler](https://www.youtube.com/watch?v=qiD39bB7DvA)
+- [Rendering terrain with Tesselation Shaders](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
+- [Noise algorithms](https://github.com/stegu/webgl-noise)
+- [FBM algorithm](https://thebookofshaders.com/13/)
+- [Edge detection shader](https://gist.github.com/Hebali/6ebfc66106459aacee6a9fac029d0115)
+- [Sound library](https://freesound.org/)
+- [Vignette Shader](https://developer.unigine.com/forum/topic/2346-vignette-shader/)
+- [Kuwahara Shader](https://www.shadertoy.com/view/MsXSz4#)

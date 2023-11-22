@@ -17,34 +17,33 @@ namespace bls
     class ECS;
 
     // System: the logic bits
-    typedef void (*System) (ECS& ecs, f32 dt);
+    typedef void (*System)(ECS &ecs, f32 dt);
 
     // ECS: container of the systems and entities
     class ECS
     {
         public:
-            ECS()
-                : id_counter(0) { }
+            ECS(u32 max_entity_id = MAX_ENTITY_ID) : max_entity_id(max_entity_id)
+            {
+                for (u32 id = 0; id <= max_entity_id; id++) available_ids.insert(id);
+            }
 
             ~ECS()
             {
-                systems.clear();
-                transforms.clear();
-                models.clear();
-                dir_lights.clear();
-
-                std::cout << "world destroyed successfully\n";
             }
 
             // Return a new id (create a new entity)
             u32 get_id()
             {
-                if (id_counter >= MAX_ENTITY_ID)
-                {
-                    std::cerr << "id_counter reached maximum id\n";
-                    exit(1);
-                }
-                return id_counter++;
+                if (available_ids.empty())
+                    throw std::runtime_error(
+                        "no available ids "
+                        "left");
+
+                u32 id = *available_ids.begin();
+                available_ids.erase(id);
+
+                return id;
             }
 
             // Register a system
@@ -53,9 +52,22 @@ namespace bls
                 systems.push_back(system);
             }
 
-            // Erase all the components of an entity (@TODO: this is not very efficient)
+            // Clear all systems
+            void clear_systems()
+            {
+                systems.clear();
+            }
+
+            void mark_for_deletion(u32 id)
+            {
+                deletion_queue.push(id);
+            }
+
+            // Erase all the components of an entity
             void erase_entity(u32 id)
             {
+                if (id > max_entity_id) throw std::runtime_error("tried to delete invalid id: " + to_str(id));
+
                 names.erase(id);
                 transforms.erase(id);
                 models.erase(id);
@@ -67,13 +79,21 @@ namespace bls
                 timers.erase(id);
                 cameras.erase(id);
                 camera_controllers.erase(id);
+                texts.erase(id);
+                sounds.erase(id);
+                state_machines.erase(id);
+                projectiles.erase(id);
+                particle_systems.erase(id);
+                bullet_indicators.erase(id);
+                hitpoints.erase(id);
+
+                available_ids.insert(id);
             }
 
             // Registered systems
             std::vector<System> systems;
 
             // Table of components
-            // @TODO: use templates or smth
             std::map<u32, str> names;
             std::map<u32, std::unique_ptr<Transform>> transforms;
             std::map<u32, std::unique_ptr<ModelComponent>> models;
@@ -86,9 +106,18 @@ namespace bls
             std::map<u32, std::unique_ptr<Camera>> cameras;
             std::map<u32, std::unique_ptr<CameraController>> camera_controllers;
             std::map<u32, std::unique_ptr<Text>> texts;
+            std::map<u32, std::map<str, std::unique_ptr<Sound>>> sounds;
+            std::map<u32, std::unique_ptr<StateMachine>> state_machines;
+            std::map<u32, std::unique_ptr<Projectile>> projectiles;
+            std::map<u32, std::unique_ptr<ParticleSystem>> particle_systems;
+            std::map<u32, std::unique_ptr<BulletLandingIndicator>> bullet_indicators;
+            std::map<u32, f32> hitpoints;
+
+            std::queue<u32> deletion_queue;
 
         private:
             // Entities IDs
-            u32 id_counter;
+            u32 max_entity_id;
+            std::set<u32> available_ids;
     };
-};
+};  // namespace bls

@@ -1,0 +1,12 @@
+<post_processing>
+{
+	fxaa_pass: 1, 1;
+	bloom_pass: 2, 0, 5, 7.0, 0.4, 0.325;
+	fog_pass: 3, 0, (0.0, 0.0, 0.0), (100.0, 500.0);
+	sharpen_pass: 4, 0, 0.05;
+	posterization_pass: 5, 0, 18.0;
+	pixelization_pass: 6, 0, 5;
+	outline_pass: 7, 0, (0.0, 0.0, 0.0), 0.8;
+	vignette_pass: 8, 0, 0.85, 0.45;
+	kuwahara_pass: 9, 0, 4;
+}
