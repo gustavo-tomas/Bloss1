@@ -1,7 +1,7 @@
 #include "core/game.hpp"
 
 #include "core/logger.hpp"
-// #include "stages/menu_stage.hpp"
+#include "stages/menu_stage.hpp"
 #include "stages/test_stage.hpp"
 #include "tools/profiler.hpp"
 
@@ -51,7 +51,7 @@ namespace bls
         BLS_PROFILE_BEGIN_SESSION("MainLoop", "profile/runtime.json");
 
         // Register initial stage
-        change_stage(new TestStage());
+        change_stage(new MenuStage());
 
         // Time variation
         last_time = window->get_time();
@@ -83,9 +83,9 @@ namespace bls
 
             if (!stage) break;
 
-// Update editor
+                // Update editor
 #if !defined(_RELEASE)
-            editor->update(*stage->ecs, dt);
+            if (stage->ecs != nullptr) editor->update(*stage->ecs, dt);
 #endif
 
             // Update window
@@ -132,11 +132,7 @@ namespace bls
 
     Game &Game::get()
     {
-        if (instance == nullptr)
-            throw std::runtime_error(
-                "game instance is "
-                "nullptr");
-
+        if (instance == nullptr) throw std::runtime_error("game instance is nullptr");
         return *instance;
     }
 
