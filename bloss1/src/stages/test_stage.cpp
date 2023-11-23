@@ -6,6 +6,7 @@
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
 #include "ecs/systems.hpp"
+#include "stages/menu_stage.hpp"
 #include "tools/profiler.hpp"
 
 namespace bls
@@ -41,9 +42,12 @@ namespace bls
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
 
         auto &renderer = Game::get().get_renderer();
-        renderer.create_shadow_map(*ecs);
-        renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
-        renderer.create_post_processing_passes();
+        if (renderer.get_shadow_map() == nullptr)
+        {
+            renderer.create_shadow_map(*ecs);
+            renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
+            renderer.create_post_processing_passes();
+        }
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
@@ -71,7 +75,7 @@ namespace bls
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
         {
-            Game::get().change_stage(nullptr);
+            Game::get().change_stage(new MenuStage());
             return;
         }
 
@@ -89,7 +93,7 @@ namespace bls
             audio_engine.load("ophanim_death_sfx", "bloss1/assets/sounds/124601__nominal__nog-paal.wav");
             audio_engine.play("ophanim_death_sfx");
 
-            ecs->clear_systems();
+            Game::get().change_stage(new MenuStage());
             return;
         }
 
@@ -102,7 +106,7 @@ namespace bls
                               "bloss1/assets/sounds/505751__thehorriblejoke__computer-breaking-sound.wav");
             audio_engine.play("player_death_sfx");
 
-            ecs->clear_systems();
+            Game::get().change_stage(new MenuStage());
             return;
         }
     }
