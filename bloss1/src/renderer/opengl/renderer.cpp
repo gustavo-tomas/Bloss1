@@ -234,6 +234,7 @@ namespace bls
     {
         auto &window = Game::get().get_window();
         auto &ecs = Game::get().get_curr_stage().ecs;
+        auto &camera = ecs->cameras[0];
 
         auto width = window.get_width();
         auto height = window.get_height();
@@ -242,14 +243,13 @@ namespace bls
         post_processing->add_pass(new FXAAPass(width, height), pass_position++);
         post_processing->add_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f), pass_position++);
 
-        post_processing->add_pass(
-            new FogPass(width,
-                        height,
-                        vec3(0.0f),
-                        vec2(ecs->cameras[0].get()->far / 3.0f, ecs->cameras[0].get()->far / 2.0f),
-                        ecs->cameras[0].get()->position,
-                        textures[0].second.get()),
-            pass_position++);
+        post_processing->add_pass(new FogPass(width,
+                                              height,
+                                              vec3(0.0f),
+                                              vec2(camera->far / 3.0f, camera->far / 2.0f),
+                                              camera->position,
+                                              textures[0].second.get()),
+                                  pass_position++);
 
         post_processing->add_pass(new SharpenPass(width, height, 0.05f), pass_position++);
         post_processing->add_pass(new PosterizationPass(width, height, 8.0f), pass_position++);
