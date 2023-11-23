@@ -1,11 +1,10 @@
 #pragma once
 
 /**
- * @brief @TODO
- *
+ * @brief Simple menu scene.
  */
 
-#include "renderer/video_player.hpp"
+// #include "renderer/video_player.hpp"
 #include "stages/stage.hpp"
 
 namespace bls
@@ -18,8 +17,5 @@ namespace bls
 
             void start() override;
             void update(f32 dt) override;
-
-        private:
-            std::unique_ptr<VideoPlayer> video_player;
     };
 };  // namespace bls
