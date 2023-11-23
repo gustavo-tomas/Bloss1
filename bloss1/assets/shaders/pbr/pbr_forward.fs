@@ -149,7 +149,7 @@ void main()
     vec2 brdf = texture(textures.brdfLut, vec2(max(dot(N, V), 0.0), Roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * AO;
+    vec3 ambient = (kD * diffuse + specular) * AO * lights.dirLightColors[0]; /* control amount of ambient color */
 
     vec3 color = ambient + ((1.0 - directShadow) * Lo) + Emissive;
 
