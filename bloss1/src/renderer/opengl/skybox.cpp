@@ -13,6 +13,7 @@ namespace bls
                                const u32 brdf_resolution,
                                const u32 prefilter_resolution,
                                const u32 max_mip_levels)
+        : path(path)
     {
         // Disable face culling during maps creation
         glDisable(GL_CULL_FACE);
@@ -303,5 +304,10 @@ namespace bls
 
         glDepthFunc(GL_LESS);
         glEnable(GL_CULL_FACE);
+    }
+
+    str OpenGLSkybox::get_path() const
+    {
+        return path;
     }
 };  // namespace bls

@@ -116,23 +116,14 @@ namespace bls
         if (!g_buffer->check()) throw std::runtime_error("framebuffer is not complete");
         g_buffer->unbind();
 
-        // Create a skybox
-        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024,
-        // 1024, 10)); skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr",
-        // 512, 32, 512, 512, 10)); skybox =
-        // std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32,
-        // 1024, 1024, 10));
-        skybox = std::unique_ptr<Skybox>(
-            Skybox::create("bloss1/assets/textures/satara_night_no_lamps_4k.hdr", 1024, 32, 1024, 1024, 10));
-        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_05_4k.hdr", 1024, 32,
-        // 1024, 1024, 10));
-
         // Create a quad for rendering
         quad = std::make_unique<Quad>(*this);
 
         // Create post processing system
         post_processing = std::make_unique<PostProcessingSystem>(width, height);
+
+        // Create a skybox
+        create_skybox("bloss1/assets/textures/satara_night_no_lamps_4k.hdr", 1024, 32, 1024, 1024, 10);
     }
 
     void OpenGLRenderer::set_viewport(u32 x, u32 y, u32 width, u32 height)
@@ -203,6 +194,18 @@ namespace bls
     {
         auto opengl_mode = convert_to_opengl_rendering_mode(mode);
         glDrawArrays(opengl_mode, 0, count);
+    }
+
+    void OpenGLRenderer::create_skybox(const str &file,
+                                       const u32 skybox_resolution,
+                                       const u32 irradiance_resolution,
+                                       const u32 brdf_resolution,
+                                       const u32 prefilter_resolution,
+                                       const u32 max_mip_levels)
+    {
+        skybox.reset();
+        skybox = std::unique_ptr<Skybox>(Skybox::create(
+            file, skybox_resolution, irradiance_resolution, brdf_resolution, prefilter_resolution, max_mip_levels));
     }
 
     void OpenGLRenderer::create_shadow_map(ECS &ecs)

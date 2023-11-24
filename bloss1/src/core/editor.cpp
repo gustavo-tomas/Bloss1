@@ -11,13 +11,15 @@
 #include "renderer/height_map.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
+#include "renderer/skybox.hpp"
 
 namespace bls
 {
     Editor::Editor(Window &window)
         : window(window),
           save_file("bloss1/assets/scenes/test_stage2.bloss"),
-          config_file("bloss1/assets/scenes/bloss_config2.bcfg")
+          config_file("bloss1/assets/scenes/bloss_config2.bcfg"),
+          skybox_file("")
     {
         // Context creation
         IMGUI_CHECKVERSION();
@@ -175,6 +177,42 @@ namespace bls
             ImGui::Dummy(ImVec2(10.0f, 10.0f));
             ImGui::Checkbox("Colliders", &AppConfig::render_colliders);
             ImGui::Checkbox("Tesselation Wireframe", &AppConfig::tess_wireframe);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        }
+
+        if (ImGui::CollapsingHeader("Skybox"))
+        {
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Text("Skybox Options");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            u32 &skybox_resolution = AppConfig::skybox_config.skybox_resolution;
+            u32 &irradiance_resolution = AppConfig::skybox_config.irradiance_resolution;
+            u32 &brdf_resolution = AppConfig::skybox_config.brdf_resolution;
+            u32 &prefilter_resolution = AppConfig::skybox_config.prefilter_resolution;
+            u32 &max_mip_levels = AppConfig::skybox_config.max_mip_levels;
+
+            ImGui::InputInt("Skybox Resolution", reinterpret_cast<i32 *>(&skybox_resolution));
+            ImGui::InputInt("Irradiance Resolution", reinterpret_cast<i32 *>(&irradiance_resolution));
+            ImGui::InputInt("BRDF Resolution", reinterpret_cast<i32 *>(&brdf_resolution));
+            ImGui::InputInt("Prefilter Resolution", reinterpret_cast<i32 *>(&prefilter_resolution));
+            ImGui::InputInt("Max Mip Levels", reinterpret_cast<i32 *>(&max_mip_levels));
+            ImGui::Text(("Current Skybox: " + renderer.get_skybox()->get_path()).c_str());
+            ImGui::InputTextWithHint("##", "Skybox File", skybox_file, 65);
+            ImGui::SameLine();
+
+            // Load new skybox
+            if (ImGui::SmallButton("load"))
+            {
+                renderer.create_skybox(skybox_file,
+                                       skybox_resolution,
+                                       irradiance_resolution,
+                                       brdf_resolution,
+                                       prefilter_resolution,
+                                       max_mip_levels);
+                skybox_file[0] = '\0';
+            }
             ImGui::Dummy(ImVec2(10.0f, 10.0f));
         }
 

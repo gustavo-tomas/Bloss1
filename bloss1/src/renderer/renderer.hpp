@@ -47,9 +47,18 @@ namespace bls
             virtual void draw_indexed(RenderingMode mode, u32 count, const void *indices = 0) = 0;
             virtual void draw_arrays(RenderingMode mode, u32 count) = 0;
 
+            virtual void create_skybox(const str &file,
+                                       const u32 skybox_resolution,
+                                       const u32 irradiance_resolution,
+                                       const u32 brdf_resolution,
+                                       const u32 prefilter_resolution,
+                                       const u32 max_mip_levels) = 0;
+
             virtual void create_shadow_map(ECS &ecs) = 0;
+
             virtual void create_height_map(
                 u32 width, u32 height, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance) = 0;
+
             virtual void create_post_processing_passes() = 0;
 
             virtual std::map<str, std::shared_ptr<Shader>> &get_shaders() = 0;

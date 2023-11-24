@@ -25,6 +25,6 @@ namespace bls
             void pop_style_vars();
 
             Window &window;
-            char save_file[65], config_file[65];
+            char save_file[65], config_file[65], skybox_file[65];
     };
 };  // namespace bls
