@@ -121,9 +121,6 @@ namespace bls
 
         // Create post processing system
         post_processing = std::make_unique<PostProcessingSystem>(width, height);
-
-        // Create a skybox
-        create_skybox("bloss1/assets/textures/satara_night_no_lamps_4k.hdr", 1024, 32, 1024, 1024, 10);
     }
 
     void OpenGLRenderer::set_viewport(u32 x, u32 y, u32 width, u32 height)

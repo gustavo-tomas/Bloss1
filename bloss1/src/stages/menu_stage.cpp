@@ -33,6 +33,13 @@ namespace bls
         auto &renderer = Game::get().get_renderer();
         if (renderer.get_shadow_map() == nullptr)
         {
+            renderer.create_skybox("bloss1/assets/textures/satara_night_no_lamps_4k.hdr",
+                                   AppConfig::skybox_config.skybox_resolution,
+                                   AppConfig::skybox_config.irradiance_resolution,
+                                   AppConfig::skybox_config.brdf_resolution,
+                                   AppConfig::skybox_config.prefilter_resolution,
+                                   AppConfig::skybox_config.max_mip_levels);
+
             renderer.create_shadow_map(*ecs);
             renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
             renderer.create_post_processing_passes();
