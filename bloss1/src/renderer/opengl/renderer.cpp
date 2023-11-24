@@ -123,14 +123,8 @@ namespace bls
         // 512, 32, 512, 512, 10)); skybox =
         // std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32,
         // 1024, 1024, 10));
-        skybox =
-            std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/"
-                                                   "satara_night_no_lamps_4k.hdr",
-                                                   1024,
-                                                   32,
-                                                   1024,
-                                                   1024,
-                                                   10));
+        skybox = std::unique_ptr<Skybox>(
+            Skybox::create("bloss1/assets/textures/satara_night_no_lamps_4k.hdr", 1024, 32, 1024, 1024, 10));
         // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_05_4k.hdr", 1024, 32,
         // 1024, 1024, 10));
 
@@ -219,7 +213,7 @@ namespace bls
             const auto &transform = ecs.transforms[id];
             auto dir = transform->rotation;
             dir.y *= -1.0f;
-            shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
+            shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0], normalize(dir));
         }
     }
 
