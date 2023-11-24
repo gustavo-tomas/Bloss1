@@ -42,7 +42,7 @@ namespace bls
 
             renderer.create_shadow_map(*ecs);
             renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
-            renderer.create_post_processing_passes();
+            renderer.create_post_processing_passes(*ecs);
         }
 
         // Load configurations from file

@@ -22,9 +22,7 @@ namespace bls
 #ifdef _OPENGL
         return new OpenGLRenderer();
 #else
-        throw std::runtime_error(
-            "no valid renderer "
-            "defined");
+        throw std::runtime_error("no valid renderer defined");
 #endif
     }
 

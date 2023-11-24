@@ -44,7 +44,7 @@ namespace bls
                                    u32 max_tess_level,
                                    f32 min_distance,
                                    f32 max_distance) override;
-            void create_post_processing_passes() override;
+            void create_post_processing_passes(ECS &ecs) override;
 
             std::map<str, std::shared_ptr<Shader>> &get_shaders() override;
             std::vector<std::pair<str, std::shared_ptr<Texture>>> &get_textures() override;

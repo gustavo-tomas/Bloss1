@@ -59,7 +59,7 @@ namespace bls
             virtual void create_height_map(
                 u32 width, u32 height, u32 min_tess_level, u32 max_tess_level, f32 min_distance, f32 max_distance) = 0;
 
-            virtual void create_post_processing_passes() = 0;
+            virtual void create_post_processing_passes(ECS &ecs) = 0;
 
             virtual std::map<str, std::shared_ptr<Shader>> &get_shaders() = 0;
             virtual std::vector<std::pair<str, std::shared_ptr<Texture>>> &get_textures() = 0;

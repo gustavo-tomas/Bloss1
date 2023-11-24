@@ -224,11 +224,10 @@ namespace bls
             std::make_unique<HeightMap>(width, height, min_tess_level, max_tess_level, min_distance, max_distance);
     }
 
-    void OpenGLRenderer::create_post_processing_passes()
+    void OpenGLRenderer::create_post_processing_passes(ECS &ecs)
     {
         auto &window = Game::get().get_window();
-        auto &ecs = Game::get().get_curr_stage().ecs;
-        auto &camera = ecs->cameras[0];
+        auto &camera = ecs.cameras[0];
 
         auto width = window.get_width();
         auto height = window.get_height();
