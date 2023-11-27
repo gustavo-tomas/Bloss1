@@ -28,7 +28,7 @@ namespace bls
         (void)io;
 
         // Nice font :)
-        io.Fonts->AddFontFromFileTTF("bloss1/assets/fonts/JetBrainsMono-Regular.ttf", 15);
+        io.Fonts->AddFontFromFileTTF("bloss1/assets/fonts/inder_regular.ttf", 15);
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
