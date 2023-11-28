@@ -73,15 +73,14 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                ImGui::InputTextWithHint("##", "file", save_file, 64);
+                ImGui::InputTextWithHint("Save Scene To File", "file", save_file, 64);
                 ImGui::SameLine();
                 if (ImGui::SmallButton("Save Scene")) SceneParser::save_scene(ecs, save_file);
 
-                ImGui::InputTextWithHint("##", "file", config_file, 64);
+                ImGui::InputTextWithHint("Save Config To File", "file", config_file, 64);
                 ImGui::SameLine();
                 if (ImGui::SmallButton("Save Config")) SceneParser::save_config(config_file);
 
-                ImGui::Separator();
                 ImGui::EndMenu();
             }
 
