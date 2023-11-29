@@ -38,8 +38,7 @@ namespace bls
         ecs->add_system(cleanup_system);
 
         // Load entities from file
-        // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
-        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/main_stage.bloss");
 
         auto &renderer = Game::get().get_renderer();
         if (renderer.get_shadow_map() == nullptr)
@@ -65,12 +64,6 @@ namespace bls
     void TestStage::update(f32 dt)
     {
         BLS_PROFILE_SCOPE("update");
-
-        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_2))
-            ecs->systems[8] = render_system_deferred;
-
-        else
-            ecs->systems[8] = render_system_forward;
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
