@@ -50,6 +50,13 @@ namespace bls
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
+
+        // Play ominous sound
+        auto &audio_engine = Game::get().get_audio_engine();
+        audio_engine.load("ophanim_speech", "bloss1/assets/sounds/o inominável.mp3", true);
+        audio_engine.set_echo_filter("ophanim_speech", 1.0f, 0.5f);
+        audio_engine.play("ophanim_speech", vec3(0.0f), vec3(0.0f), 0.01f);
+        audio_engine.fade_to("ophanim_speech", 0.2f, 2.0f);
     }
 
     void TestStage::update(f32 dt)
@@ -74,6 +81,7 @@ namespace bls
         {
             auto &audio_engine = Game::get().get_audio_engine();
 
+            audio_engine.stop_all();
             audio_engine.load("ophanim_death_sfx", "bloss1/assets/sounds/124601__nominal__nog-paal.wav");
             audio_engine.play("ophanim_death_sfx");
 
@@ -86,6 +94,7 @@ namespace bls
         {
             auto &audio_engine = Game::get().get_audio_engine();
 
+            audio_engine.stop_all();
             audio_engine.load("player_death_sfx",
                               "bloss1/assets/sounds/505751__thehorriblejoke__computer-breaking-sound.wav");
             audio_engine.play("player_death_sfx");

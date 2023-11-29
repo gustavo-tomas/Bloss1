@@ -47,11 +47,6 @@ namespace bls
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/menu_config.bcfg");
-
-        const u32 ophanim_id = 1;
-
-        ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
-        ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
     }
 
     void MenuStage::update(f32 dt)

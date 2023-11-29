@@ -27,11 +27,15 @@ namespace bls
                            const vec3 &velocity = vec3(0.0f),
                            f32 distance_from_source = 0.0f,
                            const f32 max_dist = 1000.0f) override;
+            void stop(const str &name) override;
+            void stop_all() override;
 
+            void fade_to(const str &name, const f32 volume, const f64 time) override;
             void set_echo_filter(const str &name, f32 delay, f32 decay) override;
 
         private:
             SoLoud::Soloud soloud;
+            std::map<str, SoLoud::handle> handles;
             std::map<str, std::unique_ptr<SoLoud::Wav>> audios;
             std::map<str, std::unique_ptr<SoLoud::Filter>> filters;
     };
