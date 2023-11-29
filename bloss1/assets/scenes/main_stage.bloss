@@ -7,6 +7,7 @@
 	camera: (10.000000, 5.000000, 25.000000), (0.000000, 1.000000, 0.000000), 34.999996, 1.000000, 10000.000000, 7.500000;
 	camera_controller: (250000.0, 350000.0, 250000.0), 10.0;
 	hitpoints: 100.0;
+	state_machine: ~Armature|Idle~;
 }
 
 [ophanim]
@@ -17,6 +18,7 @@
 	collider: sphere, 150.000000, (0.000000, 0.000000, 0.000000), 1, 4, 15;
 	hitpoints: 1000.0; 
 	timer: 0.000000;
+	state_machine: ~OphanimArmature|OphanimIdle~;
 }
 
 [floor]

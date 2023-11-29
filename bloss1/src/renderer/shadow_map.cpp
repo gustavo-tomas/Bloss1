@@ -8,7 +8,7 @@
 
 namespace bls
 {
-    ShadowMap::ShadowMap(Camera &camera, const vec3 &light_dir) : camera(camera)
+    ShadowMap::ShadowMap(const Camera &camera, const vec3 &light_dir)
     {
         this->light_dir = light_dir;
 
@@ -42,7 +42,7 @@ namespace bls
                      GL_DEPTH_COMPONENT32F,
                      depth_map_resolution,
                      depth_map_resolution,
-                     (int)shadow_cascade_levels.size() + 1,
+                     static_cast<i32>(shadow_cascade_levels.size()) + 1,
                      0,
                      GL_DEPTH_COMPONENT,
                      GL_FLOAT,
@@ -62,10 +62,7 @@ namespace bls
         glReadBuffer(GL_NONE);
 
         int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE)
-            throw std::runtime_error(
-                "lightFBO framebuffer "
-                "is not complete");
+        if (status != GL_FRAMEBUFFER_COMPLETE) throw std::runtime_error("lightFBO framebuffer is not complete");
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -84,10 +81,10 @@ namespace bls
         glDeleteTextures(1, &light_depth_maps);
     }
 
-    void ShadowMap::bind()
+    void ShadowMap::bind(const Camera &camera)
     {
         // UBO setup
-        const auto lightMatrices = get_light_space_matrices();
+        const auto lightMatrices = get_light_space_matrices(camera);
 
         glBindBuffer(GL_UNIFORM_BUFFER, matrices_UBO);
         for (size_t i = 0; i < lightMatrices.size(); i++)
@@ -184,7 +181,7 @@ namespace bls
         return get_frustum_corners_world_space(proj * view);
     }
 
-    mat4 ShadowMap::get_light_space_matrix(f32 near, f32 far)
+    mat4 ShadowMap::get_light_space_matrix(const Camera &camera, f32 near, f32 far)
     {
         auto &window = Game::get().get_window();
         f32 width = window.get_width();
@@ -237,19 +234,19 @@ namespace bls
         return lightProjection * lightView;
     }
 
-    std::vector<mat4> ShadowMap::get_light_space_matrices()
+    std::vector<mat4> ShadowMap::get_light_space_matrices(const Camera &camera)
     {
         std::vector<mat4> ret;
-        for (size_t i = 0; i < shadow_cascade_levels.size() + 1; ++i)
+        for (size_t i = 0; i < shadow_cascade_levels.size() + 1; i++)
         {
             if (i == 0)
-                ret.push_back(get_light_space_matrix(camera.near, shadow_cascade_levels[i]));
+                ret.push_back(get_light_space_matrix(camera, camera.near, shadow_cascade_levels[i]));
 
             else if (i < shadow_cascade_levels.size())
-                ret.push_back(get_light_space_matrix(shadow_cascade_levels[i - 1], shadow_cascade_levels[i]));
+                ret.push_back(get_light_space_matrix(camera, shadow_cascade_levels[i - 1], shadow_cascade_levels[i]));
 
             else
-                ret.push_back(get_light_space_matrix(shadow_cascade_levels[i - 1], camera.far));
+                ret.push_back(get_light_space_matrix(camera, shadow_cascade_levels[i - 1], camera.far));
         }
         return ret;
     }

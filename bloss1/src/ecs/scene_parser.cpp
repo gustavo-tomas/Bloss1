@@ -297,6 +297,15 @@ namespace bls
                 scene << "\n";
             }
 
+            if (ecs.state_machines.count(id))
+            {
+                auto &state_machine = *ecs.state_machines[id];
+
+                scene << "\tstate_machine: ";
+                scene << "~" << state_machine.current_state << "~"
+                      << ";\n";
+            }
+
             scene << "}"
                   << "\n\n";
         }
@@ -551,9 +560,7 @@ namespace bls
                 Camera(offset, world_up, stof(zoom), stof(near), stof(far), stof(lerp_factor)));
         }
 
-        else if (component_name ==
-                 "camera_"
-                 "controller")
+        else if (component_name == "camera_controller")
         {
             str sensitivity;
             vec3 speed;
@@ -662,6 +669,15 @@ namespace bls
 
             else
                 LOG_ERROR("invalid particle system type");
+        }
+
+        else if (component_name == "state_machine")
+        {
+            str initial_state;
+            std::getline(iline, initial_state, ';');
+
+            ecs.state_machines[entity_id] = std::make_unique<StateMachine>(initial_state);
+            ecs.state_machines[entity_id]->state->enter(ecs, entity_id, initial_state);
         }
     }
 

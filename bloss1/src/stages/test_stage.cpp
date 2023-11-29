@@ -50,15 +50,6 @@ namespace bls
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
-
-        const u32 player_id = 0;
-        const u32 ophanim_id = 1;
-
-        ecs->state_machines[player_id] = std::make_unique<StateMachine>(PLAYER_STATE_IDLE);
-        ecs->state_machines[player_id]->state->enter(*ecs, player_id, ecs->state_machines[player_id]->current_state);
-
-        ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
-        ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
     }
 
     void TestStage::update(f32 dt)

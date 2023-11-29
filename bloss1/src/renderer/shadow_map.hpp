@@ -14,10 +14,10 @@ namespace bls
     class ShadowMap
     {
         public:
-            ShadowMap(Camera &camera, const vec3 &light_dir);
+            ShadowMap(const Camera &camera, const vec3 &light_dir);
             ~ShadowMap();
 
-            void bind();
+            void bind(const Camera &camera);
             void unbind();
             void bind_maps(Shader &shader, u32 slot);
 
@@ -29,10 +29,8 @@ namespace bls
         private:
             std::vector<vec4> get_frustum_corners_world_space(const mat4 &projview);
             std::vector<vec4> get_frustum_corners_world_space(const mat4 &proj, const mat4 &view);
-            mat4 get_light_space_matrix(f32 near, f32 far);
-            std::vector<mat4> get_light_space_matrices();
-
-            Camera &camera;
+            mat4 get_light_space_matrix(const Camera &camera, f32 near, f32 far);
+            std::vector<mat4> get_light_space_matrices(const Camera &camera);
 
             std::shared_ptr<Shader> shadow_map_depth;
             std::shared_ptr<Shader> debug_depth;
