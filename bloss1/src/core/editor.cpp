@@ -511,6 +511,8 @@ namespace bls
                 ImGui::Text(("font: " + font_file).c_str());
                 ImGui::InputText("text", buffer, 512);
                 ImGui::InputFloat3("color", value_ptr(ecs.texts[id]->color));
+                ImGui::InputFloat3("text position", value_ptr(ecs.texts[id]->position));
+                ImGui::InputFloat("scale", &ecs.texts[id]->scale);
 
                 text = buffer;
 

@@ -34,7 +34,6 @@
 
 [text_jetbrains]
 {
-	transform: (220.000000, 200.000000, 20.000000), (0.000000, 0.000000, 0.000000), (0.500000, 0.500000, 0.500000);
-	text: bloss1/assets/fonts/YatraOne-Regular.ttf, ~Press Cross To Begin~, (0.400000, 0.600000, 0.800000);
+	text: bloss1/assets/fonts/YatraOne-Regular.ttf, ~Press Cross To Begin~, (0.400000, 0.600000, 0.800000), (220.000000, 200.000000, 0.0), 0.5;
 }
 

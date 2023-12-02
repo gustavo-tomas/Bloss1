@@ -220,7 +220,7 @@ namespace bls
         return id;
     }
 
-    u32 text(ECS &ecs, const Transform &transform, const str &text, const vec3 &color)
+    u32 text(ECS &ecs, const Transform &transform, const str &text, const vec3 &color, const vec3 &position, f32 scale)
     {
         u32 id = ecs.get_id();
 
@@ -228,7 +228,8 @@ namespace bls
 
         ecs.names[id] = "text";
         ecs.transforms[id] = std::make_unique<Transform>(transform);
-        ecs.texts[id] = std::make_unique<Text>(font.get(), "bloss1/assets/fonts/inder_regular.ttf", text, color);
+        ecs.texts[id] =
+            std::make_unique<Text>(font.get(), "bloss1/assets/fonts/inder_regular.ttf", text, color, position, scale);
 
         return id;
     }

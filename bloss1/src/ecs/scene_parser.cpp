@@ -212,7 +212,9 @@ namespace bls
                 scene << text.font_file << ", ";
                 scene << "~" << text.text << "~"
                       << ", ";
-                write_vec3(&scene, text.color, ";\n");
+                write_vec3(&scene, text.color, ", ");
+                write_vec3(&scene, text.position, ", ");
+                scene << text.scale << ";\n";
             }
 
             if (ecs.sounds.count(id))
@@ -574,15 +576,18 @@ namespace bls
 
         else if (component_name == "text")
         {
-            str font_file, text;
-            vec3 color;
+            str font_file, text, scale;
+            vec3 color, position;
 
             std::getline(iline, font_file, ',');
             std::getline(iline, text, ',');
             color = read_vec3(&iline, ',');
+            position = read_vec3(&iline, ',');
+            std::getline(iline, scale, ';');
 
             auto font = Font::create(entity_name, font_file);
-            ecs.texts[entity_id] = std::make_unique<Text>(Text(font.get(), font_file, text, color));
+            ecs.texts[entity_id] =
+                std::make_unique<Text>(Text(font.get(), font_file, text, color, position, stof(scale)));
         }
 
         else if (component_name == "sound")

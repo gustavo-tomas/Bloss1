@@ -8,6 +8,7 @@
 	camera_controller: (250000.0, 350000.0, 250000.0), 10.0;
 	hitpoints: 100.0;
 	state_machine: ~Armature|Idle~;
+	text: bloss1/assets/fonts/Dhurjati-Regular.ttf, ~HitPoints~, (0.400000, 0.600000, 0.800000), (100.0, 600.0, 0.0), 1.0;
 }
 
 [ophanim]

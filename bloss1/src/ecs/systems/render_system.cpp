@@ -168,11 +168,7 @@ namespace bls
         auto &texts = ecs.texts;
         auto &transforms = ecs.transforms;
         for (const auto &[id, text] : texts)
-        {
-            auto transform = transforms[id].get();
-            text->font->render(
-                text->text, transform->position.x, transform->position.y, transform->scale.x, text->color);
-        }
+            text->font->render(text->text, text->position.x, text->position.y, text->scale, text->color);
     }
 
     void render_colliders(ECS &ecs, const mat4 &projection, const mat4 &view)
