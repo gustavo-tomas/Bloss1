@@ -20,6 +20,9 @@ namespace bls
     {
         if (ophanim_initial_hp < 0) ophanim_initial_hp = ecs.hitpoints[1];
 
+        // Update hitpoints
+        if (ecs.texts.count(1)) ecs.texts[1]->text = to_str(static_cast<u32>(ecs.hitpoints[1]));
+
         str ophanim_state = OPHANIM_STATE_IDLE;
 
         if (ecs.hitpoints[1] < ophanim_initial_hp && ecs.hitpoints[0] > 0.0f)

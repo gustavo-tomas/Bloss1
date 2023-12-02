@@ -59,6 +59,10 @@ namespace bls
 
             // update_keyboard(ecs, id, front, right, up, dt);   // Keyboard for debugging purposes
             update_controller(ecs, id, front, right, up, dt);  // Controller is the actual player controller
+
+            // Update hitpoints
+            if (ecs.names[id] == "player" && ecs.texts.count(id))
+                ecs.texts[id]->text = to_str(static_cast<u32>(ecs.hitpoints[id]));
         }
     }
 
