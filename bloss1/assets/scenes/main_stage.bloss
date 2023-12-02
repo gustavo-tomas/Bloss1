@@ -8,7 +8,7 @@
 	camera_controller: (250000.0, 350000.0, 250000.0), 10.0;
 	hitpoints: 900.0;
 	state_machine: ~Armature|Idle~;
-	text: bloss1/assets/fonts/Anita_semi_square.ttf, ~HitPoints~, (0.400000, 0.600000, 0.800000), (100.0, 200.0, 0.0), 1.0;
+	text: bloss1/assets/fonts/Marske.ttf, ~HitPoints~, (0.400000, 0.600000, 0.800000), (100.0, 200.0, 0.0), 1.0;
 }
 
 [ophanim]
@@ -20,7 +20,7 @@
 	hitpoints: 1000.0; 
 	timer: 0.000000;
 	state_machine: ~OphanimArmature|OphanimIdle~;
-	text: bloss1/assets/fonts/Dhurjati-Regular.ttf, ~HitPoints~, (0.800000, 0.600000, 0.400000), (100.0, 600.0, 0.0), 1.0;
+	text: bloss1/assets/fonts/Marske.ttf, ~HitPoints~, (0.800000, 0.600000, 0.400000), (100.0, 600.0, 0.0), 1.0;
 }
 
 [floor]
