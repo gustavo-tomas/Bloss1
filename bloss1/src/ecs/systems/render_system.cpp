@@ -165,8 +165,8 @@ namespace bls
 
         renderer.set_viewport(0, 0, width, height);
 
-        auto &texts = ecs.texts;
-        auto &transforms = ecs.transforms;
+        const auto &texts = ecs.texts;
+        const auto &transforms = ecs.transforms;
         for (const auto &[id, text] : texts)
             text->font->render(text->text, text->position.x, text->position.y, text->scale, text->color);
     }

@@ -301,7 +301,7 @@ namespace bls
 
             if (ecs.state_machines.count(id))
             {
-                auto &state_machine = *ecs.state_machines[id];
+                const auto &state_machine = *ecs.state_machines[id];
 
                 scene << "\tstate_machine: ";
                 scene << "~" << state_machine.current_state << "~"
