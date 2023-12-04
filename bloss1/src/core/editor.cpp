@@ -98,6 +98,9 @@ namespace bls
         // Entities
         render_entities(ecs);
 
+        // Console
+        render_console();
+
         pop_style_vars();
 
         // Render
@@ -111,6 +114,31 @@ namespace bls
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backup_current_context);
         }
+    }
+
+    ImVec4 glm_to_imgui(const vec4 &vec)
+    {
+        ImVec4 color(vec.x, vec.y, vec.z, vec.w);
+        return color;
+    }
+
+    void Editor::render_console()
+    {
+        auto &messages = AppStats::log_messages;
+
+        ImGui::Begin("Console");
+        ImGuiListClipper clipper;
+        clipper.Begin(messages.size());
+
+        while (clipper.Step())
+            for (i32 line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
+                ImGui::TextColored(glm_to_imgui(messages[line_no].color), messages[line_no].message.c_str());
+
+        clipper.End();
+
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
+
+        ImGui::End();
     }
 
     void Editor::render_status()
@@ -166,7 +194,7 @@ namespace bls
     {
         auto &renderer = Game::get().get_renderer();
 
-        ImGui::Begin("Configuration");
+        ImGui::Begin("Configurations");
 
         if (ImGui::CollapsingHeader("Debug"))
         {

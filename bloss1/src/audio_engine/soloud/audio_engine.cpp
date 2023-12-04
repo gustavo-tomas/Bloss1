@@ -23,7 +23,7 @@ namespace bls
     {
         if (audios.count(name))
         {
-            LOG_WARNING("audio '%s' is already loaded", name);
+            LOG_WARNING("audio '%s' is already loaded", name.c_str());
             return;
         }
 

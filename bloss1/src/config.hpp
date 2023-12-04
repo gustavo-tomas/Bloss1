@@ -37,11 +37,13 @@ namespace bls
             static bool tess_wireframe;
     };
 
+    struct Log;
     class AppStats
     {
         public:
             static u32 vertices;
             static f32 framerate;
             static f32 ms_per_frame;
+            static std::vector<Log> log_messages;
     };
 };  // namespace bls
