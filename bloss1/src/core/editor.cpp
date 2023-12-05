@@ -1,7 +1,6 @@
 #include "core/editor.hpp"
 
 #include "core/game.hpp"
-#include "core/logger.hpp"
 #include "ecs/scene_parser.hpp"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -132,7 +131,7 @@ namespace bls
 
         while (clipper.Step())
             for (i32 line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
-                ImGui::TextColored(glm_to_imgui(messages[line_no].color), messages[line_no].message.c_str());
+                ImGui::TextColored(glm_to_imgui(messages[line_no].color), "%s", messages[line_no].message.c_str());
 
         clipper.End();
 
@@ -146,7 +145,8 @@ namespace bls
         ImGui::Begin("Status");
 
         // Show performance plots
-        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", AppStats::ms_per_frame, AppStats::framerate);
+        ImGui::Text("Frame time: %.3f ms/frame", AppStats::ms_per_frame);
+        ImGui::Text("Frames Per Second: %.0f fps", AppStats::framerate);
         {
             static std::vector<f32> frame_values(100, 0.0f);
             if (frame_values.size() == 100) frame_values.erase(frame_values.begin());
@@ -225,7 +225,7 @@ namespace bls
             ImGui::InputInt("BRDF Resolution", reinterpret_cast<i32 *>(&brdf_resolution));
             ImGui::InputInt("Prefilter Resolution", reinterpret_cast<i32 *>(&prefilter_resolution));
             ImGui::InputInt("Max Mip Levels", reinterpret_cast<i32 *>(&max_mip_levels));
-            ImGui::Text(("Current Skybox: " + renderer.get_skybox()->get_path()).c_str());
+            ImGui::Text("%s", ("Current Skybox: " + renderer.get_skybox()->get_path()).c_str());
             ImGui::InputTextWithHint("##", "Skybox File", skybox_file, 65);
             ImGui::SameLine();
 
@@ -314,7 +314,7 @@ namespace bls
                 ImGui::TableNextRow();
 
                 ImGui::TableSetColumnIndex(0);
-                ImGui::Text(to_str(pass.id).c_str());
+                ImGui::Text("%s", to_str(pass.id).c_str());
 
                 ImGui::TableSetColumnIndex(1);
                 if (pass.id > 0)
@@ -325,10 +325,10 @@ namespace bls
                 }
 
                 else
-                    ImGui::Text(("position_" + to_str(pass.id)).c_str());
+                    ImGui::Text("%s", ("position_" + to_str(pass.id)).c_str());
 
                 ImGui::TableSetColumnIndex(2);
-                ImGui::Text(pass.name.c_str());
+                ImGui::Text("%s", pass.name.c_str());
 
                 ImGui::TableSetColumnIndex(3);
                 display_editable_params(pass);
@@ -536,7 +536,7 @@ namespace bls
 
                 ImGui::Text("text");
                 ImGui::Separator();
-                ImGui::Text(("font: " + font_file).c_str());
+                ImGui::Text("%s", ("font: " + font_file).c_str());
                 ImGui::InputText("text", buffer, 512);
                 ImGui::InputFloat3("color", value_ptr(ecs.texts[id]->color));
                 ImGui::InputFloat3("text position", value_ptr(ecs.texts[id]->position));
@@ -553,9 +553,9 @@ namespace bls
                 {
                     ImGui::Text("sound");
                     ImGui::Separator();
-                    ImGui::Text(("name: " + sound_name).c_str());
-                    ImGui::Text(("file: " + sound->file).c_str());
-                    ImGui::Text(("looping: " + to_str(sound->looping)).c_str());
+                    ImGui::Text("%s", ("name: " + sound_name).c_str());
+                    ImGui::Text("%s", ("file: " + sound->file).c_str());
+                    ImGui::Text("%s", ("looping: " + to_str(sound->looping)).c_str());
                     ImGui::InputFloat("volume ", &sound->volume);
                     ImGui::Checkbox("play now ", &sound->play_now);
 
@@ -584,7 +584,7 @@ namespace bls
                 {
                     auto &key_frame = key_frames[i];
 
-                    ImGui::Text(("frame: " + to_str(i)).c_str());
+                    ImGui::Text("%s", ("frame: " + to_str(i)).c_str());
                     ImGui::InputFloat3(("position_" + to_str(i)).c_str(), value_ptr(key_frame.transform.position));
                     ImGui::InputFloat3(("rotation_" + to_str(i)).c_str(), value_ptr(key_frame.transform.rotation));
                     ImGui::InputFloat3(("scale_" + to_str(i)).c_str(), value_ptr(key_frame.transform.scale));
