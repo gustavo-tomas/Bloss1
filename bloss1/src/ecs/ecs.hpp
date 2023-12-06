@@ -35,10 +35,7 @@ namespace bls
             // Return a new id (create a new entity)
             u32 get_id()
             {
-                if (available_ids.empty())
-                    throw std::runtime_error(
-                        "no available ids "
-                        "left");
+                if (available_ids.empty()) throw std::runtime_error("no available ids left");
 
                 u32 id = *available_ids.begin();
                 available_ids.erase(id);

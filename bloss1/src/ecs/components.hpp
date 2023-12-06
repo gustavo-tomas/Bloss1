@@ -263,8 +263,8 @@ namespace bls
     class Text : public Component
     {
         public:
-            Text(Font *font, const str &font_file, const str &text, const vec3 &color)
-                : font(font), font_file(font_file), text(text), color(color)
+            Text(Font *font, const str &font_file, const str &text, const vec3 &color, const vec3 &position, f32 scale)
+                : font(font), font_file(font_file), text(text), color(color), position(position), scale(scale)
             {
             }
 
@@ -272,6 +272,8 @@ namespace bls
             str font_file;
             str text;
             vec3 color;
+            vec3 position;
+            f32 scale;
     };
 
     // Key frame for animating transforms

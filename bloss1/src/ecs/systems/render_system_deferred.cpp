@@ -47,7 +47,7 @@ namespace bls
         renderer.set_viewport(0, 0, width, height);
 
         // Render shadow map
-        shadow_map->bind();
+        shadow_map->bind(*camera);
         render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
         shadow_map->unbind();
 

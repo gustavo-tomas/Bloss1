@@ -59,7 +59,7 @@ namespace bls
             // Load character glyph
             if (FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
-                LOG_ERROR("failed to load glyph '%c'", c);
+                LOG_ERROR("failed to load glyph '%c'", static_cast<char>(c));
                 continue;
             }
 

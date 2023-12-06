@@ -16,6 +16,7 @@ namespace bls
 
             virtual void bind(Shader &shader, u32 slot) = 0;
             virtual void draw(const mat4 &view, const mat4 &projection) = 0;
+            virtual str get_path() const = 0;
 
             static Skybox *create(const str &path,
                                   const u32 skybox_resolution,

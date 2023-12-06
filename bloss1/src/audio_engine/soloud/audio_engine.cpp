@@ -23,7 +23,7 @@ namespace bls
     {
         if (audios.count(name))
         {
-            LOG_WARNING("audio '%s' is already loaded", name);
+            LOG_WARNING("audio '%s' is already loaded", name.c_str());
             return;
         }
 
@@ -41,12 +41,10 @@ namespace bls
     void SoloudAudioEngine::play(const str &name, const vec3 &position, const vec3 &velocity, f32 volume)
     {
         // This returns a handle
-        soloud.play3d(*audios[name], position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, volume);
+        auto handle = soloud.play3d(
+            *audios[name], position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, volume);
 
-        // More useful methods
-        // soloud.setVolume(handle, 0.15f);           // Set volume; 1.0f is "normal"
-        // soloud.setPan(handle, -0.2f);              // Set pan; -1 is left, 1 is right
-        // soloud.setRelativePlaySpeed(handle, 0.7f); // Play a bit slower; 1.0f is normal
+        if (handles.count(name) == 0) handles[name] = handle;
     }
 
     void SoloudAudioEngine::play_dist(
@@ -58,7 +56,22 @@ namespace bls
         f32 volume = 1.0f - (distance / max_dist);
         volume = clamp(volume, MIN_VOLUME, 1.0f);
 
-        soloud.play3d(*audios[name], position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, volume);
+        play(name, position, velocity, volume);
+    }
+
+    void SoloudAudioEngine::stop(const str &name)
+    {
+        soloud.stop(handles[name]);
+    }
+
+    void SoloudAudioEngine::stop_all()
+    {
+        soloud.stopAll();
+    }
+
+    void SoloudAudioEngine::fade_to(const str &name, const f32 volume, const f64 time)
+    {
+        soloud.fadeVolume(handles[name], volume, time);
     }
 
     void SoloudAudioEngine::set_echo_filter(const str &name, f32 delay, f32 decay)

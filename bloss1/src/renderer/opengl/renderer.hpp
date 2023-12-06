@@ -31,6 +31,12 @@ namespace bls
             void draw_indexed(RenderingMode mode, u32 count, const void *indices) override;
             void draw_arrays(RenderingMode mode, u32 count) override;
 
+            void create_skybox(const str &file,
+                               const u32 skybox_resolution,
+                               const u32 irradiance_resolution,
+                               const u32 brdf_resolution,
+                               const u32 prefilter_resolution,
+                               const u32 max_mip_levels) override;
             void create_shadow_map(ECS &ecs) override;
             void create_height_map(u32 width,
                                    u32 height,
@@ -38,7 +44,7 @@ namespace bls
                                    u32 max_tess_level,
                                    f32 min_distance,
                                    f32 max_distance) override;
-            void create_post_processing_passes() override;
+            void create_post_processing_passes(ECS &ecs) override;
 
             std::map<str, std::shared_ptr<Shader>> &get_shaders() override;
             std::vector<std::pair<str, std::shared_ptr<Texture>>> &get_textures() override;

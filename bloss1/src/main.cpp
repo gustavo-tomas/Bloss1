@@ -6,7 +6,7 @@ int main()
 {
     try
     {
-        Game game = Game("Bloss1", 1280, 720);
+        Game game = Game("Bloss1", 1920, 1080);
         game.run();
     }
 

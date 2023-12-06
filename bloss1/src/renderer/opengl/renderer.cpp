@@ -116,24 +116,6 @@ namespace bls
         if (!g_buffer->check()) throw std::runtime_error("framebuffer is not complete");
         g_buffer->unbind();
 
-        // Create a skybox
-        // skybox = Skybox::create("bloss1/assets/textures/newport_loft.hdr", 1024, 32, 2048, 2048, 12);
-        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/pine_attic_4k.hdr", 1024, 32, 1024,
-        // 1024, 10)); skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/moonlit_golf_4k.hdr",
-        // 512, 32, 512, 512, 10)); skybox =
-        // std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_02_puresky_2k.hdr", 1024, 32,
-        // 1024, 1024, 10));
-        skybox =
-            std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/"
-                                                   "satara_night_no_lamps_4k.hdr",
-                                                   1024,
-                                                   32,
-                                                   1024,
-                                                   1024,
-                                                   10));
-        // skybox = std::unique_ptr<Skybox>(Skybox::create("bloss1/assets/textures/kloppenheim_05_4k.hdr", 1024, 32,
-        // 1024, 1024, 10));
-
         // Create a quad for rendering
         quad = std::make_unique<Quad>(*this);
 
@@ -211,6 +193,18 @@ namespace bls
         glDrawArrays(opengl_mode, 0, count);
     }
 
+    void OpenGLRenderer::create_skybox(const str &file,
+                                       const u32 skybox_resolution,
+                                       const u32 irradiance_resolution,
+                                       const u32 brdf_resolution,
+                                       const u32 prefilter_resolution,
+                                       const u32 max_mip_levels)
+    {
+        skybox.reset();
+        skybox = std::unique_ptr<Skybox>(Skybox::create(
+            file, skybox_resolution, irradiance_resolution, brdf_resolution, prefilter_resolution, max_mip_levels));
+    }
+
     void OpenGLRenderer::create_shadow_map(ECS &ecs)
     {
         // Create shadow map
@@ -219,7 +213,7 @@ namespace bls
             const auto &transform = ecs.transforms[id];
             auto dir = transform->rotation;
             dir.y *= -1.0f;
-            shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0].get(), normalize(dir));
+            shadow_map = std::make_unique<ShadowMap>(*ecs.cameras[0], normalize(dir));
         }
     }
 
@@ -230,10 +224,10 @@ namespace bls
             std::make_unique<HeightMap>(width, height, min_tess_level, max_tess_level, min_distance, max_distance);
     }
 
-    void OpenGLRenderer::create_post_processing_passes()
+    void OpenGLRenderer::create_post_processing_passes(ECS &ecs)
     {
         auto &window = Game::get().get_window();
-        auto &ecs = Game::get().get_curr_stage().ecs;
+        auto &camera = ecs.cameras[0];
 
         auto width = window.get_width();
         auto height = window.get_height();
@@ -242,14 +236,13 @@ namespace bls
         post_processing->add_pass(new FXAAPass(width, height), pass_position++);
         post_processing->add_pass(new BloomPass(width, height, 5, 7.0f, 0.4f, 0.325f), pass_position++);
 
-        post_processing->add_pass(
-            new FogPass(width,
-                        height,
-                        vec3(0.0f),
-                        vec2(ecs->cameras[0].get()->far / 3.0f, ecs->cameras[0].get()->far / 2.0f),
-                        ecs->cameras[0].get()->position,
-                        textures[0].second.get()),
-            pass_position++);
+        post_processing->add_pass(new FogPass(width,
+                                              height,
+                                              vec3(0.0f),
+                                              vec2(camera->far / 3.0f, camera->far / 2.0f),
+                                              camera->position,
+                                              textures[0].second.get()),
+                                  pass_position++);
 
         post_processing->add_pass(new SharpenPass(width, height, 0.05f), pass_position++);
         post_processing->add_pass(new PosterizationPass(width, height, 8.0f), pass_position++);

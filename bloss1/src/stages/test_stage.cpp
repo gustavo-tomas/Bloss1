@@ -2,7 +2,6 @@
 
 #include "core/game.hpp"
 #include "core/input.hpp"
-#include "ecs/entities.hpp"
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
 #include "ecs/systems.hpp"
@@ -24,49 +23,37 @@ namespace bls
         ecs = std::unique_ptr<ECS>(new ECS());
 
         // Add systems in order of execution
-        ecs->add_system(player_controller_system);
-        ecs->add_system(ophanim_controller_system);
         ecs->add_system(physics_system);
-        ecs->add_system(bullet_indicator_system);
-        ecs->add_system(projectile_system);
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
-        ecs->add_system(render_system_forward);  // 8
-        ecs->add_system(sound_system);
+        ecs->add_system(render_system_forward);
         ecs->add_system(cleanup_system);
 
         // Load entities from file
-        // SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
-        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/debug.bloss");
+        SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/test_stage.bloss");
 
         auto &renderer = Game::get().get_renderer();
-        renderer.create_shadow_map(*ecs);
-        renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
-        renderer.create_post_processing_passes();
+        if (renderer.get_shadow_map() == nullptr)
+        {
+            renderer.create_skybox("bloss1/assets/textures/satara_night_no_lamps_4k.hdr",
+                                   AppConfig::skybox_config.skybox_resolution,
+                                   AppConfig::skybox_config.irradiance_resolution,
+                                   AppConfig::skybox_config.brdf_resolution,
+                                   AppConfig::skybox_config.prefilter_resolution,
+                                   AppConfig::skybox_config.max_mip_levels);
+
+            renderer.create_shadow_map(*ecs);
+            renderer.create_post_processing_passes(*ecs);
+        }
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
-
-        const u32 player_id = 0;
-        const u32 ophanim_id = 1;
-
-        ecs->state_machines[player_id] = std::make_unique<StateMachine>(PLAYER_STATE_IDLE);
-        ecs->state_machines[player_id]->state->enter(*ecs, player_id, ecs->state_machines[player_id]->current_state);
-
-        ecs->state_machines[ophanim_id] = std::make_unique<StateMachine>(OPHANIM_STATE_IDLE);
-        ecs->state_machines[ophanim_id]->state->enter(*ecs, ophanim_id, ecs->state_machines[ophanim_id]->current_state);
     }
 
     void TestStage::update(f32 dt)
     {
         BLS_PROFILE_SCOPE("update");
-
-        if (Input::is_mouse_button_pressed(MOUSE_BUTTON_2))
-            ecs->systems[8] = render_system_deferred;
-
-        else
-            ecs->systems[8] = render_system_forward;
 
         // Exit the stage
         if (Input::is_key_pressed(KEY_ESCAPE))
@@ -78,32 +65,5 @@ namespace bls
         // Update all systems in registration order
         auto &systems = ecs->systems;
         for (const auto &system : systems) system(*ecs, dt);
-
-        if (ecs->systems.size() == 0) return;
-
-        // @TODO: Player won
-        if (ecs->hitpoints[1] <= 0.0f)
-        {
-            auto &audio_engine = Game::get().get_audio_engine();
-
-            audio_engine.load("ophanim_death_sfx", "bloss1/assets/sounds/124601__nominal__nog-paal.wav");
-            audio_engine.play("ophanim_death_sfx");
-
-            ecs->clear_systems();
-            return;
-        }
-
-        // @TODO: Player lost
-        else if (ecs->hitpoints[0] <= 0.0f)
-        {
-            auto &audio_engine = Game::get().get_audio_engine();
-
-            audio_engine.load("player_death_sfx",
-                              "bloss1/assets/sounds/505751__thehorriblejoke__computer-breaking-sound.wav");
-            audio_engine.play("player_death_sfx");
-
-            ecs->clear_systems();
-            return;
-        }
     }
 };  // namespace bls

@@ -4,7 +4,6 @@
  * @brief Simple sandbox stage and not much else.
  */
 
-#include "ecs/ecs.hpp"
 #include "stages/stage.hpp"
 
 namespace bls

@@ -45,3 +45,7 @@ profile/
 
 # Imgui files
 imgui.ini
+
+# Clangd files
+.cache
+compile_commands.json

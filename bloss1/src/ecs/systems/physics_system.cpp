@@ -370,8 +370,8 @@ namespace bls
         auto entity_hp = &ecs.hitpoints[hp_id];
         auto projectile = ecs.projectiles[projectile_id].get();
 
-        *entity_hp = clamp(*entity_hp - projectile->damage, 0.0f, *entity_hp);
-
-        std::cout << "ID: " << hp_id << " ENTT HP: " << *entity_hp << "\n";
+        auto final_hp = *entity_hp - projectile->damage;
+        *entity_hp = mix(*entity_hp, final_hp, 0.5f);
+        *entity_hp = clamp(*entity_hp, 0.0f, *entity_hp);
     }
 };  // namespace bls

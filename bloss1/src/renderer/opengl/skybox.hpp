@@ -25,8 +25,10 @@ namespace bls
 
             void bind(Shader &shader, u32 slot) override;
             void draw(const mat4 &view, const mat4 &projection) override;
+            str get_path() const override;
 
         private:
+            str path;
             std::shared_ptr<Shader> hdr_to_cubemap_shader;
             std::shared_ptr<Shader> skybox_shader;
             std::shared_ptr<Shader> irradiance_shader, prefilter_shader, brdf_shader;

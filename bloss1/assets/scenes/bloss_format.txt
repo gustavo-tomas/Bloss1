@@ -24,12 +24,13 @@ dir_light: ambient, diffuse, specular;
 point_light: ambient, diffuse, specular, constant, linear, quadratic;
 camera: offset, world_up, zoom, near, far, lerp_factor;
 camera_controller: speed, sensitivity;
-text: font, ~text~, color;
+text: font, ~text~, color, position, scale;
 sound: file, name, volume, play_now, looping;
 timer: time;
 transform_animation: number_of_transforms, transform1, duration1; transform2, duration2; ... ;
 hitpoints: hitpoints;
 particle_system: type, particle_2D, particles_to_be_emitted, time_to_emit, center, dimensions;
+state_machine: ~initial_state~;
 
 // Post processing config:
 <post_processing>

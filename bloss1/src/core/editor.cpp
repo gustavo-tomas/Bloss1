@@ -1,7 +1,6 @@
 #include "core/editor.hpp"
 
 #include "core/game.hpp"
-#include "core/logger.hpp"
 #include "ecs/scene_parser.hpp"
 #include "imgui/backends/imgui_impl_glfw.h"
 #include "imgui/backends/imgui_impl_opengl3.h"
@@ -11,13 +10,15 @@
 #include "renderer/height_map.hpp"
 #include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
+#include "renderer/skybox.hpp"
 
 namespace bls
 {
     Editor::Editor(Window &window)
         : window(window),
           save_file("bloss1/assets/scenes/test_stage2.bloss"),
-          config_file("bloss1/assets/scenes/bloss_config2.bcfg")
+          config_file("bloss1/assets/scenes/bloss_config2.bcfg"),
+          skybox_file("")
     {
         // Context creation
         IMGUI_CHECKVERSION();
@@ -26,7 +27,7 @@ namespace bls
         (void)io;
 
         // Nice font :)
-        io.Fonts->AddFontFromFileTTF("bloss1/assets/fonts/JetBrainsMono-Regular.ttf", 15);
+        io.Fonts->AddFontFromFileTTF("bloss1/assets/fonts/inder_regular.ttf", 15);
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -71,15 +72,14 @@ namespace bls
         {
             if (ImGui::BeginMenu("Options"))
             {
-                ImGui::InputTextWithHint("##", "file", save_file, 64);
+                ImGui::InputTextWithHint("Save Scene To File", "file", save_file, 64);
                 ImGui::SameLine();
                 if (ImGui::SmallButton("Save Scene")) SceneParser::save_scene(ecs, save_file);
 
-                ImGui::InputTextWithHint("##", "file", config_file, 64);
+                ImGui::InputTextWithHint("Save Config To File", "file", config_file, 64);
                 ImGui::SameLine();
                 if (ImGui::SmallButton("Save Config")) SceneParser::save_config(config_file);
 
-                ImGui::Separator();
                 ImGui::EndMenu();
             }
 
@@ -97,6 +97,9 @@ namespace bls
         // Entities
         render_entities(ecs);
 
+        // Console
+        render_console();
+
         pop_style_vars();
 
         // Render
@@ -112,12 +115,38 @@ namespace bls
         }
     }
 
+    ImVec4 glm_to_imgui(const vec4 &vec)
+    {
+        ImVec4 color(vec.x, vec.y, vec.z, vec.w);
+        return color;
+    }
+
+    void Editor::render_console()
+    {
+        auto &messages = AppStats::log_messages;
+
+        ImGui::Begin("Console");
+        ImGuiListClipper clipper;
+        clipper.Begin(messages.size());
+
+        while (clipper.Step())
+            for (i32 line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
+                ImGui::TextColored(glm_to_imgui(messages[line_no].color), "%s", messages[line_no].message.c_str());
+
+        clipper.End();
+
+        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
+
+        ImGui::End();
+    }
+
     void Editor::render_status()
     {
         ImGui::Begin("Status");
 
         // Show performance plots
-        ImGui::Text("Frame time: %.3f ms/frame (%.0f FPS)", AppStats::ms_per_frame, AppStats::framerate);
+        ImGui::Text("Frame time: %.3f ms/frame", AppStats::ms_per_frame);
+        ImGui::Text("Frames Per Second: %.0f fps", AppStats::framerate);
         {
             static std::vector<f32> frame_values(100, 0.0f);
             if (frame_values.size() == 100) frame_values.erase(frame_values.begin());
@@ -165,108 +194,156 @@ namespace bls
     {
         auto &renderer = Game::get().get_renderer();
 
-        ImGui::Begin("Configuration");
+        ImGui::Begin("Configurations");
 
-        ImGui::Text("Debug options");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-        ImGui::Checkbox("Colliders", &AppConfig::render_colliders);
-        ImGui::Checkbox("Tesselation Wireframe", &AppConfig::tess_wireframe);
-
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        auto &height_map = renderer.get_height_map();
-
-        ImGui::Text("Terrain");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-        ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
-        ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
-        ImGui::InputFloat("Min distance", &height_map->min_distance);
-        ImGui::InputFloat("Max distance", &height_map->max_distance);
-        ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
-        ImGui::InputInt("Noise Algorithm", reinterpret_cast<i32 *>(&height_map->noise_algorithm));
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGui::Text("Layers");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        for (size_t i = 0; i < height_map->texture_heights.size(); i++)
-            ImGui::InputFloat(("Layer " + to_str(i)).c_str(), &height_map->texture_heights[i]);
-
-        ImGui::Checkbox("Toggle Gradient", &height_map->toggle_gradient);
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGui::Text("FBM");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-        ImGui::InputInt("Octaves", &height_map->fbm_octaves);
-        ImGui::InputFloat("FBM Scale", &height_map->fbm_scale);
-        ImGui::InputFloat("FBM Height", &height_map->fbm_height);
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGui::Text("Perlin");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-        ImGui::InputFloat("Perlin Scale", &height_map->perlin_scale);
-        ImGui::InputFloat("Perlin Height", &height_map->perlin_height);
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGui::Text("Post processing passes");
-        ImGui::Separator();
-        ImGui::Dummy(ImVec2(10.0f, 10.0f));
-
-        ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersH |
-                                ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersInnerH |
-                                ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterV |
-                                ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuter |
-                                ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable;
-        //    ImGuiTableFlags_NoBordersInBody;
-
-        ImGui::BeginTable("render_passes_table", 5, flags);
-
-        ImGui::TableSetupColumn("ID");
-        ImGui::TableSetupColumn("Position");
-        ImGui::TableSetupColumn("Pass");
-        ImGui::TableSetupColumn("Parameters");
-        ImGui::TableSetupColumn("Active");
-
-        ImGui::TableHeadersRow();
-        auto &post_processing = renderer.get_post_processing();
-        for (auto &pass : AppConfig::render_passes)
+        if (ImGui::CollapsingHeader("Debug"))
         {
-            ImGui::TableNextRow();
-
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text(to_str(pass.id).c_str());
-
-            ImGui::TableSetColumnIndex(1);
-            if (pass.id > 0)
-            {
-                if (!ImGui::InputInt(("position_" + to_str(pass.id)).c_str(), reinterpret_cast<i32 *>(&pass.position)))
-                    pass.position = clamp(pass.position, 1U, static_cast<u32>(AppConfig::render_passes.size()));
-            }
-
-            else
-                ImGui::Text(("position_" + to_str(pass.id)).c_str());
-
-            ImGui::TableSetColumnIndex(2);
-            ImGui::Text(pass.name.c_str());
-
-            ImGui::TableSetColumnIndex(3);
-            display_editable_params(pass);
-
-            ImGui::TableSetColumnIndex(4);
-            if (pass.id > 0)
-                ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
-
-            else
-                ImGui::Text("BasePass is always enabled");
-
-            if (pass.id > 0) post_processing->set_pass(pass.id, pass.enabled, pass.position);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Text("Debug Options");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Checkbox("Colliders", &AppConfig::render_colliders);
+            ImGui::Checkbox("Tesselation Wireframe", &AppConfig::tess_wireframe);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
         }
-        ImGui::EndTable();
+
+        if (ImGui::CollapsingHeader("Skybox"))
+        {
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Text("Skybox Options");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            u32 &skybox_resolution = AppConfig::skybox_config.skybox_resolution;
+            u32 &irradiance_resolution = AppConfig::skybox_config.irradiance_resolution;
+            u32 &brdf_resolution = AppConfig::skybox_config.brdf_resolution;
+            u32 &prefilter_resolution = AppConfig::skybox_config.prefilter_resolution;
+            u32 &max_mip_levels = AppConfig::skybox_config.max_mip_levels;
+
+            ImGui::InputInt("Skybox Resolution", reinterpret_cast<i32 *>(&skybox_resolution));
+            ImGui::InputInt("Irradiance Resolution", reinterpret_cast<i32 *>(&irradiance_resolution));
+            ImGui::InputInt("BRDF Resolution", reinterpret_cast<i32 *>(&brdf_resolution));
+            ImGui::InputInt("Prefilter Resolution", reinterpret_cast<i32 *>(&prefilter_resolution));
+            ImGui::InputInt("Max Mip Levels", reinterpret_cast<i32 *>(&max_mip_levels));
+            ImGui::Text("%s", ("Current Skybox: " + renderer.get_skybox()->get_path()).c_str());
+            ImGui::InputTextWithHint("##", "Skybox File", skybox_file, 65);
+            ImGui::SameLine();
+
+            // Load new skybox
+            if (ImGui::SmallButton("load"))
+            {
+                renderer.create_skybox(skybox_file,
+                                       skybox_resolution,
+                                       irradiance_resolution,
+                                       brdf_resolution,
+                                       prefilter_resolution,
+                                       max_mip_levels);
+                skybox_file[0] = '\0';
+            }
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        }
+
+        if (ImGui::CollapsingHeader("Terrain"))
+        {
+            auto &height_map = renderer.get_height_map();
+
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Text("Terrain Options");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::InputInt("Min tesselation level", reinterpret_cast<i32 *>(&height_map->min_tess_level));
+            ImGui::InputInt("Max tesselation level", reinterpret_cast<i32 *>(&height_map->max_tess_level));
+            ImGui::InputFloat("Min distance", &height_map->min_distance);
+            ImGui::InputFloat("Max distance", &height_map->max_distance);
+            ImGui::InputFloat2("Displacement Multiplier", value_ptr(height_map->displacement_multiplier));
+            ImGui::InputInt("Noise Algorithm", reinterpret_cast<i32 *>(&height_map->noise_algorithm));
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            ImGui::Text("Layers");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            for (size_t i = 0; i < height_map->texture_heights.size(); i++)
+                ImGui::InputFloat(("Layer " + to_str(i)).c_str(), &height_map->texture_heights[i]);
+
+            ImGui::Checkbox("Toggle Gradient", &height_map->toggle_gradient);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            ImGui::Text("FBM");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::InputInt("Octaves", &height_map->fbm_octaves);
+            ImGui::InputFloat("FBM Scale", &height_map->fbm_scale);
+            ImGui::InputFloat("FBM Height", &height_map->fbm_height);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            ImGui::Text("Perlin");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::InputFloat("Perlin Scale", &height_map->perlin_scale);
+            ImGui::InputFloat("Perlin Height", &height_map->perlin_height);
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+        }
+
+        if (ImGui::CollapsingHeader("Post Processing"))
+        {
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+            ImGui::Text("Passes");
+            ImGui::Separator();
+            ImGui::Dummy(ImVec2(10.0f, 10.0f));
+
+            ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersH |
+                                    ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersInnerH |
+                                    ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterV |
+                                    ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuter |
+                                    ImGuiTableFlags_BordersInner | ImGuiTableFlags_Resizable;
+            //    ImGuiTableFlags_NoBordersInBody;
+
+            ImGui::BeginTable("render_passes_table", 5, flags);
+
+            ImGui::TableSetupColumn("ID");
+            ImGui::TableSetupColumn("Position");
+            ImGui::TableSetupColumn("Pass");
+            ImGui::TableSetupColumn("Parameters");
+            ImGui::TableSetupColumn("Active");
+
+            ImGui::TableHeadersRow();
+            auto &post_processing = renderer.get_post_processing();
+            for (auto &pass : AppConfig::render_passes)
+            {
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%s", to_str(pass.id).c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                if (pass.id > 0)
+                {
+                    if (!ImGui::InputInt(("position_" + to_str(pass.id)).c_str(),
+                                         reinterpret_cast<i32 *>(&pass.position)))
+                        pass.position = clamp(pass.position, 1U, static_cast<u32>(AppConfig::render_passes.size()));
+                }
+
+                else
+                    ImGui::Text("%s", ("position_" + to_str(pass.id)).c_str());
+
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%s", pass.name.c_str());
+
+                ImGui::TableSetColumnIndex(3);
+                display_editable_params(pass);
+
+                ImGui::TableSetColumnIndex(4);
+                if (pass.id > 0)
+                    ImGui::Checkbox(("enabled_" + to_str(pass.id)).c_str(), &pass.enabled);
+
+                else
+                    ImGui::Text("BasePass is always enabled");
+
+                if (pass.id > 0) post_processing->set_pass(pass.id, pass.enabled, pass.position);
+            }
+            ImGui::EndTable();
+        }
         ImGui::End();
     }
 
@@ -459,9 +536,11 @@ namespace bls
 
                 ImGui::Text("text");
                 ImGui::Separator();
-                ImGui::Text(("font: " + font_file).c_str());
+                ImGui::Text("%s", ("font: " + font_file).c_str());
                 ImGui::InputText("text", buffer, 512);
                 ImGui::InputFloat3("color", value_ptr(ecs.texts[id]->color));
+                ImGui::InputFloat3("text position", value_ptr(ecs.texts[id]->position));
+                ImGui::InputFloat("scale", &ecs.texts[id]->scale);
 
                 text = buffer;
 
@@ -474,9 +553,9 @@ namespace bls
                 {
                     ImGui::Text("sound");
                     ImGui::Separator();
-                    ImGui::Text(("name: " + sound_name).c_str());
-                    ImGui::Text(("file: " + sound->file).c_str());
-                    ImGui::Text(("looping: " + to_str(sound->looping)).c_str());
+                    ImGui::Text("%s", ("name: " + sound_name).c_str());
+                    ImGui::Text("%s", ("file: " + sound->file).c_str());
+                    ImGui::Text("%s", ("looping: " + to_str(sound->looping)).c_str());
                     ImGui::InputFloat("volume ", &sound->volume);
                     ImGui::Checkbox("play now ", &sound->play_now);
 
@@ -505,7 +584,7 @@ namespace bls
                 {
                     auto &key_frame = key_frames[i];
 
-                    ImGui::Text(("frame: " + to_str(i)).c_str());
+                    ImGui::Text("%s", ("frame: " + to_str(i)).c_str());
                     ImGui::InputFloat3(("position_" + to_str(i)).c_str(), value_ptr(key_frame.transform.position));
                     ImGui::InputFloat3(("rotation_" + to_str(i)).c_str(), value_ptr(key_frame.transform.rotation));
                     ImGui::InputFloat3(("scale_" + to_str(i)).c_str(), value_ptr(key_frame.transform.scale));

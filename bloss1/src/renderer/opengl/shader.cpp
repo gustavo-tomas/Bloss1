@@ -42,7 +42,7 @@ namespace bls
 
         catch (...)
         {
-            LOG_ERROR("error when reading files '%s' and '%s'", vertex_path, fragment_path);
+            LOG_ERROR("error when reading files '%s' and '%s'", vertex_path.c_str(), fragment_path.c_str());
         }
 
         // Compile shaders

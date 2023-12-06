@@ -19,19 +19,31 @@ namespace bls
             RenderPass *pass;
     };
 
+    struct SkyboxConfig
+    {
+            u32 skybox_resolution;
+            u32 irradiance_resolution;
+            u32 brdf_resolution;
+            u32 prefilter_resolution;
+            u32 max_mip_levels;
+    };
+
     class AppConfig
     {
         public:
             static std::vector<PassConfig> render_passes;
+            static SkyboxConfig skybox_config;
             static bool render_colliders;
             static bool tess_wireframe;
     };
 
+    struct Log;
     class AppStats
     {
         public:
             static u32 vertices;
             static f32 framerate;
             static f32 ms_per_frame;
+            static std::vector<Log> log_messages;
     };
 };  // namespace bls

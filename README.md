@@ -6,6 +6,8 @@ C++ game engine.
 
 :)
 
+![Sponza Test Scene](screenshots/bloss1_sponza.png)
+
 > Note: the build/run commands use the [just command runner](https://github.com/casey/just)
 
 ## Build & Run
@@ -56,3 +58,4 @@ $ just clean cfg
 - [Sound library](https://freesound.org/)
 - [Vignette Shader](https://developer.unigine.com/forum/topic/2346-vignette-shader/)
 - [Kuwahara Shader](https://www.shadertoy.com/view/MsXSz4#)
+- [Fonts](https://www.1001fonts.com/science-fiction-fonts.html)

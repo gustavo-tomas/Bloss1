@@ -212,7 +212,9 @@ namespace bls
                 scene << text.font_file << ", ";
                 scene << "~" << text.text << "~"
                       << ", ";
-                write_vec3(&scene, text.color, ";\n");
+                write_vec3(&scene, text.color, ", ");
+                write_vec3(&scene, text.position, ", ");
+                scene << text.scale << ";\n";
             }
 
             if (ecs.sounds.count(id))
@@ -295,6 +297,15 @@ namespace bls
                 }
 
                 scene << "\n";
+            }
+
+            if (ecs.state_machines.count(id))
+            {
+                const auto &state_machine = *ecs.state_machines[id];
+
+                scene << "\tstate_machine: ";
+                scene << "~" << state_machine.current_state << "~"
+                      << ";\n";
             }
 
             scene << "}"
@@ -551,9 +562,7 @@ namespace bls
                 Camera(offset, world_up, stof(zoom), stof(near), stof(far), stof(lerp_factor)));
         }
 
-        else if (component_name ==
-                 "camera_"
-                 "controller")
+        else if (component_name == "camera_controller")
         {
             str sensitivity;
             vec3 speed;
@@ -567,15 +576,18 @@ namespace bls
 
         else if (component_name == "text")
         {
-            str font_file, text;
-            vec3 color;
+            str font_file, text, scale;
+            vec3 color, position;
 
             std::getline(iline, font_file, ',');
             std::getline(iline, text, ',');
             color = read_vec3(&iline, ',');
+            position = read_vec3(&iline, ',');
+            std::getline(iline, scale, ';');
 
             auto font = Font::create(entity_name, font_file);
-            ecs.texts[entity_id] = std::make_unique<Text>(Text(font.get(), font_file, text, color));
+            ecs.texts[entity_id] =
+                std::make_unique<Text>(Text(font.get(), font_file, text, color, position, stof(scale)));
         }
 
         else if (component_name == "sound")
@@ -662,6 +674,15 @@ namespace bls
 
             else
                 LOG_ERROR("invalid particle system type");
+        }
+
+        else if (component_name == "state_machine")
+        {
+            str initial_state;
+            std::getline(iline, initial_state, ';');
+
+            ecs.state_machines[entity_id] = std::make_unique<StateMachine>(initial_state);
+            ecs.state_machines[entity_id]->state->enter(ecs, entity_id, initial_state);
         }
     }
 
