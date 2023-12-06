@@ -8,11 +8,11 @@
 
 namespace bls
 {
-    class TestStage : public Stage
+    class MainStage : public Stage
     {
         public:
-            TestStage();
-            ~TestStage();
+            MainStage();
+            ~MainStage();
 
             void start() override;
             void update(f32 dt) override;

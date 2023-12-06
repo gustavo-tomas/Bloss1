@@ -4,7 +4,7 @@
 #include "core/input.hpp"
 #include "ecs/scene_parser.hpp"
 #include "ecs/systems.hpp"
-#include "stages/test_stage.hpp"
+#include "stages/main_stage.hpp"
 
 namespace bls
 {
@@ -59,6 +59,6 @@ namespace bls
             Game::get().change_stage(nullptr);
 
         if (Input::is_key_pressed(KEY_SPACE) || Input::is_joystick_button_pressed(JOYSTICK_2, GAMEPAD_BUTTON_CROSS))
-            Game::get().change_stage(new TestStage());
+            Game::get().change_stage(new MainStage());
     }
 };  // namespace bls
