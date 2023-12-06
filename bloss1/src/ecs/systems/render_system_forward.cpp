@@ -1,9 +1,7 @@
 #include "config.hpp"
 #include "core/game.hpp"
 #include "ecs/systems/render_system.hpp"
-#include "renderer/font.hpp"
 #include "renderer/height_map.hpp"
-#include "renderer/model.hpp"
 #include "renderer/post/post_processing.hpp"
 #include "renderer/shadow_map.hpp"
 #include "renderer/skybox.hpp"
@@ -102,6 +100,7 @@ namespace bls
         render_scene(ecs, *pbr_shader, renderer);
 
         // Render height map
+#if !defined(_RELEASE)
         if (AppConfig::tess_wireframe)
         {
             renderer.set_debug_mode(AppConfig::tess_wireframe);
@@ -111,6 +110,7 @@ namespace bls
 
         else
             height_map->render(view, projection, dt);
+#endif
 
         // Render particles
         particle_system(ecs, dt);
