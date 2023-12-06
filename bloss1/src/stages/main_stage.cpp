@@ -5,6 +5,7 @@
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
 #include "ecs/systems.hpp"
+#include "renderer/height_map.hpp"
 #include "stages/menu_stage.hpp"
 #include "tools/profiler.hpp"
 
@@ -32,7 +33,7 @@ namespace bls
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
-        ecs->add_system(render_system_forward);  // 8
+        ecs->add_system(render_system_forward);
         ecs->add_system(sound_system);
         ecs->add_system(cleanup_system);
 
@@ -40,12 +41,9 @@ namespace bls
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/main_stage.bloss");
 
         auto &renderer = Game::get().get_renderer();
-        if (renderer.get_shadow_map() == nullptr)
-        {
-            renderer.create_shadow_map(*ecs);
-            renderer.create_height_map(2048, 2048, 4, 64, 20.0f, 1000.0f);
-            renderer.create_post_processing_passes(*ecs);
-        }
+        if (renderer.get_height_map()) renderer.get_height_map().reset();
+        if (!renderer.get_shadow_map()) renderer.create_shadow_map(*ecs);
+        if (!renderer.get_post_processing()) renderer.create_post_processing_passes(*ecs);
 
         // Load configurations from file
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");

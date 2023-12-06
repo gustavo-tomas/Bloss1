@@ -41,14 +41,17 @@ namespace bls
         renderer.set_viewport(0, 0, width, height);
 
         // Render shadow map
-        shadow_map->bind(*camera);
-        render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
-        shadow_map->unbind();
+        if (shadow_map)
+        {
+            shadow_map->bind(*camera);
+            render_scene(ecs, shadow_map->get_shadow_depth_shader(), renderer);
+            shadow_map->unbind();
 
-        // Reset the viewport
-        renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});
-        renderer.clear();
-        renderer.set_viewport(0, 0, width, height);
+            // Reset the viewport
+            renderer.clear_color({0.0f, 0.0f, 0.0f, 1.0f});
+            renderer.clear();
+            renderer.set_viewport(0, 0, width, height);
+        }
 
         pbr_shader->bind();
         pbr_shader->set_uniform4("projection", projection);
@@ -90,8 +93,8 @@ namespace bls
         }
 
         // Bind maps
-        skybox->bind(*pbr_shader, 12);           // IBL maps
-        shadow_map->bind_maps(*pbr_shader, 15);  // Shadow map
+        if (skybox) skybox->bind(*pbr_shader, 12);               // IBL maps
+        if (shadow_map) shadow_map->bind_maps(*pbr_shader, 15);  // Shadow map
 
         // Begin post processing
         post_processing->begin();
@@ -100,23 +103,24 @@ namespace bls
         render_scene(ecs, *pbr_shader, renderer);
 
         // Render height map
-#if !defined(_RELEASE)
-        if (AppConfig::tess_wireframe)
+        if (height_map)
         {
-            renderer.set_debug_mode(AppConfig::tess_wireframe);
-            height_map->render(view, projection, dt);
-            renderer.set_debug_mode(!AppConfig::tess_wireframe);
-        }
+            if (AppConfig::tess_wireframe)
+            {
+                renderer.set_debug_mode(AppConfig::tess_wireframe);
+                height_map->render(view, projection, dt);
+                renderer.set_debug_mode(!AppConfig::tess_wireframe);
+            }
 
-        else
-            height_map->render(view, projection, dt);
-#endif
+            else
+                height_map->render(view, projection, dt);
+        }
 
         // Render particles
         particle_system(ecs, dt);
 
         // Draw the skybox last
-        skybox->draw(view, projection);
+        if (skybox) skybox->draw(view, projection);
 
         // Draw UI
         render_ui();
