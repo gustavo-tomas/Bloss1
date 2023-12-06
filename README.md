@@ -6,6 +6,8 @@ C++ game engine.
 
 :)
 
+![Sponza Test Scene](screenshots/bloss1_sponza.png)
+
 > Note: the build/run commands use the [just command runner](https://github.com/casey/just)
 
 ## Build & Run
