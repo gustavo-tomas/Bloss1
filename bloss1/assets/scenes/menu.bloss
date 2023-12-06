@@ -14,12 +14,6 @@
 	state_machine: ~OphanimArmature|OphanimIdle~;
 }
 
-[floor]
-{
-	model: bloss1/assets/models/floor/floor.gltf, 0;
-	transform: (0.000000, 0.000000, 0.000000), (0.000000, 0.000000, 0.000000), (1.300000, 1.000000, 1.300000);
-}
-
 [dir_light]
 {
 	transform: (0.000000, 0.000000, 0.000000), (0.300000, -1.000000, 0.150000), (1.000000, 1.000000, 1.000000);

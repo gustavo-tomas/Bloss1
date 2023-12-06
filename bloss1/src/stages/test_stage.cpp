@@ -2,7 +2,6 @@
 
 #include "core/game.hpp"
 #include "core/input.hpp"
-#include "ecs/entities.hpp"
 #include "ecs/scene_parser.hpp"
 #include "ecs/state_machine.hpp"
 #include "ecs/systems.hpp"
