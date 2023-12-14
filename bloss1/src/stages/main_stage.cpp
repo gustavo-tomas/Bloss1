@@ -49,11 +49,11 @@ namespace bls
         SceneParser::parse_scene(*ecs, "bloss1/assets/scenes/bloss_config.bcfg");
 
         // Play ominous sound
-        auto &audio_engine = Game::get().get_audio_engine();
-        audio_engine.load("ophanim_speech", "bloss1/assets/sounds/o inominável.mp3", true);
-        audio_engine.set_echo_filter("ophanim_speech", 1.0f, 0.5f);
-        audio_engine.play("ophanim_speech", vec3(0.0f), vec3(0.0f), 0.01f);
-        audio_engine.fade_to("ophanim_speech", 0.2f, 2.0f);
+        // auto &audio_engine = Game::get().get_audio_engine();
+        // audio_engine.load("ophanim_speech", "bloss1/assets/sounds/o inominável.mp3", true);
+        // audio_engine.set_echo_filter("ophanim_speech", 1.0f, 0.5f);
+        // audio_engine.play("ophanim_speech", vec3(0.0f), vec3(0.0f), 0.01f);
+        // audio_engine.fade_to("ophanim_speech", 0.2f, 2.0f);
     }
 
     void MainStage::update(f32 dt)
