@@ -39,7 +39,6 @@ namespace bls
                 audio_engine.load("ophanim_alerted_sfx",
                                   "bloss1/assets/sounds/193602__speedenza__deep-metal-impact-airy-angellic-chorus.wav");
                 audio_engine.play("ophanim_alerted_sfx");
-                audio_engine.stop("ophanim_speech");
 
                 alerted = true;
             }
