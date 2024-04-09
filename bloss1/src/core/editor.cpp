@@ -620,7 +620,7 @@ namespace bls
                     ImGui::InputFloat3("dimensions", value_ptr(dimensions));
                 }
 
-                else if (ecs.colliders[id]->type == Collider::ColliderType::Sphere)
+                else if (particle_sys->emitter->type == Emitter::EmitterType::Sphere)
                 {
                     const auto &emitter = particle_sys->emitter;
 
