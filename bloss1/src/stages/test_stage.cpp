@@ -27,7 +27,7 @@ namespace bls
         ecs->add_system(state_machine_system);
         ecs->add_system(camera_system);
         ecs->add_system(animation_system);
-        ecs->add_system(render_system_forward);
+        ecs->add_system(render_system_deferred);
         ecs->add_system(cleanup_system);
 
         // Load entities from file

@@ -131,6 +131,7 @@ namespace bls
 
     void render_ui()
     {
+        return;
         auto &renderer = Game::get().get_renderer();
         auto &textures = renderer.get_textures();
         auto &shader = renderer.get_shaders()["ui"];

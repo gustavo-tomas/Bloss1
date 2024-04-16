@@ -51,7 +51,7 @@ namespace bls
         BLS_PROFILE_BEGIN_SESSION("MainLoop", "profile/runtime.json");
 
         // Register initial stage
-        change_stage(new MenuStage());
+        change_stage(new TestStage());
 
         // Time variation
         last_time = window->get_time();

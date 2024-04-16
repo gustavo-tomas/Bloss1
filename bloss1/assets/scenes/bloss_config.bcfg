@@ -4,9 +4,9 @@
 	bloom_pass: 2, 0, 5, 7.000000, 0.400000, 0.325000, 
 	fog_pass: 3, 0, (0.000000, 0.000000, 0.000000), (100.000000, 500.000000); 
 	sharpen_pass: 4, 0, 0.050000; 
-	posterization_pass: 5, 1, 10.000000; 
+	posterization_pass: 5, 0, 10.000000; 
 	pixelization_pass: 6, 0, 5; 
-	outline_pass: 7, 1, (0.000000, 0.000000, 0.000000), 0.800000; 
-	vignette_pass: 8, 1, 0.675000, 0.350000; 
+	outline_pass: 7, 0, (0.000000, 0.000000, 0.000000), 0.800000; 
+	vignette_pass: 8, 0, 0.675000, 0.350000; 
 	kuwahara_pass: 9, 0, 4; 
 }
